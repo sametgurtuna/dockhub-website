@@ -1,0 +1,32 @@
+---
+interface Props {
+  class?: string;
+  label?: boolean;
+}
+const { class: className = '', label = true } = Astro.props;
+---
+
+<span class:list={['wordmark', className]} role={label ? 'img' : undefined} aria-label={label ? 'DockHub' : undefined} aria-hidden={label ? undefined : 'true'}>
+  <span class="wm-dock" aria-hidden="true">Dock</span><span class="wm-hub" aria-hidden="true">Hub</span>
+</span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    white-space: nowrap;
+    color: #fff;
+  }
+  .wm-hub {
+    margin-left: 0.1em;
+    padding: 0.1em 0.2em 0.12em;
+    border-radius: 0.2em;
+    background: var(--accent);
+    color: #02101a;
+    letter-spacing: -0.03em;
+  }
+</style>

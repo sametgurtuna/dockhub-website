@@ -1,0 +1,181 @@
+---
+import Desktop from './Desktop.astro';
+import { icons } from '../lib/icons';
+import { site } from '../lib/site';
+---
+
+<section class="hero" id="top">
+  <div class="hero-stage" id="demo">
+    <Desktop>
+      <div slot="overlay" class="hero-copy">
+        <h1 class="hero-title">
+          <span class="line"><span>Görev çubuğun.</span></span>
+          <span class="line"><span>Yeniden tasarlandı.</span></span>
+        </h1>
+        <p class="hero-lead">
+          Windows görev çubuğunun yerine widget'lı, cam gibi bir dock koy. Başlat, tepsi ve açık uygulamaların yerinde kalır.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href={site.downloadUrl}>
+            <span set:html={icons.windows} />
+            Ücretsiz indir
+          </a>
+          <a class="btn btn-glass" href={site.githubUrl}>
+            <span set:html={icons.github} />
+            GitHub'da incele
+          </a>
+        </div>
+        <p class="hero-fine">Ücretsiz ve açık kaynak · Windows 10 ve 11 · Aşağıdaki dock gerçekten çalışır</p>
+      </div>
+      <div slot="between" class="demo-intro">
+        <h2 class="section-title">Hadi, kendine göre yap.</h2>
+        <p class="section-lead">
+          Masaüstündeki her şey çalışır. Widget'lara tıkla, sağ tıkla, sürükleyip sırala. Dock'u başka kenara taşı ya da tamamen kapat.
+        </p>
+      </div>
+    </Desktop>
+    <p class="fine demo-note">
+      Demo tarayıcında çalışır. Saat gerçek; hava durumu, sistem değerleri ve çalan parçalar örnektir.
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: 12px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -68px 0 auto;
+    height: 1000px;
+    background:
+      radial-gradient(60% 45% at 50% 20%, rgb(0 103 192 / 0.3), transparent 70%),
+      radial-gradient(40% 35% at 50% 80%, rgb(76 194 255 / 0.12), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .hero-stage {
+    width: min(100% - 2 * var(--gutter), 1440px);
+    margin-inline: auto;
+  }
+  .hero-stage :global(.stage) {
+    height: clamp(600px, calc(100svh - 92px), 960px);
+  }
+  .hero-copy {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    text-align: center;
+    gap: 20px;
+    height: 100%;
+    padding: clamp(44px, 8vh, 104px) 24px 0;
+    background: radial-gradient(62% 58% at 50% 26%, rgb(1 4 14 / 0.82) 0%, rgb(1 4 14 / 0.6) 45%, transparent 78%);
+  }
+  .hero-title {
+    font-size: clamp(2.75rem, 7.4vw, 6rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    display: grid;
+    text-shadow: 0 6px 40px rgb(0 8 30 / 0.55);
+  }
+  .line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .line > span {
+    display: inline-block;
+  }
+  .hero-lead {
+    max-width: 44ch;
+    font-size: clamp(1.0625rem, 1.8vw, 1.3125rem);
+    line-height: 1.45;
+    color: #eef3ff;
+    text-shadow: 0 2px 16px rgb(0 8 30 / 0.7);
+  }
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .hero-cta .btn {
+    --btn-h: 52px;
+    padding-inline: 24px;
+    font-size: 1.0625rem;
+    pointer-events: auto;
+  }
+  .hero-cta .btn :global(span) {
+    width: 18px;
+    height: 18px;
+    display: grid;
+  }
+  .hero-fine {
+    font-size: 0.875rem;
+    color: #e3ebfa;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: rgb(1 4 14 / 0.55);
+    backdrop-filter: blur(8px);
+    text-shadow: 0 1px 10px rgb(0 8 30 / 0.8);
+  }
+  .demo-intro {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 16px;
+    margin-top: clamp(64px, 9vw, 110px);
+  }
+  .demo-note {
+    text-align: center;
+    margin-top: 14px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .line > span {
+      animation: rise 900ms var(--ease-out) both;
+      animation-delay: 150ms;
+    }
+    .line:nth-child(2) > span {
+      animation-delay: 240ms;
+    }
+    .hero-lead,
+    .hero-cta,
+    .hero-fine {
+      animation: fade-up 800ms var(--ease-out) both;
+      animation-delay: 380ms;
+    }
+    .hero-cta {
+      animation-delay: 460ms;
+    }
+    .hero-fine {
+      animation-delay: 520ms;
+    }
+    .hero-stage :global(.stage-shell) {
+      animation: stage-in 900ms var(--ease-out) both;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes stage-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.985);
+    }
+  }
+</style>
