@@ -252,6 +252,9 @@ const ICON = {
   network: 'M8,4 V20 M4,16 L8,20 L12,16 M16,20 V4 M12,8 L16,4 L20,8',
   status: 'M12,4 A8,8 0 1 1 11.99,4 Z M12,8 A4,4 0 1 1 11.99,8 Z',
   weather: 'M17.5,19 H8 A5,5 0 1 1 9.6,9.3 A6,6 0 0 1 20.8,11.6 A3.8,3.8 0 0 1 17.5,19 Z',
+  audio: 'M11,4 L6,8 H3 A1,1 0 0 0 2,9 V15 A1,1 0 0 0 3,16 H6 L11,20 A1,1 0 0 0 12.5,19.2 V4.8 A1,1 0 0 0 11,4 Z M16,8 A5,5 0 0 1 16,16 M19,5 A9,9 0 0 1 19,19',
+  batteryDevices: 'M4,7 H18 A2,2 0 0 1 20,9 V15 A2,2 0 0 1 18,17 H4 A2,2 0 0 1 2,15 V9 A2,2 0 0 1 4,7 Z M20,11 H22 V13 H20 Z',
+  recycleBin: 'M3,6 H21 M8,6 V4 A2,2 0 0 1 10,2 H14 A2,2 0 0 1 16,4 V6 M19,6 V20 A2,2 0 0 1 17,22 H7 A2,2 0 0 1 5,20 V6 Z M10,11 V17 M14,11 V17',
 };
 
 const cities = [
@@ -1294,6 +1297,202 @@ export const widgets: WidgetDef[] = [
           hours.replaceChildren(
             ...w.hourly.map((x) => h('div', { class: 'wp-hour' }, h('span', { class: 'wp-muted num', text: pad((d.getHours() + x.h) % 24) }), h('span', { html: weatherIcon(x.c, 24) }), h('span', { class: 'num', text: `${x.t}°` }))),
           ),
+      };
+    },
+  },
+  /* --------------------------------------------------- Ses Aygıtı & Mikser */
+  {
+    id: 'audio',
+    name: 'Ses Aygıtı & Mikser',
+    category: 'Medya',
+    description: 'Kulaklık ve hoparlör arasında tek tıkla geçiş, fare tekerleğiyle ses ayarı ve uygulama mikseri.',
+    icon: ICON.audio,
+    accent: ACCENT.cyan,
+    variants: [
+      { id: 'compact', name: 'Kompakt' },
+      { id: 'slider', name: 'Çubuklu' },
+    ],
+    card(i) {
+      if (i.variant === 'slider') {
+        return {
+          el: card(
+            'wc-audio',
+            glyph(ICON.audio, ACCENT.cyan),
+            h('div', { class: 'wc-stack', style: 'min-width:70px' },
+              h('div', { class: 'wc-title', text: 'Kulaklık' }),
+              h('div', { class: 'hbar', style: 'background:var(--w-track);margin-top:2px' }, h('i', { style: 'width:62%;background:var(--c-cyan)' }))
+            ),
+            h('div', { class: 'num', style: 'font-size:11px;color:var(--text-2);margin-left:4px', text: '%62' })
+          ),
+        };
+      }
+      return {
+        el: card(
+          'wc-audio',
+          glyph(ICON.audio, ACCENT.cyan),
+          h('div', { class: 'wc-stack' },
+            h('div', { class: 'wc-title', text: 'Kulaklık' }),
+            h('div', { class: 'wc-sub num', style: 'color:var(--c-cyan)', text: '%62' })
+          )
+        ),
+      };
+    },
+    compact() {
+      return {
+        el: compactTile(glyph(ICON.audio, ACCENT.cyan), h('div', { class: 'wt-text num', text: '%62' })),
+      };
+    },
+    panel() {
+      const apps = [
+        { name: 'Spotify', vol: 75, icon: 'S' },
+        { name: 'Discord', vol: 90, icon: 'D' },
+        { name: 'Google Chrome', vol: 50, icon: 'C' },
+      ];
+      const rows = apps.map((a) =>
+        h(
+          'div',
+          { class: 'wp-list-row' },
+          h('div', { class: 'wp-strong', style: 'width:24px;height:24px;border-radius:12px;background:var(--surface);display:grid;place-items:center;font-size:11px', text: a.icon }),
+          h('div', { class: 'grow' },
+            h('div', { class: 'wp-strong', text: a.name }),
+            h('div', { class: 'hbar', style: 'background:var(--w-track);margin-top:4px' }, h('i', { style: `width:${a.vol}%;background:var(--c-cyan)` }))
+          ),
+          h('div', { class: 'wp-num num', text: `%${a.vol}` })
+        )
+      );
+      return {
+        el: panelShell(
+          'Ses Mikseri',
+          h('div', { class: 'wp-hero-sub', text: 'Varsayılan: Kulaklık (HyperX Cloud II Wireless)' }),
+          h('div', { class: 'wp-list' }, ...rows),
+          h('div', { class: 'wp-foot', text: 'Dock üzerinden sol tıkla mikser açılır, fare tekerleğiyle ses ayarlanır.' })
+        ),
+      };
+    },
+  },
+  /* --------------------------------------------------- Aygıt Pilleri */
+  {
+    id: 'battery-devices',
+    name: 'Aygıt Pilleri',
+    category: 'Sistem',
+    description: 'Bluetooth ve 2.4 GHz kablosuz kulaklık, fare ve klavyelerin anlık şarj seviyesi.',
+    icon: ICON.batteryDevices,
+    accent: ACCENT.green,
+    variants: [
+      { id: 'single', name: 'Tekli' },
+      { id: 'multi', name: 'Çoklu' },
+    ],
+    card(i) {
+      if (i.variant === 'multi') {
+        const devs = [
+          { p: 62 },
+          { p: 85 },
+        ];
+        const cells = devs.map((d) => {
+          const r = ring(28, 2.8, ACCENT.green, TRACK.green);
+          r.set(d.p);
+          r.inner.classList.add('num');
+          r.inner.textContent = String(d.p);
+          return h('div', { style: 'display:flex;align-items:center;gap:4px' }, r.el);
+        });
+        return {
+          el: card('wc-rings', ...cells),
+        };
+      }
+      const r = ring(32, 3.2, ACCENT.green, TRACK.green);
+      r.set(62);
+      r.inner.classList.add('num');
+      r.inner.textContent = '62';
+      return {
+        el: card(
+          'wc-battery-single',
+          r.el,
+          h('div', { class: 'wc-stack' },
+            h('div', { class: 'wc-title', text: 'Cloud II Wireless' }),
+            h('div', { class: 'wc-sub num', text: '%62' })
+          )
+        ),
+      };
+    },
+    compact() {
+      const r = ring(26, 2.6, ACCENT.green, TRACK.green);
+      r.set(62);
+      r.inner.classList.add('num');
+      r.inner.textContent = '62';
+      return {
+        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'Kulaklık' })),
+      };
+    },
+    panel() {
+      const devs = [
+        { name: 'HyperX Cloud II Wireless', p: 62, type: '2.4 GHz Kulaklık' },
+        { name: 'Logitech G PRO X Superlight', p: 85, type: 'Kablosuz Fare' },
+      ];
+      const rows = devs.map((d) => {
+        const r = ring(34, 3.4, ACCENT.green, TRACK.green);
+        r.set(d.p);
+        r.inner.classList.add('num');
+        r.inner.textContent = String(d.p);
+        return h(
+          'div',
+          { class: 'wp-list-row' },
+          r.el,
+          h('div', { class: 'grow' },
+            h('div', { class: 'wp-strong', text: d.name }),
+            h('div', { class: 'wp-muted', text: d.type })
+          ),
+          h('div', { class: 'wp-num num', text: `%${d.p}` })
+        );
+      });
+      return {
+        el: panelShell('Bağlı Aygıt Pilleri', h('div', { class: 'wp-list' }, ...rows)),
+      };
+    },
+  },
+  /* --------------------------------------------------- Çöp Kutusu */
+  {
+    id: 'recycle-bin',
+    name: 'Çöp Kutusu',
+    category: 'Sistem',
+    description: 'macOS tarzı çöp sepeti. Sürükle-bırak ile dosya silme, doluluk göstergesi ve sağ tıkla boşaltma.',
+    icon: ICON.recycleBin,
+    accent: ACCENT.blue,
+    variants: [
+      { id: 'icon', name: 'İkon' },
+      { id: 'details', name: 'Detaylı' },
+    ],
+    card(i) {
+      if (i.variant === 'details') {
+        return {
+          el: card(
+            'wc-recycle-bin',
+            glyph(ICON.recycleBin, ACCENT.blue),
+            h('div', { class: 'wc-stack' },
+              h('div', { class: 'wc-title', text: 'Çöp Kutusu' }),
+              h('div', { class: 'wc-sub num', text: '3 öğe · 142 MB' })
+            )
+          ),
+        };
+      }
+      return {
+        el: card(
+          'wc-square',
+          glyph(ICON.recycleBin, ACCENT.blue)
+        ),
+      };
+    },
+    compact() {
+      return {
+        el: compactTile(glyph(ICON.recycleBin, ACCENT.blue), h('div', { class: 'wt-text', text: 'Çöp' })),
+      };
+    },
+    panel() {
+      return {
+        el: panelShell(
+          'Çöp Kutusu',
+          h('div', { class: 'wp-hero-sub', text: '3 öğe · 142 MB' }),
+          h('div', { class: 'wp-foot', text: 'Dosyaları silmek için dock üzerindeki çöp kutusuna sürükleyip bırakabilirsiniz.' })
+        ),
       };
     },
   },
