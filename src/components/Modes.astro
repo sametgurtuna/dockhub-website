@@ -3,12 +3,12 @@ import MiniStage from './MiniStage.astro';
 import { icons } from '../lib/icons';
 ---
 
-<section class="section" id="modlar">
+<section class="section" id="modes">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 class="section-title">Windows, biraz daha senin.</h2>
+      <h2 class="section-title">Windows, customized your way.</h2>
       <p class="section-lead">
-        DockHub görev çubuğunun yerini alabilir ya da ona hiç dokunmadan üstünde ayrı bir dock olarak durabilir.
+        DockHub can seamlessly replace the default Windows taskbar, or coexist right above it as an independent floating dock.
       </p>
     </div>
 
@@ -18,17 +18,17 @@ import { icons } from '../lib/icons';
           <MiniStage
             id="bloom-mode-a"
             bloomScale={1.15}
-            label="Görev çubuğunun yerini almış DockHub"
+            label="DockHub replacing the taskbar"
             spec="start app:explorer:active app:browser:run app:terminal sep w:clock:digital w:media:compact w:status:rings tray clock"
           />
         </div>
         <div class="mode-copy">
-          <h3>Görev çubuğunun yerini al.</h3>
+          <h3>Replace the taskbar.</h3>
           <p>
-            Başlat, arama, açık uygulamalar, sistem tepsisi ve saat tek bir dock'ta. Windows tuşu, bildirim merkezi ve hızlı ayarlar her zamanki gibi Windows'un kendi panelleriyle açılır.
+            Start menu, search, running apps, system tray, and clock unified in a single fluid dock. The Windows key, Action Center, and Quick Settings continue to open Windows' native panels as expected.
           </p>
           <button class="try" type="button" data-demo-set="mode:replace">
-            Demoda dene <span set:html={icons.arrowUp} />
+            Try in demo <span set:html={icons.arrowUp} />
           </button>
         </div>
       </article>
@@ -40,19 +40,19 @@ import { icons } from '../lib/icons';
             bloomScale={1.4}
             bloomOrigin="50% 100%"
             hue={-12}
-            label="Windows görev çubuğunun üstünde duran DockHub"
+            label="DockHub sitting above the Windows taskbar"
             mode="both"
             taskbar
             spec="app:photos app:music sep w:clock:calendar w:weather:condition w:system:rings w:hydration:goal"
           />
         </div>
         <div class="mode-copy">
-          <h3>İkisi birlikte.</h3>
+          <h3>Both together.</h3>
           <p>
-            Windows görev çubuğuna dokunulmaz, tepsi de onda kalır. Dock onun hemen üstünde durur ve yalnızca widget'lara, sevdiğin uygulamalara ayrılır.
+            Leave the default Windows taskbar untouched with its own tray. DockHub hovers gracefully above it, dedicated entirely to your favorite apps and live desktop widgets.
           </p>
           <button class="try" type="button" data-demo-set="mode:both">
-            Demoda dene <span set:html={icons.arrowUp} />
+            Try in demo <span set:html={icons.arrowUp} />
           </button>
         </div>
       </article>

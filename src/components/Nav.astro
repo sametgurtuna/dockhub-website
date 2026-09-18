@@ -5,26 +5,26 @@ import { site } from '../lib/site';
 
 const links = [
   { href: '#demo', label: 'Demo' },
-  { href: '#widgetlar', label: "Widget'lar" },
-  { href: '#ozellikler', label: 'Özellikler' },
-  { href: '#guven', label: 'Güvenlik' },
-  { href: '#sss', label: 'SSS' },
+  { href: '#widgets', label: 'Widgets' },
+  { href: '#features', label: 'Features' },
+  { href: '#safety', label: 'Safety' },
+  { href: '#faq', label: 'FAQ' },
 ];
 ---
 
 <header class="nav" data-nav>
   <div class="nav-inner wrap">
-    <a class="brand" href="#top" aria-label="DockHub ana sayfa">
+    <a class="brand" href="#top" aria-label="DockHub home">
       <Wordmark label={false} />
     </a>
-    <nav class="nav-links" aria-label="Sayfa bölümleri">
+    <nav class="nav-links" aria-label="Page sections">
       {links.map((l) => <a href={l.href}>{l.label}</a>)}
     </nav>
     <div class="nav-actions">
-      <a class="nav-gh" href={site.githubUrl} aria-label="GitHub deposu" set:html={icons.github} />
+      <a class="nav-gh" href={site.githubUrl} aria-label="GitHub repository" set:html={icons.github} />
       <a class="btn btn-primary nav-dl" href={site.downloadUrl}>
         <span set:html={icons.windows} />
-        <span>İndir</span>
+        <span>Download</span>
       </a>
     </div>
   </div>

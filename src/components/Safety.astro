@@ -5,41 +5,41 @@ import { icons } from '../lib/icons';
 const scenarios = [
   {
     id: 'exit',
-    title: 'Normal kapattığında',
-    text: 'Dock menüsünden, tepsiden ya da --exit ile kapatınca görev çubuğu tepsi simgeleriyle birlikte hemen geri gelir.',
+    title: 'Normal Exit',
+    text: 'When closing via the dock menu, tray, or --exit, the Windows taskbar and system tray icons reappear immediately.',
   },
   {
     id: 'logoff',
-    title: 'Oturumu kapatırken',
-    text: 'Windows oturumu kapatmadan önce DockHub görev çubuğunu eski haline getirir. Bir sonraki girişte her şey yerinde.',
+    title: 'Signing Out',
+    text: 'Before Windows finishes logging off or shutting down, DockHub restores the taskbar. Everything is in order on your next login.',
   },
   {
     id: 'crash',
-    title: 'Beklenmedik bir hatada',
-    text: 'İşlenmeyen bir hata olursa uygulama kapanmadan önce görev çubuğunu geri verir. Masaüstün çıplak kalmaz.',
+    title: 'Unexpected Crash',
+    text: 'If an unhandled exception occurs, the crash handler restores the taskbar before terminating. You are never left without a desktop.',
   },
   {
     id: 'kill',
-    title: 'Zorla sonlandırılırsa',
-    text: 'Görev Yöneticisi ya da elektrik kesintisi gibi durumlarda görev çubuğu otomatik gizli kalır, fare alt kenara gelince açılır. Sonraki açılışta orijinal durum geri yüklenir.',
+    title: 'Forced Process Kill',
+    text: 'If terminated via Task Manager or a power cut, the taskbar remains in auto-hide mode and reveals when hovering the bottom edge. On next launch, original state is fully restored.',
   },
 ];
 
 const facts = [
-  { title: 'Yönetici izni gerekmez', text: 'Normal kullanıcı olarak çalışır. Explorer kapatılmaz, onun yanında çalışır.' },
-  { title: 'Ayarlar yarıda kalmaz', text: 'Dosyalar önce geçici olarak yazılır, sonra yerine taşınır. Bozuk dosya yedeklenip varsayılanla devam edilir.' },
-  { title: 'Yalnızca hava durumu için ağ', text: 'Tek istek Open-Meteo\'ya gider. Hesap, API anahtarı ya da takip yok.' },
+  { title: 'No administrator privileges required', text: 'Runs as a standard user process. Explorer.exe is never terminated or injected.' },
+  { title: 'Atomic configuration writes', text: 'Settings are written to a temp file and moved atomically. Corrupted files are safely backed up.' },
+  { title: 'Network access strictly for weather', text: 'The only outbound HTTP requests query Open-Meteo. No user telemetry, accounts, or tracking.' },
 ] as const;
 ---
 
-<section class="section" id="guven">
+<section class="section" id="safety">
   <div class="wrap">
     <div class="safety">
       <div class="safety-copy reveal">
-        <h2 class="section-title">Görev çubuğun hep bir adım geride bekler.</h2>
-        <p class="section-lead">DockHub ne olursa olsun Windows'u eskisi gibi bırakır. Bir durum seç, nasıl davrandığını izle.</p>
+        <h2 class="section-title">Your taskbar is always one step away.</h2>
+        <p class="section-lead">No matter what happens, DockHub ensures Windows returns to its pristine state. Pick a scenario below to watch how it recovers.</p>
 
-        <div class="scenarios" role="tablist" aria-label="Geri dönüş senaryoları" data-scenarios>
+        <div class="scenarios" role="tablist" aria-label="Recovery scenarios" data-scenarios>
           {
             scenarios.map((s, i) => (
               <button type="button" role="tab" class="scn" aria-selected={i === 0 ? 'true' : 'false'} data-scn={s.id}>
@@ -57,13 +57,13 @@ const facts = [
           id="bloom-safety"
           taskbar
           size="medium"
-          label="DockHub kapanınca Windows görev çubuğunun geri gelişi"
+          label="Windows taskbar restoring when DockHub exits"
           spec="start app:explorer:active app:browser app:terminal sep w:clock:analog w:media:compact w:weather:current tray clock"
           class="safety-stage"
         >
           <div class="scn-overlay" data-scn-overlay>
             <span class="scn-spinner" aria-hidden="true"></span>
-            <span>Oturum kapatılıyor</span>
+            <span>Signing out</span>
           </div>
           <div class="scn-toast flyout" data-scn-toast>
             <b>DockHub</b>
@@ -73,12 +73,12 @@ const facts = [
         </MiniStage>
 
         <div class="cmd">
-          <span class="cmd-label">Acil durumda tek komut</span>
+          <span class="cmd-label">Emergency one-line recovery</span>
           <div class="cmd-line">
             <code>DockHub.exe --restore-taskbar</code>
-            <button type="button" class="cmd-copy" data-copy="DockHub.exe --restore-taskbar" aria-label="Komutu kopyala">
+            <button type="button" class="cmd-copy" data-copy="DockHub.exe --restore-taskbar" aria-label="Copy command">
               <span class="cmd-ic" set:html={icons.copy} />
-              <span class="cmd-state">Kopyala</span>
+              <span class="cmd-state">Copy</span>
             </button>
           </div>
         </div>
@@ -144,12 +144,12 @@ const facts = [
       if (still) {
         stage.dataset.phase = id === 'kill' ? 'ready' : 'exited';
         if (id === 'kill') stage.classList.add('is-killed', 'tb-peek', 'tb-shown');
-        if (id !== 'logoff') note(id === 'kill' ? 'Sonraki açılışta orijinal durum geri yüklenir.' : 'Görev çubuğu ve tepsi simgeleri geri geldi.');
+        if (id !== 'logoff') note(id === 'kill' ? 'Original taskbar state will be restored on next launch.' : 'Taskbar and tray icons restored.');
         return;
       }
       if (id === 'exit') {
         later(700, () => (stage.dataset.phase = 'exited'));
-        later(1500, () => note('Kapatıldı. Görev çubuğu ve tepsi simgeleri geri geldi.'));
+        later(1500, () => note('Exited. Taskbar and tray icons restored.'));
       } else if (id === 'logoff') {
         later(500, () => {
           stage.classList.add('is-dim');
@@ -166,12 +166,12 @@ const facts = [
           stage.classList.remove('is-crashing');
           stage.dataset.phase = 'exited';
         });
-        later(2000, () => note('Beklenmeyen bir hata oldu. Görev çubuğu geri getirildi.'));
+        later(2000, () => note('An unexpected error occurred. Taskbar restored.'));
       } else {
         later(600, () => stage.classList.add('is-killed', 'tb-peek'));
         later(1800, () => cursor.classList.add('at-edge'));
         later(2700, () => stage.classList.add('tb-shown'));
-        later(3600, () => note('Sonraki açılışta session.json okunur, orijinal durum geri yüklenir.'));
+        later(3600, () => note('session.json read on next launch, original state restored.'));
       }
       if (auto) later(DURATION, () => visible && play((current + 1) % tabs.length));
     };
@@ -207,11 +207,11 @@ const facts = [
       const state = b.querySelector('.cmd-state')!;
       try {
         await navigator.clipboard.writeText(b.dataset.copy!);
-        state.textContent = 'Kopyalandı';
+        state.textContent = 'Copied';
       } catch {
-        state.textContent = 'Kopyalanamadı';
+        state.textContent = 'Failed to copy';
       }
-      setTimeout(() => (state.textContent = 'Kopyala'), 1800);
+      setTimeout(() => (state.textContent = 'Copy'), 1800);
     }),
   );
 </script>

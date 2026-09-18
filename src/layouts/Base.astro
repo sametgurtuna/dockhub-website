@@ -12,7 +12,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,7 +22,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:locale" content="en_US" />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <script is:inline>
       if (new URLSearchParams(location.search).has('static')) document.documentElement.classList.add('static');
@@ -32,7 +32,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
       <defs set:html={appDefs} />
     </svg>
-    <a class="skip" href="#icerik">İçeriğe geç</a>
+    <a class="skip" href="#content">Skip to content</a>
     <slot />
   </body>
 </html>

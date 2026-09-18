@@ -6,30 +6,30 @@ import { appIcons } from '../lib/apps';
 const cursor = `<svg viewBox="0 0 18 22"><path d="M1.5 1.5v16.2l4.2-4 2.9 6.6 3-1.3-2.9-6.5h5.8z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
 ---
 
-<section class="section" id="ozellikler">
+<section class="section" id="features">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 class="section-title">Küçük şeyler, halledildi.</h2>
-      <p class="section-lead">Bir görev çubuğundan beklediğin her şey yerinde, üstüne dock'un rahatlığı.</p>
+      <h2 class="section-title">The little details, perfected.</h2>
+      <p class="section-lead">Everything you expect from a taskbar, elevated with the comfort and fluidity of a modern dock.</p>
     </div>
 
     <div class="bento">
       <article class="card card-wide reveal" data-card>
         <div class="card-copy">
-          <h3>İstediğin kenarda.</h3>
-          <p>Alt, üst, sol ya da sağ. Dikey dock'ta widget'lar kompakt kutucuğa dönüşür, kısa değeri bir bakışta okunur.</p>
+          <h3>Any screen edge.</h3>
+          <p>Bottom, top, left, or right. On vertical edges, widgets adapt into compact pills displaying key values at a glance.</p>
           <div class="edge-opts" aria-hidden="true">
-            <span data-edge-opt="bottom" class="on">Alt</span>
-            <span data-edge-opt="left">Sol</span>
-            <span data-edge-opt="top">Üst</span>
-            <span data-edge-opt="right">Sağ</span>
+            <span data-edge-opt="bottom" class="on">Bottom</span>
+            <span data-edge-opt="left">Left</span>
+            <span data-edge-opt="top">Top</span>
+            <span data-edge-opt="right">Right</span>
           </div>
         </div>
         <div class="card-art art-tall">
           <MiniStage
             id="bloom-b-edge"
             cycle="edge"
-            label="Dock sırayla alt, sol, üst ve sağ kenara geçiyor"
+            label="Dock cycling through bottom, left, top, and right screen edges"
             spec="start app:explorer app:browser sep w:clock:analog w:weather:current w:status:rings tray clock"
           />
         </div>
@@ -37,37 +37,37 @@ const cursor = `<svg viewBox="0 0 18 22"><path d="M1.5 1.5v16.2l4.2-4 2.9 6.6 3-
 
       <article class="card reveal" data-card>
         <div class="card-art">
-          <MiniStage id="bloom-b-hide" cycle="autohide" size="large" bloomScale={1.9} bloomOrigin="50% 95%" hue={-18} label="Otomatik gizlenen dock, imleç kenara gelince geri geliyor" spec="app:explorer sep w:clock:digital w:system:numbers">
+          <MiniStage id="bloom-b-hide" cycle="autohide" size="large" bloomScale={1.9} bloomOrigin="50% 95%" hue={-18} label="Dock auto-hiding and sliding back when cursor hits screen edge" spec="app:explorer sep w:clock:digital w:system:numbers">
             <span class="mini-cursor" data-cursor set:html={cursor} />
           </MiniStage>
         </div>
         <div class="card-copy">
-          <h3>Gerektiğinde çekilir.</h3>
-          <p>Otomatik gizlemede dock kenara kayar, imleç gelince döner. Oyunda, videoda ve F11'de kendiliğinden gizlenir.</p>
+          <h3>Tucks away when not needed.</h3>
+          <p>Auto-hide glides the dock off-screen until you hover the edge. Automatically hides during full-screen games, videos, and F11 mode.</p>
         </div>
       </article>
 
       <article class="card reveal" data-card>
         <div class="card-art">
-          <MiniStage id="bloom-b-pin" cycle="pin" size="large" bloomScale={2.4} bloomOrigin="25% 30%" hue={12} label="Explorer sağ tık menüsünden DockHub'a sabitleme" spec="app:explorer app:browser app:terminal">
+          <MiniStage id="bloom-b-pin" cycle="pin" size="large" bloomScale={2.4} bloomOrigin="25% 30%" hue={12} label="Pinning to DockHub from File Explorer context menu" spec="app:explorer app:browser app:terminal">
             <div class="pin-menu" data-pin-menu>
-              <div class="pin-file"><span set:html={appIcons.calculator} />Hesap Makinesi.lnk</div>
+              <div class="pin-file"><span set:html={appIcons.calculator} />Calculator.lnk</div>
               <div class="flyout menu">
-                <div class="menu-item"><span class="mi-ic" set:html={icons.external} /><span class="mi-label">Aç</span></div>
-                <div class="menu-item pin-target"><span class="mi-ic" set:html={icons.pin} /><span class="mi-label">DockHub'a sabitle</span></div>
+                <div class="menu-item"><span class="mi-ic" set:html={icons.external} /><span class="mi-label">Open</span></div>
+                <div class="menu-item pin-target"><span class="mi-ic" set:html={icons.pin} /><span class="mi-label">Pin to DockHub</span></div>
               </div>
             </div>
           </MiniStage>
         </div>
         <div class="card-copy">
-          <h3>Explorer'dan sabitle.</h3>
-          <p>Bir .exe ya da kısayola sağ tıkla, "DockHub'a sabitle" de. Çalışan bir uygulamayı dock'a sürüklemek de yeter.</p>
+          <h3>Pin straight from Explorer.</h3>
+          <p>Right-click any .exe or shortcut and select "Pin to DockHub". Or simply drag and drop running applications directly onto the dock.</p>
         </div>
       </article>
 
       <article class="card reveal" data-card>
         <div class="card-art">
-          <MiniStage id="bloom-b-tray" layout="attached" size="large" bloomScale={2.8} bloomOrigin="85% 85%" hue={-8} label="Dock'taki sistem tepsisi ve gizli simgeler menüsü" spec="w:media:mini tray clock" class="tray-mini">
+          <MiniStage id="bloom-b-tray" layout="attached" size="large" bloomScale={2.8} bloomOrigin="85% 85%" hue={-8} label="System tray on the dock and hidden icons flyout" spec="w:media:mini tray clock" class="tray-mini">
             <div class="flyout tray-fly">
               <div class="tray-grid">
                 <span class="tg" set:html={appIcons.music} />
@@ -79,44 +79,44 @@ const cursor = `<svg viewBox="0 0 18 22"><path d="M1.5 1.5v16.2l4.2-4 2.9 6.6 3-
           </MiniStage>
         </div>
         <div class="card-copy">
-          <h3>Tepsi simgelerin yerinde.</h3>
-          <p>Uygulama simgeleri dock'ta, gizli olanlar ok menüsünde. İlk açılışta Windows'taki tercihlerin içe aktarılır.</p>
+          <h3>Your tray icons, right in place.</h3>
+          <p>Active app icons sit cleanly on the dock, overflow apps rest inside the arrow flyout. Your existing Windows tray preferences are imported seamlessly.</p>
         </div>
       </article>
 
       <article class="card reveal" data-card>
         <div class="card-art">
-          <MiniStage id="bloom-b-vert" edge="left" size="medium" panel="weather" bloomScale={1.7} bloomOrigin="0% 45%" hue={20} label="Sol kenarda dikey dock ve yanında açılmış hava durumu paneli" spec="start w:weather:current w:clock:analog w:focus w:hydration:timer" />
+          <MiniStage id="bloom-b-vert" edge="left" size="medium" panel="weather" bloomScale={1.7} bloomOrigin="0% 45%" hue={20} label="Vertical dock on the left edge with weather flyout expanded" spec="start w:weather:current w:clock:analog w:focus w:hydration:timer" />
         </div>
         <div class="card-copy">
-          <h3>Dikeyde de rahat.</h3>
-          <p>Kutucuğa tıklayınca widget'ın tamamı yanda açılır. Zamanlayıcıda ve su sayacında tıklama doğrudan işi yapar.</p>
+          <h3>Effortless in vertical orientation.</h3>
+          <p>Click any pill to open the full widget flyout sideways. For quick actions like timers and hydration counters, a click triggers them immediately.</p>
         </div>
       </article>
 
       <article class="card reveal" data-card>
         <div class="card-art">
-          <MiniStage id="bloom-b-drag" cycle="reorder" size="large" bloomScale={2.2} bloomOrigin="60% 20%" hue={-26} label="Dock üzerinde yer değiştiren widget'lar" spec="w:weather:current w:clock:digital w:hydration:timer" />
+          <MiniStage id="bloom-b-drag" cycle="reorder" size="large" bloomScale={2.2} bloomOrigin="60% 20%" hue={-26} label="Reordering widgets smoothly along the dock" spec="w:weather:current w:clock:digital w:hydration:timer" />
         </div>
         <div class="card-copy">
-          <h3>Sürükle, bırak, sırala.</h3>
-          <p>Uygulamalar, widget'lar ve ayraçlar dock üzerinde yer değiştirir. Sığmayanlar tekerlekle yumuşakça kayar.</p>
+          <h3>Drag, drop, arrange.</h3>
+          <p>Reorder apps, widgets, and separators with smooth spring physics. When items overflow, scroll effortlessly with your mouse wheel.</p>
         </div>
       </article>
 
       <article class="card card-wide card-hz reveal" data-card>
         <div class="card-copy">
-          <h3>Ekranının hızında.</h3>
-          <p>Kaydırma, gizlenme ve paneller ekranın yenileme hızında akar. 60 Hz'den yüksek ekranlarda da.</p>
+          <h3>Runs at your display's native speed.</h3>
+          <p>Scrolling, transitions, and widget panels render synchronously at your monitor's refresh rate—including 120Hz, 144Hz, and beyond.</p>
         </div>
         <div class="hz" data-hz>
           <div class="hz-read">
-            <span class="hz-label">Bu ekran</span>
+            <span class="hz-label">This display</span>
             <span class="hz-value"><b data-hz-value>60</b> Hz</span>
           </div>
           <div class="hz-tracks" aria-hidden="true">
             <div class="hz-track"><span class="hz-name">30 Hz</span><span class="hz-rail"><i data-hz-dot="30"></i></span></div>
-            <div class="hz-track is-live"><span class="hz-name">Senin ekranın</span><span class="hz-rail"><i data-hz-dot="0"></i></span></div>
+            <div class="hz-track is-live"><span class="hz-name">Your display</span><span class="hz-rail"><i data-hz-dot="0"></i></span></div>
           </div>
         </div>
       </article>

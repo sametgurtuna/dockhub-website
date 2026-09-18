@@ -112,7 +112,7 @@ export function initDemo() {
       return { el: h('div', { class: 'dock-item', 'data-key': it.key }, btn), btn };
     }
     const def = widgetById[it.inst.id];
-    const btn = h('div', { class: 'widget-btn', role: 'button', tabindex: '0', 'aria-label': `${def.name} widget'ı`, 'data-widget': def.id });
+    const btn = h('div', { class: 'widget-btn', role: 'button', tabindex: '0', 'aria-label': `${def.name} widget`, 'data-widget': def.id });
     const rec: Rec = { el: h('div', { class: 'dock-item', 'data-key': it.key }, btn), btn };
     const activate = () => {
       const compact = rec.mode === 'compact';
@@ -193,7 +193,7 @@ export function initDemo() {
 
   function pinApp(id: AppId) {
     if (items.some((i) => i.kind === 'app' && i.app === id)) {
-      toast('Zaten sabitli', `${appNames[id]} dock'ta duruyor.`);
+      toast('Already pinned', `${appNames[id]} is already on the dock.`);
       return;
     }
     const lastApp = items.map((i) => i.kind).lastIndexOf('app');
@@ -201,7 +201,7 @@ export function initDemo() {
     items.splice(lastApp + 1, 0, it);
     render(it.key);
     setTimeout(() => recs.get(it.key)?.el.classList.remove('is-new'), 700);
-    toast('DockHub\'a sabitlendi', `${appNames[id]} sabitlenmiş uygulamaların sonuna eklendi.`);
+    toast('Pinned to DockHub', `${appNames[id]} added to pinned apps.`);
   }
 
   /* ----------------------------------------------------------- fades */
@@ -582,7 +582,7 @@ export function initDemo() {
     const def = widgetById[it.inst.id];
     if (def.variants.length < 2) return null;
     return {
-      label: 'Görünüm',
+      label: 'Appearance',
       icon: 'widgets',
       sub: def.variants.map((v) => ({
         label: v.name,
@@ -604,10 +604,10 @@ export function initDemo() {
     const entries: Entry[] = [{ head: def.name }];
     const v = variantsEntry(it);
     if (v) entries.push(v);
-    entries.push({ label: "Widget ayarları…", icon: 'settings', run: () => openWidgetPanel(it, btn) });
+    entries.push({ label: 'Widget settings…', icon: 'settings', run: () => openWidgetPanel(it, btn) });
     if (def.id === 'stopwatch')
       entries.push({
-        label: 'Sıfırla',
+        label: 'Reset',
         icon: 'restore',
         run: () => {
           it.inst.state.elapsed = 0;
@@ -615,7 +615,7 @@ export function initDemo() {
           refreshAll();
         },
       });
-    entries.push('sep', { label: 'Dock\'tan kaldır', icon: 'close', danger: true, run: () => removeItem(it.key) });
+    entries.push('sep', { label: 'Remove from dock', icon: 'close', danger: true, run: () => removeItem(it.key) });
     openMenu(entries, e, btn);
   }
 
@@ -624,13 +624,13 @@ export function initDemo() {
     const btn = recs.get(it.key)?.btn;
     const entries: Entry[] = [
       { head: appNames[it.app] },
-      { label: open ? 'Pencereye geç' : 'Aç', icon: 'external', run: () => openApp(it.app) },
-      { label: 'Yönetici olarak çalıştır', icon: 'shield', run: () => { openApp(it.app); toast('Yönetici olarak çalıştırıldı', `${appNames[it.app]} yükseltilmiş izinle açıldı. DockHub'ın kendisi yönetici izni istemez.`); } },
-      { label: 'Dosya konumunu aç', icon: 'pin', run: () => openApp('explorer') },
+      { label: open ? 'Switch to window' : 'Open', icon: 'external', run: () => openApp(it.app) },
+      { label: 'Run as administrator', icon: 'shield', run: () => { openApp(it.app); toast('Run as administrator', `${appNames[it.app]} opened with elevated privileges. DockHub itself does not require admin privileges.`); } },
+      { label: 'Open file location', icon: 'pin', run: () => openApp('explorer') },
       'sep',
-      { label: 'DockHub\'dan kaldır', icon: 'close', run: () => removeItem(it.key) },
+      { label: 'Remove from DockHub', icon: 'close', run: () => removeItem(it.key) },
     ];
-    if (open) entries.push({ label: 'Tüm pencereleri kapat', icon: 'close', danger: true, run: () => closeWin(it.app) });
+    if (open) entries.push({ label: 'Close all windows', icon: 'close', danger: true, run: () => closeWin(it.app) });
     openMenu(entries, e, btn);
   }
 
@@ -642,10 +642,10 @@ export function initDemo() {
     });
     openMenu(
       [
-        { label: 'Widget ekle', icon: 'widgets', run: () => openGallery() },
-        { label: 'Uygulama sabitle', icon: 'pin', run: () => openApp('explorer') },
+        { label: 'Add widget', icon: 'widgets', run: () => openGallery() },
+        { label: 'Pin app', icon: 'pin', run: () => openApp('explorer') },
         {
-          label: 'Ayraç ekle',
+          label: 'Add separator',
           icon: 'minus',
           run: () => {
             const it: Item = { key: nextKey(), kind: 'sep' };
@@ -654,26 +654,26 @@ export function initDemo() {
           },
         },
         'sep',
-        { label: 'Otomatik gizle', icon: 'autohide', checked: state.autohide, run: () => set('autohide', !state.autohide) },
-        pick('Konum', 'monitor', 'edge', [
-          ['bottom', 'Alt'],
-          ['top', 'Üst'],
-          ['left', 'Sol'],
-          ['right', 'Sağ'],
+        { label: 'Auto-hide', icon: 'autohide', checked: state.autohide, run: () => set('autohide', !state.autohide) },
+        pick('Position', 'monitor', 'edge', [
+          ['bottom', 'Bottom'],
+          ['top', 'Top'],
+          ['left', 'Left'],
+          ['right', 'Right'],
         ]),
-        pick('Boyut', 'grip', 'size', [
-          ['small', 'Küçük (48)'],
-          ['medium', 'Orta (56)'],
-          ['large', 'Büyük (66)'],
+        pick('Size', 'grip', 'size', [
+          ['small', 'Small (48)'],
+          ['medium', 'Medium (56)'],
+          ['large', 'Large (66)'],
         ]),
-        pick('Arka plan', 'sparkle', 'backdrop', [
-          ['blur', 'Bulanık cam'],
+        pick('Backdrop', 'sparkle', 'backdrop', [
+          ['blur', 'Blurred glass'],
           ['acrylic', 'Acrylic'],
-          ['solid', 'Düz'],
+          ['solid', 'Solid'],
         ]),
         'sep',
-        { label: 'Ayarlar', icon: 'settings', run: () => openApp('dock-settings') },
-        { label: 'Çıkış', icon: 'power', danger: true, run: () => exitDock() },
+        { label: 'Settings', icon: 'settings', run: () => openApp('dock-settings') },
+        { label: 'Exit', icon: 'power', danger: true, run: () => exitDock() },
       ],
       e,
     );
@@ -690,11 +690,11 @@ export function initDemo() {
     openMenu(
       [
         { label: 'Terminal', icon: 'terminal', run: () => openApp('terminal') },
-        { label: 'Dosya Gezgini', icon: 'monitor', run: () => openApp('explorer') },
-        { label: 'Ayarlar', icon: 'settings', run: () => openApp('dock-settings') },
-        { label: 'Masaüstü', icon: 'monitor', run: () => showDesktop() },
+        { label: 'File Explorer', icon: 'monitor', run: () => openApp('explorer') },
+        { label: 'Settings', icon: 'settings', run: () => openApp('dock-settings') },
+        { label: 'Desktop', icon: 'monitor', run: () => showDesktop() },
         'sep',
-        { label: 'Kapat veya oturumu kapat', icon: 'power', sub: [{ label: 'Oturumu kapat', run: () => toast('Oturum kapatılıyor', 'DockHub, oturum kapanmadan önce Windows görev çubuğunu geri getirir.') }] },
+        { label: 'Shut down or sign out', icon: 'power', sub: [{ label: 'Sign out', run: () => toast('Signing out', 'DockHub restores the Windows taskbar before signing out.') }] },
       ],
       e,
     );
@@ -722,7 +722,7 @@ export function initDemo() {
       ['dock-settings', 'DockHub', dockLogo('dl-start')],
       ['settings', appNames.settings, appIcons.settings],
       ['pc', appNames.pc, appIcons.pc],
-      ['bin', 'Geri Dönüşüm', appIcons.bin],
+      ['bin', 'Recycle Bin', appIcons.bin],
     ];
     const grid = h(
       'div',
@@ -731,10 +731,10 @@ export function initDemo() {
         h('button', { class: 'start-app', type: 'button', onclick: () => { closeFlyout(); openApp(id); } }, h('span', { html: ic }), h('span', { text: name })),
       ),
     );
-    const input = h('input', { type: 'search', placeholder: 'Uygulama, ayar ve belge arayın', 'aria-label': 'Ara' }) as HTMLInputElement;
+    const input = h('input', { type: 'search', placeholder: 'Search apps, settings and documents', 'aria-label': 'Search' }) as HTMLInputElement;
     input.addEventListener('input', () => {
-      const q = input.value.toLocaleLowerCase('tr-TR');
-      grid.querySelectorAll<HTMLElement>('.start-app').forEach((b) => (b.hidden = !!q && !b.textContent!.toLocaleLowerCase('tr-TR').includes(q)));
+      const q = input.value.toLowerCase();
+      grid.querySelectorAll<HTMLElement>('.start-app').forEach((b) => (b.hidden = !!q && !b.textContent!.toLowerCase().includes(q)));
     });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') grid.querySelector<HTMLElement>('.start-app:not([hidden])')?.click();
@@ -748,23 +748,23 @@ export function initDemo() {
         'div',
         { class: 'start-body' },
         h('label', { class: 'start-search' }, h('span', { html: icons.search }), input),
-        h('div', { class: 'start-head' }, 'Sabitlenmiş', h('span', { text: 'Tüm uygulamalar' })),
+        h('div', { class: 'start-head' }, 'Pinned', h('span', { text: 'All apps' })),
         grid,
-        h('div', { class: 'start-head' }, 'Önerilen'),
+        h('div', { class: 'start-head' }, 'Recommended'),
         h(
           'div',
           { class: 'start-rec' },
-          rec(dockLogo('dl-rec'), 'DockHub', 'Yeni eklendi', () => openApp('dock-settings')),
+          rec(dockLogo('dl-rec'), 'DockHub', 'Recently added', () => openApp('dock-settings')),
           rec(appIcons.notepad, 'config.json', '%AppData%\\DockHub', () => openApp('notepad')),
-          rec(appIcons.terminal, 'Görev çubuğunu geri getir', 'DockHub.exe --restore-taskbar', () => openApp('terminal')),
-          rec(appIcons.photos, 'Masaüstü düzeni.png', 'Resimler', () => openApp('photos')),
+          rec(appIcons.terminal, 'Restore taskbar', 'DockHub.exe --restore-taskbar', () => openApp('terminal')),
+          rec(appIcons.photos, 'Desktop Layout.png', 'Pictures', () => openApp('photos')),
         ),
       ),
       h(
         'div',
         { class: 'start-foot' },
-        h('span', { class: 'start-user' }, h('span', { class: 'avatar', html: icons.user }), 'Kullanıcı'),
-        h('button', { class: 'start-power', type: 'button', 'aria-label': 'Güç', html: icons.power, onclick: () => { closeFlyout(); exitDock(); } }),
+        h('span', { class: 'start-user' }, h('span', { class: 'avatar', html: icons.user }), 'User'),
+        h('button', { class: 'start-power', type: 'button', 'aria-label': 'Power', html: icons.power, onclick: () => { closeFlyout(); exitDock(); } }),
       ),
     );
     openFlyout(content, { kind: 'start', anchor, cls: 'start-fly', focus: focusSearch ? 'input' : undefined });
@@ -777,9 +777,9 @@ export function initDemo() {
 
   $('[data-tray-more]').addEventListener('click', (e) => {
     const trayApps: [AppId, string][] = [
-      ['music', 'Medya Oynatıcı: çalıyor'],
-      ['photos', 'Fotoğraflar: eşitleniyor'],
-      ['calculator', 'Hesap Makinesi'],
+      ['music', 'Media Player: playing'],
+      ['photos', 'Photos: syncing'],
+      ['calculator', 'Calculator'],
     ];
     const grid = h(
       'div',
@@ -805,10 +805,10 @@ export function initDemo() {
     const content = h(
       'div',
       { class: 'quick' },
-      h('div', { class: 'quick-tiles' }, tile('wifi', 'Wi-Fi', true), tile('moon', 'Odak', false), tile('battery', 'Enerji tasarrufu', false), tile('sun', 'Gece ışığı', false), tile('shield', 'Güvenlik', true), tile('monitor', 'Yansıt', false)),
-      h('label', { class: 'quick-slider' }, h('span', { html: icons.sun }), h('input', { type: 'range', min: '0', max: '100', value: '70', 'aria-label': 'Parlaklık' })),
-      h('label', { class: 'quick-slider' }, h('span', { html: icons.volume }), h('input', { type: 'range', min: '0', max: '100', value: '45', 'aria-label': 'Ses' })),
-      h('div', { class: 'quick-foot' }, h('span', {}, h('span', { html: icons.battery }), batt), h('button', { class: 'gallery-close', type: 'button', 'aria-label': 'Ayarlar', html: icons.settings, onclick: () => { closeFlyout(); openApp('dock-settings'); } })),
+      h('div', { class: 'quick-tiles' }, tile('wifi', 'Wi-Fi', true), tile('moon', 'Focus', false), tile('battery', 'Battery saver', false), tile('sun', 'Night light', false), tile('shield', 'Security', true), tile('monitor', 'Cast', false)),
+      h('label', { class: 'quick-slider' }, h('span', { html: icons.sun }), h('input', { type: 'range', min: '0', max: '100', value: '70', 'aria-label': 'Brightness' })),
+      h('label', { class: 'quick-slider' }, h('span', { html: icons.volume }), h('input', { type: 'range', min: '0', max: '100', value: '45', 'aria-label': 'Volume' })),
+      h('div', { class: 'quick-foot' }, h('span', {}, h('span', { html: icons.battery }), batt), h('button', { class: 'gallery-close', type: 'button', 'aria-label': 'Settings', html: icons.settings, onclick: () => { closeFlyout(); openApp('dock-settings'); } })),
     );
     openFlyout(content, { kind: 'quick', anchor: e.currentTarget as HTMLElement, views: [view] });
   });
@@ -819,7 +819,7 @@ export function initDemo() {
     const content = h(
       'div',
       { class: 'notif' },
-      h('div', { class: 'notif-top' }, h('div', { class: 'start-head' }, 'Bildirimler', h('span', { text: 'Rahatsız etme' })), h('div', { class: 'wp-muted', text: 'Yeni bildirim yok' })),
+      h('div', { class: 'notif-top' }, h('div', { class: 'start-head' }, 'Notifications', h('span', { text: 'Do not disturb' })), h('div', { class: 'wp-muted', text: 'No new notifications' })),
       cal.el,
     );
     openFlyout(content, { kind: 'clock', anchor: clockBtn, views: [cal] });
@@ -829,10 +829,10 @@ export function initDemo() {
     e.stopPropagation();
     openMenu(
       [
-        { label: 'Hızlı ayarlar', icon: 'settings', run: () => $<HTMLElement>('[data-quick]').click() },
-        { label: 'Tarih ve saati ayarla', icon: 'monitor', run: () => openApp('dock-settings') },
+        { label: 'Quick settings', icon: 'settings', run: () => $<HTMLElement>('[data-quick]').click() },
+        { label: 'Adjust date and time', icon: 'monitor', run: () => openApp('dock-settings') },
         'sep',
-        { label: 'Bildirim merkezi', icon: 'bell', run: () => clockBtn.click() },
+        { label: 'Notification center', icon: 'bell', run: () => clockBtn.click() },
       ],
       e,
     );
@@ -843,7 +843,7 @@ export function initDemo() {
   const tbClock = stage.querySelector('[data-clock-tb]');
   const tickClock = (d: Date) => {
     const t = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    const ds = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+    const ds = `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
     clockTime.textContent = t;
     clockDate.textContent = ds;
     if (tbClock) tbClock.innerHTML = `<span>${t}</span><span>${ds}</span>`;
@@ -856,18 +856,18 @@ export function initDemo() {
   /* ---------------------------------------------------------- gallery */
 
   function openGallery(anchor: HTMLElement | null = null) {
-    const cats: (Category | 'Tümü')[] = ['Tümü', 'Saatler', 'Hatırlatıcılar', 'Notlar', 'Medya', 'Sistem', 'Hava durumu'];
-    let cat: string = 'Tümü';
+    const cats: (Category | 'All')[] = ['All', 'Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'];
+    let cat: string = 'All';
     const list = h('div', { class: 'gallery-list' });
     const tabs = h('div', { class: 'gallery-tabs', role: 'tablist' });
     const draw = () => {
       tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.cat === cat)));
       list.replaceChildren(
         ...widgets
-          .filter((d) => cat === 'Tümü' || d.category === cat)
+          .filter((d) => cat === 'All' || d.category === cat)
           .map((d) => {
-            const sel = d.variants.length > 1 ? (h('select', { 'aria-label': `${d.name} görünümü` }, ...d.variants.map((v) => h('option', { value: v.id, text: v.name }))) as HTMLSelectElement) : null;
-            const add = h('button', { class: 'add-btn', type: 'button', 'aria-label': `${d.name} ekle`, html: icons.plus });
+            const sel = d.variants.length > 1 ? (h('select', { 'aria-label': `${d.name} view` }, ...d.variants.map((v) => h('option', { value: v.id, text: v.name }))) as HTMLSelectElement) : null;
+            const add = h('button', { class: 'add-btn', type: 'button', 'aria-label': `Add ${d.name}`, html: icons.plus });
             add.addEventListener('click', () => {
               addWidget(d.id, sel?.value);
               add.innerHTML = icons.check;
@@ -905,7 +905,7 @@ export function initDemo() {
     const content = h(
       'div',
       { class: 'gallery' },
-      h('div', { class: 'gallery-head' }, 'Widget galerisi', h('button', { class: 'gallery-close', type: 'button', 'aria-label': 'Kapat', html: icons.close, onclick: () => closeFlyout() })),
+      h('div', { class: 'gallery-head' }, 'Widget Gallery', h('button', { class: 'gallery-close', type: 'button', 'aria-label': 'Close', html: icons.close, onclick: () => closeFlyout() })),
       tabs,
       list,
     );
@@ -1061,7 +1061,7 @@ export function initDemo() {
     const off = (cascade++ % 5) * 26;
     const left = area.x + Math.max(0, (area.w - ww) / 2 - 60 + off);
     const top = area.y + Math.max(0, Math.min((area.h - wh) / 2 - 20 + off, area.h - wh));
-    const title = key === 'dock-settings' ? 'DockHub Ayarları' : appNames[key as AppId];
+    const title = key === 'dock-settings' ? 'DockHub Settings' : appNames[key as AppId];
     const icon = key === 'dock-settings' ? dockLogo(`dl-w${cascade}`) : appIcons[key as AppId];
     const content = winContent(key);
     const bodyEl = h('div', { class: 'win-body' }, content.el);
@@ -1073,9 +1073,9 @@ export function initDemo() {
       h(
         'div',
         { class: 'win-ctrls' },
-        ctrl(icons.minus, 'Simge durumuna küçült', '', () => minimizeWin(wv)),
-        ctrl('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>', 'Ekranı kapla', '', () => maximize()),
-        ctrl(icons.close, 'Kapat', 'close', () => closeWin(key)),
+        ctrl(icons.minus, 'Minimize', '', () => minimizeWin(wv)),
+        ctrl('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>', 'Maximize', '', () => maximize()),
+        ctrl(icons.close, 'Close', 'close', () => closeWin(key)),
       ),
     );
     const el = h('div', { class: 'win', role: 'dialog', 'aria-label': title, style: `left:${left}px;top:${top}px;width:${ww}px;height:${wh}px` }, barEl, bodyEl);
@@ -1131,21 +1131,21 @@ export function initDemo() {
       case 'pc':
         return explorerContent();
       case 'bin':
-        return { el: h('div', { class: 'br-page' }, h('span', { class: 'logo', html: appIcons.bin }), h('p', { text: 'Geri Dönüşüm Kutusu boş.' })), views: [] };
+        return { el: h('div', { class: 'br-page' }, h('span', { class: 'logo', html: appIcons.bin }), h('p', { text: 'Recycle Bin is empty.' })), views: [] };
       case 'browser':
         return {
           el: h(
             'div',
             { class: 'br' },
-            h('div', { class: 'br-bar' }, h('div', { class: 'br-url' }, h('span', { html: icons.search }), 'Arayın ya da bir adres yazın')),
-            h('div', { class: 'br-page' }, h('span', { class: 'logo', html: dockLogo('dl-br') }), h('h4', { text: 'Yeni sekme' }), h('p', { text: 'Bu pencere demo içinde. Başlıktan tutup sürükleyebilir, dock\'taki simgeye tıklayarak küçültebilirsin.' })),
+            h('div', { class: 'br-bar' }, h('div', { class: 'br-url' }, h('span', { html: icons.search }), 'Search or enter web address')),
+            h('div', { class: 'br-page' }, h('span', { class: 'logo', html: dockLogo('dl-br') }), h('h4', { text: 'New Tab' }), h('p', { text: 'This window is part of the interactive demo. Drag from the title bar to move, or click the dock icon to minimize.' })),
           ),
           views: [],
         };
       case 'terminal':
         return terminalContent();
       case 'notepad': {
-        const ta = h('textarea', { class: 'np', spellcheck: 'false', 'aria-label': 'Not Defteri' }) as HTMLTextAreaElement;
+        const ta = h('textarea', { class: 'np', spellcheck: 'false', 'aria-label': 'Notepad' }) as HTMLTextAreaElement;
         ta.value = `{\n  "version": 2,\n  "taskbarMode": "Replace",\n  "edge": "${cap(state.edge)}",\n  "theme": "${cap(state.theme)}",\n  "backdrop": "${cap(state.backdrop)}",\n  "size": "${cap(state.size)}",\n  "layout": "${cap(state.layout)}",\n  "autoHide": ${state.autohide},\n  "items": [ … ]\n}\n\n%AppData%\\DockHub\\config.json`;
         return { el: ta, views: [] };
       }
@@ -1167,13 +1167,13 @@ export function initDemo() {
 
   function explorerContent() {
     const files: { name: string; ic: string; pin?: AppId; lnk?: boolean }[] = [
-      { name: 'Belgeler', ic: appIcons.explorer },
-      { name: 'İndirilenler', ic: appIcons.explorer },
-      { name: 'Resimler', ic: appIcons.explorer },
-      { name: 'Müzik', ic: appIcons.explorer },
-      { name: 'Hesap Makinesi', ic: appIcons.calculator, pin: 'calculator', lnk: true },
-      { name: 'Fotoğraflar', ic: appIcons.photos, pin: 'photos', lnk: true },
-      { name: 'Medya Oynatıcı', ic: appIcons.music, pin: 'music', lnk: true },
+      { name: 'Documents', ic: appIcons.explorer },
+      { name: 'Downloads', ic: appIcons.explorer },
+      { name: 'Pictures', ic: appIcons.explorer },
+      { name: 'Music', ic: appIcons.explorer },
+      { name: 'Calculator', ic: appIcons.calculator, pin: 'calculator', lnk: true },
+      { name: 'Photos', ic: appIcons.photos, pin: 'photos', lnk: true },
+      { name: 'Media Player', ic: appIcons.music, pin: 'music', lnk: true },
       { name: 'DockHub.exe', ic: dockLogo('dl-ex') },
     ];
     const grid = h('div', { class: 'ex-grid' });
@@ -1182,9 +1182,9 @@ export function initDemo() {
       const menu = (e: MouseEvent | null) => {
         grid.querySelectorAll('.is-selected').forEach((x) => x.classList.remove('is-selected'));
         b.classList.add('is-selected');
-        const entries: Entry[] = [{ head: f.name }, { label: 'Aç', icon: 'external', run: () => (f.pin ? openApp(f.pin) : f.name === 'DockHub.exe' ? startDock() : undefined) }];
-        if (f.pin) entries.push({ label: 'DockHub\'a sabitle', icon: 'pin', run: () => pinApp(f.pin!) });
-        entries.push('sep', { label: 'Özellikler', icon: 'settings' });
+        const entries: Entry[] = [{ head: f.name }, { label: 'Open', icon: 'external', run: () => (f.pin ? openApp(f.pin) : f.name === 'DockHub.exe' ? startDock() : undefined) }];
+        if (f.pin) entries.push({ label: 'Pin to DockHub', icon: 'pin', run: () => pinApp(f.pin!) });
+        entries.push('sep', { label: 'Properties', icon: 'settings' });
         openMenu(entries, e, b);
       };
       b.addEventListener('contextmenu', (e) => {
@@ -1207,7 +1207,7 @@ export function initDemo() {
     const side = h(
       'div',
       { class: 'ex-side' },
-      ...['Giriş', 'Masaüstü', 'Belgeler', 'İndirilenler', 'Bu bilgisayar'].map((n, i) => h('button', { type: 'button', class: i === 0 ? 'on' : '' }, h('span', { html: i === 4 ? appIcons.pc : appIcons.explorer }), n)),
+      ...['Home', 'Desktop', 'Documents', 'Downloads', 'This PC'].map((n, i) => h('button', { type: 'button', class: i === 0 ? 'on' : '' }, h('span', { html: i === 4 ? appIcons.pc : appIcons.explorer }), n)),
     );
     return {
       el: h(
@@ -1217,8 +1217,8 @@ export function initDemo() {
         h(
           'div',
           { class: 'ex-main' },
-          h('div', { class: 'ex-crumb', text: 'Giriş  ›  Hızlı erişim' }),
-          h('div', { class: 'ex-tip' }, h('span', { html: icons.pin }), h('span', { text: 'Bir kısayola sağ tıklayıp (dokunmatikte basılı tutup) "DockHub\'a sabitle" komutunu dene.' })),
+          h('div', { class: 'ex-crumb', text: 'Home  ›  Quick access' }),
+          h('div', { class: 'ex-tip' }, h('span', { html: icons.pin }), h('span', { text: 'Right-click (or tap and hold on touch) a shortcut and choose "Pin to DockHub".' })),
           grid,
         ),
       ),
@@ -1228,12 +1228,12 @@ export function initDemo() {
 
   function terminalContent() {
     const out = h('div');
-    const input = h('input', { type: 'text', 'aria-label': 'Komut', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-    const prompt = 'PS C:\\Users\\sen> ';
+    const input = h('input', { type: 'text', 'aria-label': 'Command', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
+    const prompt = 'PS C:\\Users\\you> ';
     const term = h('div', { class: 'term' }, out, h('div', { class: 'term-line' }, h('span', { text: prompt }), input));
     const print = (text: string, cls = '') => out.append(h('p', { class: cls, text }));
     print('Windows PowerShell', 't-dim');
-    print('Denemek için: DockHub.exe --exit, DockHub.exe, --restore-taskbar, --pin calc, yardım', 't-dim');
+    print('Try: DockHub.exe --exit, DockHub.exe, --restore-taskbar, --pin calc, help', 't-dim');
     print('');
     const history: string[] = [];
     let hi = 0;
@@ -1255,40 +1255,40 @@ export function initDemo() {
       if (!raw) return;
       history.push(raw);
       hi = history.length;
-      const cmd = raw.toLocaleLowerCase('tr-TR').replace(/^\.\\/, '').replace(/(dockhub|customdock)(\.exe)?/, 'dockhub');
+      const cmd = raw.toLowerCase().replace(/^\.\\/, '').replace(/(dockhub|customdock)(\.exe)?/, 'dockhub');
       if (cmd === 'cls' || cmd === 'clear') out.replaceChildren();
       else if (cmd === 'yardım' || cmd === 'yardim' || cmd === 'help') {
-        print('DockHub.exe                        Başlatır ya da ayarları öne getirir');
-        print('DockHub.exe --exit                 Düzgünce kapatır, görev çubuğu geri gelir');
-        print('DockHub.exe --restore-taskbar      Acil durumda görev çubuğunu geri getirir');
-        print('DockHub.exe --pin "<dosya>"        Uygulamayı dock\'a sabitler (calc, photos, music)');
+        print('DockHub.exe                        Launch or bring settings to foreground');
+        print('DockHub.exe --exit                 Gracefully exit, taskbar restored');
+        print('DockHub.exe --restore-taskbar      Emergency taskbar restoration');
+        print('DockHub.exe --pin "<file>"         Pin an app to the dock (calc, photos, music)');
       } else if (cmd === 'dockhub') {
         if (stage!.dataset.phase === 'exited') {
           startDock();
-          print('DockHub başlatıldı. Görev çubuğu gizlendi.', 't-ok');
+          print('DockHub launched. Taskbar hidden.', 't-ok');
         } else {
           openApp('dock-settings');
-          print('Zaten çalışıyor, ayarlar penceresi öne getirildi.', 't-ok');
+          print('Already running, brought settings window to front.', 't-ok');
         }
       } else if (cmd === 'dockhub --exit') {
-        if (stage!.dataset.phase === 'exited') print('DockHub zaten kapalı.', 't-dim');
+        if (stage!.dataset.phase === 'exited') print('DockHub is already closed.', 't-dim');
         else {
           exitDock();
-          print('DockHub kapatıldı. Windows görev çubuğu geri geldi.', 't-ok');
+          print('DockHub closed. Windows taskbar restored.', 't-ok');
         }
       } else if (cmd === 'dockhub --restore-taskbar') {
         if (stage!.dataset.phase !== 'exited') exitDock(true);
-        print('session.json okundu, görev çubuğunun orijinal durumu geri yüklendi.', 't-ok');
-        print('TaskbarCreated yayını gönderildi, tepsi simgeleri yeniden kaydoldu.', 't-ok');
+        print('session.json read, original taskbar state restored.', 't-ok');
+        print('TaskbarCreated broadcast sent, tray icons re-registered.', 't-ok');
       } else if (cmd.startsWith('dockhub --pin')) {
         const arg = cmd.slice('dockhub --pin'.length).replace(/"/g, '').trim();
         const target: AppId | null = /calc|hesap/.test(arg) ? 'calculator' : /photo|foto/.test(arg) ? 'photos' : /music|müzik|media|medya/.test(arg) ? 'music' : /note|not/.test(arg) ? 'notepad' : /term/.test(arg) ? 'terminal' : null;
-        if (!target) print(`"${arg || '?'}" bulunamadı. Örnek: DockHub.exe --pin calc`, 't-err');
+        if (!target) print(`"${arg || '?'}" not found. Example: DockHub.exe --pin calc`, 't-err');
         else {
           pinApp(target);
-          print(`${appNames[target]} dock'a sabitlendi.`, 't-ok');
+          print(`${appNames[target]} pinned to dock.`, 't-ok');
         }
-      } else print(`'${raw}' tanınmadı. Komutlar için "yardım" yaz.`, 't-err');
+      } else print(`'${raw}' is not recognized. Type "help" for commands.`, 't-err');
       term.scrollTop = term.scrollHeight;
     });
     return { el: term, views: [], after: () => setTimeout(() => input.focus({ preventScroll: true }), 50) };
@@ -1323,7 +1323,7 @@ export function initDemo() {
         if (op !== null && acc !== null) {
           const r = calc(acc, parseFloat(cur), op);
           hist.textContent = `${String(acc).replace('.', ',')} ${op} ${cur.replace('.', ',')} =`;
-          cur = Number.isFinite(r) ? String(+r.toFixed(10)) : 'Sıfıra bölünemez';
+          cur = Number.isFinite(r) ? String(+r.toFixed(10)) : 'Cannot divide by zero';
           acc = null;
           op = null;
           fresh = true;
@@ -1354,8 +1354,8 @@ export function initDemo() {
   }
 
   function settingsContent() {
-    const pages = ['Genel', 'Görünüm', 'Görev çubuğu', 'Widget galerisi'];
-    let page = 'Görünüm';
+    const pages = ['General', 'Appearance', 'Taskbar', 'Widget Gallery'];
+    let page = 'Appearance';
     const main = h('div', { class: 'set-main' });
     const side = h('div', { class: 'set-side' });
     const select = (key: keyof typeof state, opts: [string, string][]) => {
@@ -1373,38 +1373,38 @@ export function initDemo() {
     const draw = () => {
       const focused = main.contains(document.activeElement) ? (document.activeElement as HTMLElement).getAttribute('aria-label') : null;
       side.replaceChildren(
-        h('div', { class: 'set-app' }, h('span', { html: dockLogo('dl-set') }), h('div', {}, h('b', { text: 'DockHub' }), h('small', { text: 'Ayarlar' }))),
+        h('div', { class: 'set-app' }, h('span', { html: dockLogo('dl-set') }), h('div', {}, h('b', { text: 'DockHub' }), h('small', { text: 'Settings' }))),
         ...pages.map((p) =>
           h('button', { type: 'button', class: p === page ? 'on' : '', onclick: () => { page = p; draw(); } }, h('span', { html: icons[(['settings', 'sparkle', 'monitor', 'widgets'] as const)[pages.indexOf(p)]] }), p),
         ),
       );
       const rows: HTMLElement[] = [];
-      if (page === 'Genel') {
+      if (page === 'General') {
         rows.push(
-          row('Görev çubuğunun yerini al', 'Değiştirince uygulama kendini yeniden başlatır', select('mode', [['replace', 'DockHub'], ['both', 'İkisi birlikte']])),
-          row('Windows ile başlat', 'Oturum açınca dock hazır olsun', h('button', { class: 'switch', role: 'switch', type: 'button', 'aria-checked': 'true', onclick: (e: Event) => { const b = e.currentTarget as HTMLElement; b.setAttribute('aria-checked', String(b.getAttribute('aria-checked') !== 'true')); } })),
-          row('Windows görev çubuğunu geri getir', 'Acil durum: her koşulda çalışır', h('button', { class: 'wp-btn', type: 'button', text: 'Geri getir', onclick: () => exitDock(true) })),
+          row('Replace taskbar', 'Application restarts itself when toggled', select('mode', [['replace', 'DockHub only'], ['both', 'Both together']])),
+          row('Start with Windows', 'Dock is ready upon logging in', h('button', { class: 'switch', role: 'switch', type: 'button', 'aria-checked': 'true', onclick: (e: Event) => { const b = e.currentTarget as HTMLElement; b.setAttribute('aria-checked', String(b.getAttribute('aria-checked') !== 'true')); } })),
+          row('Restore Windows taskbar', 'Emergency fallback: always works', h('button', { class: 'wp-btn', type: 'button', text: 'Restore', onclick: () => exitDock(true) })),
         );
-      } else if (page === 'Görünüm') {
+      } else if (page === 'Appearance') {
         rows.push(
           h('div', { class: 'set-group', text: 'Dock' }),
-          row('Konum', 'Dock\'un duracağı ekran kenarı', select('edge', [['bottom', 'Alt'], ['top', 'Üst'], ['left', 'Sol'], ['right', 'Sağ']])),
-          row('Biçim', 'Yüzen ya da klasik yapışık', select('layout', [['floating', 'Yüzen'], ['attached', 'Yapışık']])),
-          row('Boyut', 'Küçük, Windows görev çubuğuyla aynı kalınlıktadır', select('size', [['small', 'Küçük (48)'], ['medium', 'Orta (56)'], ['large', 'Büyük (66)']])),
-          h('div', { class: 'set-group', text: 'Görünüm' }),
-          row('Tema', 'Koyu, açık ya da sisteme uyan', select('theme', [['dark', 'Koyu'], ['light', 'Açık']])),
-          row('Arka plan', 'Bulanık cam, Acrylic ya da düz', select('backdrop', [['blur', 'Bulanık cam'], ['acrylic', 'Acrylic'], ['solid', 'Düz']])),
+          row('Position', 'Screen edge where the dock sits', select('edge', [['bottom', 'Bottom'], ['top', 'Top'], ['left', 'Left'], ['right', 'Right']])),
+          row('Layout', 'Floating island or edge attached', select('layout', [['floating', 'Floating'], ['attached', 'Attached']])),
+          row('Size', 'Small matches default Windows taskbar height', select('size', [['small', 'Small (48)'], ['medium', 'Medium (56)'], ['large', 'Large (66)']])),
+          h('div', { class: 'set-group', text: 'Appearance' }),
+          row('Theme', 'Dark, light, or follow system', select('theme', [['dark', 'Dark'], ['light', 'Light']])),
+          row('Backdrop', 'Blurred glass, Acrylic, or solid', select('backdrop', [['blur', 'Blurred glass'], ['acrylic', 'Acrylic'], ['solid', 'Solid']])),
         );
-      } else if (page === 'Görev çubuğu') {
+      } else if (page === 'Taskbar') {
         rows.push(
-          row('Otomatik gizle', 'Dock kenara kayar, imleç gelince döner', toggle('autohide')),
-          row('Tam ekranda gizle', 'Oyun, video ve F11 modunda', toggle('fullscreenHide')),
-          row('Başlat düğmesi', 'Windows Başlat menüsünü açar', h('button', { class: 'switch', role: 'switch', type: 'button', 'aria-checked': 'true', disabled: true })),
+          row('Auto-hide', 'Slides off screen, slides back on hover', toggle('autohide')),
+          row('Hide in fullscreen', 'During games, videos, and F11 mode', toggle('fullscreenHide')),
+          row('Start button', 'Opens the Windows Start menu', h('button', { class: 'switch', role: 'switch', type: 'button', 'aria-checked': 'true', disabled: true })),
         );
       } else {
         rows.push(
           ...widgets.map((d) =>
-            row(d.name, d.variants.map((v) => v.name).join(', '), h('button', { class: 'add-btn', type: 'button', 'aria-label': `${d.name} ekle`, html: icons.plus, onclick: () => addWidget(d.id) })),
+            row(d.name, d.variants.map((v) => v.name).join(', '), h('button', { class: 'add-btn', type: 'button', 'aria-label': `Add ${d.name}`, html: icons.plus, onclick: () => addWidget(d.id) })),
           ),
         );
       }
@@ -1426,7 +1426,7 @@ export function initDemo() {
     const el = h(
       'div',
       { class: 'toast', role: 'status' },
-      h('div', { class: 'toast-app' }, h('span', { html: dockLogo(`dl-t${Date.now()}`) }), 'DockHub', h('button', { class: 'toast-close', type: 'button', 'aria-label': 'Kapat', html: icons.close, onclick: close })),
+      h('div', { class: 'toast-app' }, h('span', { html: dockLogo(`dl-t${Date.now()}`) }), 'DockHub', h('button', { class: 'toast-close', type: 'button', 'aria-label': 'Close', html: icons.close, onclick: close })),
       h('b', { text: title }),
       h('p', { text: body }),
       opts.actions
@@ -1461,8 +1461,8 @@ export function initDemo() {
     closeFlyout();
     stage!.dataset.phase = 'exited';
     stage!.classList.remove('is-hidden');
-    toast(restore ? 'Görev çubuğu geri getirildi' : 'DockHub kapatıldı', 'Windows görev çubuğu ve tepsi simgeleri geri geldi. Hiçbir şey kaybolmadı.', {
-      actions: [{ label: 'DockHub\'ı yeniden başlat', accent: true, run: startDock }],
+    toast(restore ? 'Taskbar restored' : 'DockHub closed', 'Windows taskbar and tray icons are restored. Nothing was lost.', {
+      actions: [{ label: 'Restart DockHub', accent: true, run: startDock }],
       timeout: 0,
     });
   }
@@ -1480,7 +1480,7 @@ export function initDemo() {
       enter();
       requestAnimationFrame(updateFades);
     }, 1000);
-    setTimeout(() => toast('DockHub çalışıyor', 'Görev çubuğunun yerini aldı. Kapattığında Windows görev çubuğu kendiliğinden geri gelir.'), 2400);
+    setTimeout(() => toast('DockHub is running', 'Replaced the taskbar. When you close it, the Windows taskbar returns automatically.'), 2400);
   }
 
   /* ---------------------------------------------------------- autohide */
@@ -1573,8 +1573,8 @@ export function initDemo() {
     } else apply();
     if (key === 'mode') {
       toast(
-        value === 'both' ? 'İkisi birlikte' : 'DockHub görev çubuğunun yerini aldı',
-        value === 'both' ? 'Windows görev çubuğuna dokunulmaz, dock onun üstünde durur. Tepsi devralınmaz.' : 'Windows görev çubuğu gizlendi, tepsi simgeleri dock\'a taşındı.',
+        value === 'both' ? 'Both together' : 'DockHub replaced the taskbar',
+        value === 'both' ? 'Windows taskbar remains untouched; dock sits above it. Tray icons are not overtaken.' : 'Windows taskbar hidden, tray icons moved to the dock.',
       );
     }
   }

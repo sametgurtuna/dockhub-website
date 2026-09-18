@@ -162,7 +162,7 @@ function tickBar(count: number) {
 
 /* ------------------------------------------------------------ registry */
 
-export type Category = 'Saatler' | 'Hatırlatıcılar' | 'Notlar' | 'Medya' | 'Sistem' | 'Hava durumu';
+export type Category = 'Clocks' | 'Reminders' | 'Notes' | 'Media' | 'System' | 'Weather';
 
 export interface Instance {
   uid: string;
@@ -211,7 +211,7 @@ const monthGrid = (d: Date) => {
   const first = new Date(d.getFullYear(), d.getMonth(), 1);
   const lead = (first.getDay() + 6) % 7;
   const days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-  const grid = h('div', { class: 'cal' }, ...['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((x) => h('b', { text: x })));
+  const grid = h('div', { class: 'cal' }, ...['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((x) => h('b', { text: x })));
   for (let i = 0; i < lead; i++) grid.append(h('span'));
   for (let day = 1; day <= days; day++) grid.append(h('span', { class: day === d.getDate() ? 'today' : '', text: day }));
   return grid;
@@ -258,7 +258,7 @@ const ICON = {
 };
 
 const cities = [
-  { name: 'İstanbul', short: 'İST', off: 0 },
+  { name: 'Istanbul', short: 'IST', off: 0 },
   { name: 'Tokyo', short: 'TYO', off: 6 },
   { name: 'New York', short: 'NYC', off: -7 },
 ];
@@ -272,12 +272,12 @@ const noteColors: Record<string, string> = {
   green: '#A3D48A',
 };
 const noteColorNames: Record<string, string> = {
-  yellow: 'Sarı',
-  orange: 'Turuncu',
-  red: 'Kırmızı',
-  purple: 'Mor',
-  blue: 'Mavi',
-  green: 'Yeşil',
+  yellow: 'Yellow',
+  orange: 'Orange',
+  red: 'Red',
+  purple: 'Purple',
+  blue: 'Blue',
+  green: 'Green',
 };
 
 function timerToggle(st: Record<string, any>) {
@@ -297,11 +297,11 @@ function mediaControls(env: Env, size: 'sm' | 'lg') {
         env.refreshAll();
       },
     });
-  const play = btn('play', 'Oynat', () => (m.playing = !m.playing));
+  const play = btn('play', 'Play', () => (m.playing = !m.playing));
   const el = h(
     'div',
     { class: `mc mc-${size}` },
-    btn('prev', 'Önceki', () => {
+    btn('prev', 'Previous', () => {
       if (m.pos > 3) m.pos = 0;
       else {
         m.index = (m.index + tracks.length - 1) % tracks.length;
@@ -309,7 +309,7 @@ function mediaControls(env: Env, size: 'sm' | 'lg') {
       }
     }),
     play,
-    btn('next', 'Sonraki', () => {
+    btn('next', 'Next', () => {
       m.index = (m.index + 1) % tracks.length;
       m.pos = 0;
     }),
@@ -318,24 +318,24 @@ function mediaControls(env: Env, size: 'sm' | 'lg') {
     el,
     sync() {
       play.innerHTML = m.playing ? icons.pause : icons.play;
-      play.setAttribute('aria-label', m.playing ? 'Duraklat' : 'Oynat');
+      play.setAttribute('aria-label', m.playing ? 'Pause' : 'Play');
     },
   };
 }
 
 export const widgets: WidgetDef[] = [
-  /* ----------------------------------------------------------- Saat */
+  /* ----------------------------------------------------------- Clock */
   {
     id: 'clock',
-    name: 'Saat',
-    category: 'Saatler',
-    description: 'Analog, dijital ya da takvim görünümü. Takvim sıradaki anımsatıcıyı da gösterir.',
+    name: 'Clock',
+    category: 'Clocks',
+    description: 'Analog, digital, or calendar view. Calendar displays your next upcoming reminder.',
     icon: ICON.clock,
     accent: ACCENT.orange,
     variants: [
       { id: 'analog', name: 'Analog' },
-      { id: 'digital', name: 'Dijital' },
-      { id: 'calendar', name: 'Takvim' },
+      { id: 'digital', name: 'Digital' },
+      { id: 'calendar', name: 'Calendar' },
     ],
     card(i) {
       if (i.variant === 'analog') {
@@ -349,7 +349,7 @@ export const widgets: WidgetDef[] = [
           el: card('wc-stack wc-digital', t, s),
           tick: (d) => {
             t.textContent = hhmm(d);
-            s.textContent = `${TR_DAYS[d.getDay()]}, ${d.getDate()} ${TR_MONTHS[d.getMonth()]}`;
+            s.textContent = `${TR_DAYS[d.getDay()]}, ${TR_MONTHS[d.getMonth()]} ${d.getDate()}`;
           },
         };
       }
@@ -360,10 +360,10 @@ export const widgets: WidgetDef[] = [
         el: card(
           'wc-calendar',
           h('div', { class: 'cal-date' }, dow, day),
-          h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: next?.title ?? 'Boş gün' }), h('div', { class: 'wc-sub', text: next?.time ?? 'Anımsatıcı yok' })),
+          h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: next?.title ?? 'No events today' }), h('div', { class: 'wc-sub', text: next?.time ?? 'No reminders' })),
         ),
         tick: (d) => {
-          dow.textContent = TR_DAYS[d.getDay()].toLocaleUpperCase('tr-TR');
+          dow.textContent = TR_DAYS[d.getDay()].toUpperCase();
           day.textContent = String(d.getDate());
         },
       };
@@ -388,11 +388,11 @@ export const widgets: WidgetDef[] = [
       const grid = h('div');
       let lastDay = -1;
       return {
-        el: panelShell('Saat', h('div', { class: 'wp-row wp-clock' }, a.el, h('div', {}, time, date)), grid),
+        el: panelShell('Clock', h('div', { class: 'wp-row wp-clock' }, a.el, h('div', {}, time, date)), grid),
         tick: (d) => {
           a.set(d);
           time.textContent = `${hhmm(d)}:${pad(d.getSeconds())}`;
-          date.textContent = d.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          date.textContent = d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
           if (d.getDate() !== lastDay) {
             lastDay = d.getDate();
             grid.replaceChildren(h('div', { class: 'wp-label', text: `${TR_MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}` }), monthGrid(d));
@@ -401,17 +401,17 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* ----------------------------------------------------- Dünya saati */
+  /* ----------------------------------------------------- World Clock */
   {
     id: 'world-clock',
-    name: 'Dünya saati',
-    category: 'Saatler',
-    description: 'Bir ya da birkaç şehrin saati, gündüz ve gece kadranıyla.',
+    name: 'World Clock',
+    category: 'Clocks',
+    description: 'Track single or multiple timezones with day and night dial indicators.',
     icon: ICON.world,
     accent: ACCENT.blue,
     variants: [
-      { id: 'single', name: 'Tek şehir' },
-      { id: 'multi', name: 'Çoklu şehir' },
+      { id: 'single', name: 'Single city' },
+      { id: 'multi', name: 'Multiple cities' },
     ],
     card(i) {
       const list = i.variant === 'single' ? [cities[1]] : cities;
@@ -440,10 +440,10 @@ export const widgets: WidgetDef[] = [
       const rows = cities.map((c) => {
         const a = analog(40);
         const t = h('div', { class: 'wp-num num' });
-        return { c, a, t, el: h('div', { class: 'wp-list-row' }, a.el, h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: c.name }), h('div', { class: 'wp-muted', text: c.off === 0 ? 'Yerel saat' : `${c.off > 0 ? '+' : ''}${c.off} sa` })), t) };
+        return { c, a, t, el: h('div', { class: 'wp-list-row' }, a.el, h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: c.name }), h('div', { class: 'wp-muted', text: c.off === 0 ? 'Local time' : `${c.off > 0 ? '+' : ''}${c.off} hrs` })), t) };
       });
       return {
-        el: panelShell('Dünya saati', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el))),
+        el: panelShell('World Clock', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el))),
         tick: (d) =>
           rows.forEach(({ c, a, t }) => {
             a.set(d, c.off);
@@ -452,15 +452,15 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* ------------------------------------------------------ Kronometre */
+  /* ------------------------------------------------------ Stopwatch */
   {
     id: 'stopwatch',
-    name: 'Kronometre',
-    category: 'Saatler',
-    description: 'Tıkla başlat, tekrar tıkla duraklat. Sağ tık menüsünden sıfırla.',
+    name: 'Stopwatch',
+    category: 'Clocks',
+    description: 'Click to start, click again to pause. Reset anytime from the right-click menu.',
     icon: ICON.stopwatch,
     accent: ACCENT.orange,
-    variants: [{ id: 'default', name: 'Standart' }],
+    variants: [{ id: 'default', name: 'Standard' }],
     init: () => ({ elapsed: 0, running: false }),
     primary(i, env) {
       timerToggle(i.state);
@@ -478,7 +478,7 @@ export const widgets: WidgetDef[] = [
         },
         refresh: () => {
           dot.classList.toggle('on', i.state.running);
-          (s.lastChild as HTMLElement).textContent = i.state.running ? 'Çalışıyor' : i.state.elapsed > 0 ? 'Duraklatıldı' : 'Başlatmak için tıkla';
+          (s.lastChild as HTMLElement).textContent = i.state.running ? 'Running' : i.state.elapsed > 0 ? 'Paused' : 'Click to start';
         },
       };
       return view;
@@ -493,27 +493,27 @@ export const widgets: WidgetDef[] = [
     panel(i, env) {
       const t = h('div', { class: 'wp-hero num' });
       const go = h('button', { class: 'wp-btn accent', onclick: () => { timerToggle(i.state); env.refreshAll(); } });
-      const reset = h('button', { class: 'wp-btn', text: 'Sıfırla', onclick: () => { i.state.elapsed = 0; i.state.running = false; env.refreshAll(); } });
+      const reset = h('button', { class: 'wp-btn', text: 'Reset', onclick: () => { i.state.elapsed = 0; i.state.running = false; env.refreshAll(); } });
       return {
-        el: panelShell('Kronometre', t, h('div', { class: 'wp-actions' }, go, reset)),
+        el: panelShell('Stopwatch', t, h('div', { class: 'wp-actions' }, go, reset)),
         frame: () => {
           const e = i.state.elapsed;
           t.textContent = `${pad(Math.floor(e / 60))}:${pad(Math.floor(e % 60))},${pad(Math.floor((e * 100) % 100))}`;
         },
-        refresh: () => (go.textContent = i.state.running ? 'Duraklat' : 'Başlat'),
+        refresh: () => (go.textContent = i.state.running ? 'Pause' : 'Start'),
       };
     },
   },
-  /* ------------------------------------------------ Odak zamanlayıcı */
+  /* ------------------------------------------------ Focus Timer */
   {
     id: 'focus',
-    name: 'Odak zamanlayıcı',
-    category: 'Saatler',
-    description: 'Pomodoro: odak ve mola süreleri, bitince bildirim.',
+    name: 'Focus Timer',
+    category: 'Clocks',
+    description: 'Pomodoro technique: focused sprints and short breaks with completion notifications.',
     icon: ICON.focus,
     accent: ACCENT.orange,
-    variants: [{ id: 'default', name: 'Standart' }],
-    init: () => ({ total: 25 * 60, left: 25 * 60, running: false, phase: 'Odak' }),
+    variants: [{ id: 'default', name: 'Standard' }],
+    init: () => ({ total: 25 * 60, left: 25 * 60, running: false, phase: 'Focus' }),
     primary(i, env) {
       timerToggle(i.state);
       env.refreshAll();
@@ -529,7 +529,7 @@ export const widgets: WidgetDef[] = [
           t.textContent = mmss(i.state.left);
         },
         refresh: () => {
-          s.textContent = i.state.running ? i.state.phase : `${i.state.phase} · başlat`;
+          s.textContent = i.state.running ? i.state.phase : `${i.state.phase} · start`;
           r.set((1 - i.state.left / i.state.total) * 100);
           t.textContent = mmss(i.state.left);
         },
@@ -551,7 +551,7 @@ export const widgets: WidgetDef[] = [
       const go = h('button', { class: 'wp-btn accent', onclick: () => { timerToggle(i.state); env.refreshAll(); } });
       const reset = h('button', {
         class: 'wp-btn',
-        text: 'Sıfırla',
+        text: 'Reset',
         onclick: () => {
           Object.assign(i.state, { left: i.state.total, running: false });
           env.refreshAll();
@@ -559,30 +559,30 @@ export const widgets: WidgetDef[] = [
       });
       const phase = h('div', { class: 'wp-muted center' });
       return {
-        el: panelShell('Odak zamanlayıcı', h('div', { class: 'center' }, r.el), phase, h('div', { class: 'wp-actions' }, go, reset)),
+        el: panelShell('Focus Timer', h('div', { class: 'center' }, r.el), phase, h('div', { class: 'wp-actions' }, go, reset)),
         tick: () => {
           r.set((1 - i.state.left / i.state.total) * 100);
           r.inner.textContent = mmss(i.state.left);
         },
         refresh: () => {
-          go.textContent = i.state.running ? 'Duraklat' : 'Başlat';
-          phase.textContent = `${i.state.phase} · odak 25 dk, mola 5 dk`;
+          go.textContent = i.state.running ? 'Pause' : 'Start';
+          phase.textContent = `${i.state.phase} · 25 min focus, 5 min break`;
           r.set((1 - i.state.left / i.state.total) * 100);
           r.inner.textContent = mmss(i.state.left);
         },
       };
     },
   },
-  /* ------------------------------------------------------ Geri sayım */
+  /* ------------------------------------------------------ Countdown */
   {
     id: 'countdown',
-    name: 'Geri sayım',
-    category: 'Saatler',
-    description: 'Hazır süreler ve etiket. Süre bitince bildirim gelir.',
+    name: 'Countdown Timer',
+    category: 'Clocks',
+    description: 'Quick duration presets with customizable labels and desktop alerts when done.',
     icon: ICON.countdown,
     accent: ACCENT.yellow,
-    variants: [{ id: 'default', name: 'Standart' }],
-    init: () => ({ total: 5 * 60, left: 5 * 60, running: false, label: 'Çay' }),
+    variants: [{ id: 'default', name: 'Standard' }],
+    init: () => ({ total: 5 * 60, left: 5 * 60, running: false, label: 'Tea' }),
     primary(i, env) {
       if (i.state.left <= 0) i.state.left = i.state.total;
       timerToggle(i.state);
@@ -601,7 +601,7 @@ export const widgets: WidgetDef[] = [
         refresh: () => {
           t.textContent = mmss(i.state.left);
           r.set((i.state.left / i.state.total) * 100);
-          s.textContent = i.state.running ? i.state.label : `${i.state.label} · başlat`;
+          s.textContent = i.state.running ? i.state.label : `${i.state.label} · start`;
         },
       };
     },
@@ -624,7 +624,7 @@ export const widgets: WidgetDef[] = [
         ...[1, 3, 5, 10, 25].map((m) =>
           h('button', {
             class: 'wp-chip',
-            text: `${m} dk`,
+            text: `${m} min`,
             onclick: () => {
               Object.assign(i.state, { total: m * 60, left: m * 60, running: true });
               env.refreshAll();
@@ -633,12 +633,12 @@ export const widgets: WidgetDef[] = [
         ),
       );
       return {
-        el: panelShell('Geri sayım', t, h('div', { class: 'wp-label', text: 'Hazır süreler' }), presets, h('div', { class: 'wp-actions' }, go)),
+        el: panelShell('Countdown Timer', t, h('div', { class: 'wp-label', text: 'Presets' }), presets, h('div', { class: 'wp-actions' }, go)),
         tick: () => (t.textContent = mmss(i.state.left)),
         refresh: () => {
           t.textContent = mmss(i.state.left);
-          go.textContent = i.state.running ? 'Duraklat' : 'Başlat';
-          presets.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.textContent === `${i.state.total / 60} dk`));
+          go.textContent = i.state.running ? 'Pause' : 'Start';
+          presets.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.textContent === `${i.state.total / 60} min`));
         },
       };
     },
@@ -647,18 +647,18 @@ export const widgets: WidgetDef[] = [
   {
     id: 'alarm',
     name: 'Alarm',
-    category: 'Saatler',
-    description: 'Saat, etiket ve her gün tekrar. Bildirimi sesli ve kalıcıdır.',
+    category: 'Clocks',
+    description: 'Time, custom label, and daily repetition with persistent chime notifications.',
     icon: ICON.alarm,
     accent: ACCENT.red,
-    variants: [{ id: 'default', name: 'Standart' }],
-    init: () => ({ time: '07:30', on: true, label: 'Uyan' }),
+    variants: [{ id: 'default', name: 'Standard' }],
+    init: () => ({ time: '07:30', on: true, label: 'Wake up' }),
     card(i) {
       const s = h('div', { class: 'wc-sub' });
       return {
         el: card('wc-alarm', glyph(ICON.alarm, ACCENT.red), h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title num', text: i.state.time }), s)),
         refresh: () => {
-          s.textContent = i.state.on ? 'Her gün' : 'Kapalı';
+          s.textContent = i.state.on ? 'Every day' : 'Off';
           s.parentElement!.parentElement!.classList.toggle('is-off', !i.state.on);
         },
       };
@@ -667,31 +667,31 @@ export const widgets: WidgetDef[] = [
       return { el: compactTile(glyph(ICON.alarm, ACCENT.red), h('div', { class: 'wt-text num', text: i.state.time })) };
     },
     panel(i, env) {
-      const sw = h('button', { class: 'switch', role: 'switch', 'aria-label': 'Alarm açık', onclick: () => { i.state.on = !i.state.on; env.refreshAll(); } });
+      const sw = h('button', { class: 'switch', role: 'switch', 'aria-label': 'Alarm enabled', onclick: () => { i.state.on = !i.state.on; env.refreshAll(); } });
       return {
-        el: panelShell('Alarm', h('div', { class: 'wp-list-row' }, h('div', { class: 'grow' }, h('div', { class: 'wp-hero num', text: i.state.time }), h('div', { class: 'wp-muted', text: `${i.state.label} · her gün` })), sw)),
+        el: panelShell('Alarm', h('div', { class: 'wp-list-row' }, h('div', { class: 'grow' }, h('div', { class: 'wp-hero num', text: i.state.time }), h('div', { class: 'wp-muted', text: `${i.state.label} · every day` })), sw)),
         refresh: () => sw.setAttribute('aria-checked', String(i.state.on)),
       };
     },
   },
-  /* ----------------------------------------------- Zaman ilerlemesi */
+  /* ----------------------------------------------- Time Progress */
   {
     id: 'time-progress',
-    name: 'Zaman ilerlemesi',
-    category: 'Saatler',
-    description: 'Günün, haftanın, ayın ya da yılın ne kadarının geçtiği.',
+    name: 'Time Progress',
+    category: 'Clocks',
+    description: 'Visualize how much of the day, week, month, or year has elapsed.',
     icon: ICON.progress,
     accent: ACCENT.purple,
     variants: [
-      { id: 'bar', name: 'Çubuk' },
-      { id: 'ring', name: 'Halka' },
+      { id: 'bar', name: 'Bar' },
+      { id: 'ring', name: 'Ring' },
     ],
     card(i) {
       if (i.variant === 'ring') {
         const r = ring(30, 3.2, ACCENT.purple, 'var(--t-purple)');
         r.inner.classList.add('num');
         return {
-          el: card('wc-focus', r.el, h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: 'Gün' }), h('div', { class: 'wc-sub', text: 'geçti' }))),
+          el: card('wc-focus', r.el, h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: 'Day' }), h('div', { class: 'wc-sub', text: 'elapsed' }))),
           tick: (d) => {
             const p = dayPct(d);
             r.set(p);
@@ -702,11 +702,11 @@ export const widgets: WidgetDef[] = [
       const tb = tickBar(16);
       const v = h('span', { class: 'num' });
       return {
-        el: card('wc-stack wc-progress', h('div', { class: 'wc-row' }, h('span', { class: 'wc-title', text: 'Gün' }), v), tb.el),
+        el: card('wc-stack wc-progress', h('div', { class: 'wc-row' }, h('span', { class: 'wc-title', text: 'Day' }), v), tb.el),
         tick: (d) => {
           const p = dayPct(d);
           tb.set(p);
-          v.textContent = `%${Math.floor(p)}`;
+          v.textContent = `${Math.floor(p)}%`;
         },
       };
     },
@@ -721,40 +721,40 @@ export const widgets: WidgetDef[] = [
       };
     },
     panel() {
-      const rows = ['Gün', 'Hafta', 'Ay', 'Yıl'].map((name) => {
+      const rows = ['Day', 'Week', 'Month', 'Year'].map((name) => {
         const tb = tickBar(24);
         const v = h('span', { class: 'num' });
         return { name, tb, v, el: h('div', { class: 'wp-progress' }, h('div', { class: 'wc-row' }, h('span', { class: 'wp-strong', text: name }), v), tb.el) };
       });
       return {
-        el: panelShell('Zaman ilerlemesi', ...rows.map((r) => r.el)),
+        el: panelShell('Time Progress', ...rows.map((r) => r.el)),
         tick: (d) =>
           rows.forEach((r) => {
             const p = periodPct(d, r.name);
             r.tb.set(p);
-            r.v.textContent = `%${Math.floor(p)}`;
+            r.v.textContent = `${Math.floor(p)}%`;
           }),
       };
     },
   },
-  /* -------------------------------------------------------- Su içme */
+  /* -------------------------------------------------------- Hydration */
   {
     id: 'hydration',
-    name: 'Su içme',
-    category: 'Hatırlatıcılar',
-    description: 'Tıkla, bir bardak ekle. Aralıklı hatırlatmada "İçtim" düğmesi var.',
+    name: 'Hydration Tracker',
+    category: 'Reminders',
+    description: 'Click to log a glass of water. Timed reminders include a quick "Drank" button.',
     icon: ICON.drop,
     accent: ACCENT.cyan,
     variants: [
-      { id: 'timer', name: 'Zamanlayıcı' },
-      { id: 'goal', name: 'Günlük hedef' },
+      { id: 'timer', name: 'Timer' },
+      { id: 'goal', name: 'Daily goal' },
     ],
     primary(_i, env) {
       const hy = sim.hydration;
       hy.count = hy.count >= hy.goal ? 0 : hy.count + 1;
       hy.next = 45 * 60;
       env.refreshAll();
-      if (hy.count === hy.goal) env.toast?.('Günlük hedef tamam', `${hy.goal} bardak su içtin. Böyle devam.`);
+      if (hy.count === hy.goal) env.toast?.('Daily goal reached', `You drank ${hy.goal} glasses of water. Keep it up!`);
     },
     card(i) {
       const hy = sim.hydration;
@@ -764,7 +764,7 @@ export const widgets: WidgetDef[] = [
         return {
           el: card('wc-hydration wc-stack', t, h('div', { class: 'drops' }, ...drops)),
           refresh: () => {
-            t.textContent = `${hy.count} / ${hy.goal} bardak`;
+            t.textContent = `${hy.count} / ${hy.goal} glasses`;
             drops.forEach((d, k) => d.classList.toggle('on', k < hy.count));
           },
         };
@@ -774,7 +774,7 @@ export const widgets: WidgetDef[] = [
       const el = card('wc-hydration', h('span', { class: 'wc-drop', html: icons.drop }), h('div', { class: 'wc-stack' }, t, s));
       return {
         el,
-        tick: () => (s.textContent = hy.next > 0 ? `Sonraki ${Math.ceil(hy.next / 60)} dk` : 'Su zamanı'),
+        tick: () => (s.textContent = hy.next > 0 ? `Next in ${Math.ceil(hy.next / 60)} min` : 'Time to hydrate'),
         refresh: () => {
           t.textContent = `${hy.count}/${hy.goal}`;
           el.classList.remove('splash');
@@ -799,31 +799,31 @@ export const widgets: WidgetDef[] = [
       const t = h('div', { class: 'wp-hero num' });
       return {
         el: panelShell(
-          'Su içme',
+          'Hydration Tracker',
           t,
           h('div', { class: 'drops drops-lg' }, ...drops),
-          h('div', { class: 'wp-muted', text: 'Hatırlatma her 45 dakikada bir. Bildirimdeki "İçtim" düğmesi de sayar.' }),
-          h('div', { class: 'wp-actions' }, h('button', { class: 'wp-btn accent', text: 'İçtim', onclick: () => { hy.count = Math.min(hy.goal, hy.count + 1); hy.next = 45 * 60; env.refreshAll(); } }), h('button', { class: 'wp-btn', text: 'Sıfırla', onclick: () => { hy.count = 0; env.refreshAll(); } })),
+          h('div', { class: 'wp-muted', text: 'Reminds you every 45 minutes. The "Drank" button in notifications also counts.' }),
+          h('div', { class: 'wp-actions' }, h('button', { class: 'wp-btn accent', text: 'Drank', onclick: () => { hy.count = Math.min(hy.goal, hy.count + 1); hy.next = 45 * 60; env.refreshAll(); } }), h('button', { class: 'wp-btn', text: 'Reset', onclick: () => { hy.count = 0; env.refreshAll(); } })),
         ),
         refresh: () => {
-          t.textContent = `${hy.count} / ${hy.goal} bardak`;
+          t.textContent = `${hy.count} / ${hy.goal} glasses`;
           drops.forEach((d, k) => d.classList.toggle('on', k < hy.count));
         },
       };
     },
   },
-  /* -------------------------------------------------- Anımsatıcılar */
+  /* -------------------------------------------------- Reminders */
   {
     id: 'reminders',
-    name: 'Anımsatıcılar',
-    category: 'Hatırlatıcılar',
-    description: 'Liste, sıradaki ya da sayı. Bildirimde "10 dk ertele" var.',
+    name: 'Reminders',
+    category: 'Reminders',
+    description: 'Full list, next upcoming reminder, or count. Notification includes a "Snooze 10m" action.',
     icon: ICON.list,
     accent: ACCENT.blue,
     variants: [
-      { id: 'next', name: 'Sıradaki' },
-      { id: 'list', name: 'Liste' },
-      { id: 'count', name: 'Sayı' },
+      { id: 'next', name: 'Next' },
+      { id: 'list', name: 'List' },
+      { id: 'count', name: 'Count' },
     ],
     card(i) {
       const box = card(i.variant === 'count' ? 'wc-count' : 'wc-stack wc-reminders');
@@ -832,12 +832,12 @@ export const widgets: WidgetDef[] = [
         refresh: () => {
           const open = sim.reminders.filter((r) => !r.done);
           if (i.variant === 'count') {
-            box.replaceChildren(h('div', { class: 'wc-big num', text: open.length }), h('div', { class: 'wc-sub', html: 'bekleyen<br>anımsatıcı' }));
+            box.replaceChildren(h('div', { class: 'wc-big num', text: open.length }), h('div', { class: 'wc-sub', html: 'pending<br>reminders' }));
           } else if (i.variant === 'list') {
-            box.replaceChildren(...(open.length ? open.slice(0, 2).map((r) => h('div', { class: 'wc-li' }, h('i'), h('span', { text: r.title }))) : [h('div', { class: 'wc-sub', text: 'Hepsi tamam' })]));
+            box.replaceChildren(...(open.length ? open.slice(0, 2).map((r) => h('div', { class: 'wc-li' }, h('i'), h('span', { text: r.title }))) : [h('div', { class: 'wc-sub', text: 'All done' })]));
           } else {
             const n = open[0];
-            box.replaceChildren(h('div', { class: 'wc-li' }, h('i'), h('span', { class: 'wc-title', text: n?.title ?? 'Hepsi tamam' })), h('div', { class: 'wc-sub', text: n?.time ?? 'Yeni anımsatıcı yok' }));
+            box.replaceChildren(h('div', { class: 'wc-li' }, h('i'), h('span', { class: 'wc-title', text: n?.title ?? 'All done' })), h('div', { class: 'wc-sub', text: n?.time ?? 'No upcoming reminders' }));
           }
         },
       };
@@ -852,7 +852,7 @@ export const widgets: WidgetDef[] = [
     panel(_i, env) {
       const list = h('div', { class: 'wp-list' });
       return {
-        el: panelShell('Anımsatıcılar', list),
+        el: panelShell('Reminders', list),
         refresh: () =>
           list.replaceChildren(
             ...sim.reminders.map((r) =>
@@ -861,23 +861,23 @@ export const widgets: WidgetDef[] = [
                 { class: `wp-list-row ${r.done ? 'is-done' : ''}` },
                 h('button', { class: 'check', role: 'checkbox', 'aria-checked': String(r.done), 'aria-label': r.title, html: icons.check, onclick: () => { r.done = !r.done; env.refreshAll(); } }),
                 h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: r.title }), h('div', { class: 'wp-muted', text: r.time })),
-                h('button', { class: 'wp-chip', text: '10 dk ertele', onclick: () => env.toast?.('Ertelendi', `"${r.title}" 10 dakika sonra tekrar hatırlatılacak.`) }),
+                h('button', { class: 'wp-chip', text: 'Snooze 10m', onclick: () => env.toast?.('Snoozed', `"${r.title}" will remind you again in 10 minutes.`) }),
               ),
             ),
           ),
       };
     },
   },
-  /* --------------------------------------------------- Yapışkan not */
+  /* --------------------------------------------------- Sticky Notes */
   {
     id: 'notes',
-    name: 'Yapışkan not',
-    category: 'Notlar',
-    description: 'Dock\'ta notun önizlemesi. Tıklayınca büyük kağıt açılır, kendiliğinden kaydedilir.',
+    name: 'Sticky Notes',
+    category: 'Notes',
+    description: 'Dock preview for your quick notes. Click to expand full notepad; auto-saves instantly.',
     icon: ICON.note,
     accent: ACCENT.yellow,
-    variants: [{ id: 'default', name: 'Standart' }],
-    init: () => ({ text: 'Market: ekmek, zeytin, çay\nPazartesi sunum', color: 'yellow', size: 15 }),
+    variants: [{ id: 'default', name: 'Standard' }],
+    init: () => ({ text: 'Groceries: milk, olive oil, coffee\nMonday team sync', color: 'yellow', size: 15 }),
     card(i) {
       const p = h('div', { class: 'note-preview' });
       const el = card('wc-note', p);
@@ -885,7 +885,7 @@ export const widgets: WidgetDef[] = [
         el,
         refresh: () => {
           el.style.setProperty('--note', noteColors[i.state.color]);
-          p.textContent = i.state.text || 'Boş not';
+          p.textContent = i.state.text || 'Empty note';
         },
       };
     },
@@ -900,7 +900,7 @@ export const widgets: WidgetDef[] = [
       };
     },
     panel(i, env) {
-      const ta = h('textarea', { class: 'note-paper', 'aria-label': 'Not metni', spellcheck: 'false' }) as HTMLTextAreaElement;
+      const ta = h('textarea', { class: 'note-paper', 'aria-label': 'Note text', spellcheck: 'false' }) as HTMLTextAreaElement;
       ta.value = i.state.text;
       ta.addEventListener('input', () => {
         i.state.text = ta.value;
@@ -908,7 +908,7 @@ export const widgets: WidgetDef[] = [
       });
       const chips = h(
         'div',
-        { class: 'note-colors', role: 'radiogroup', 'aria-label': 'Kağıt rengi' },
+        { class: 'note-colors', role: 'radiogroup', 'aria-label': 'Paper color' },
         ...Object.keys(noteColors).map((k) =>
           h('button', {
             class: 'note-color',
@@ -923,7 +923,7 @@ export const widgets: WidgetDef[] = [
           }),
         ),
       );
-      const wrap = h('div', { class: 'wp wp-note' }, ta, h('div', { class: 'note-foot' }, chips, h('span', { class: 'wp-muted', text: 'Kendiliğinden kaydedilir' })));
+      const wrap = h('div', { class: 'wp wp-note' }, ta, h('div', { class: 'note-foot' }, chips, h('span', { class: 'wp-muted', text: 'Auto-saves automatically' })));
       return {
         el: wrap,
         refresh: () => {
@@ -933,17 +933,17 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* -------------------------------------------------- Şu an çalıyor */
+  /* -------------------------------------------------- Now Playing */
   {
     id: 'media',
-    name: 'Şu an çalıyor',
-    category: 'Medya',
-    description: 'Spotify, tarayıcılar, VLC. Windows medya kontrollerini destekleyen her oynatıcı.',
+    name: 'Now Playing',
+    category: 'Media',
+    description: 'Spotify, web browsers, VLC, and any player supporting Windows Media controls.',
     icon: ICON.music,
     accent: ACCENT.pink,
     variants: [
-      { id: 'full', name: 'Tam' },
-      { id: 'compact', name: 'Kompakt' },
+      { id: 'full', name: 'Full' },
+      { id: 'compact', name: 'Compact' },
       { id: 'mini', name: 'Mini' },
     ],
     card(i, env) {
@@ -992,7 +992,7 @@ export const widgets: WidgetDef[] = [
       const b = h('span', { class: 'num' });
       const ctl = mediaControls(env, 'lg');
       return {
-        el: h('div', { class: 'wp wp-media' }, art, title, artist, bar, h('div', { class: 'wc-row wp-muted' }, a, b), ctl.el, h('div', { class: 'wp-foot', text: 'Oynatıcı: Medya Oynatıcı · kamu malı eserler' })),
+        el: h('div', { class: 'wp wp-media' }, art, title, artist, bar, h('div', { class: 'wc-row wp-muted' }, a, b), ctl.el, h('div', { class: 'wp-foot', text: 'Player: Media Player · Public domain classical tracks' })),
         frame: () => {
           const len = tracks[m.index].length;
           (bar.firstChild as HTMLElement).style.transform = `scaleX(${m.pos / len})`;
@@ -1008,18 +1008,18 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* -------------------------------------------------- CPU ve bellek */
+  /* -------------------------------------------------- CPU & Memory */
   {
     id: 'system',
-    name: 'CPU ve bellek',
-    category: 'Sistem',
-    description: 'İşlemci ve bellek kullanımı; sayı, halka ya da çubuk.',
+    name: 'CPU & Memory',
+    category: 'System',
+    description: 'Processor and memory utilization shown as rings, numbers, or activity bars.',
     icon: ICON.pulse,
     accent: ACCENT.magenta,
     variants: [
-      { id: 'rings', name: 'Halkalar' },
-      { id: 'numbers', name: 'Sayılar' },
-      { id: 'bars', name: 'Çubuklar' },
+      { id: 'rings', name: 'Rings' },
+      { id: 'numbers', name: 'Numbers' },
+      { id: 'bars', name: 'Bars' },
     ],
     card(i) {
       const rows = [
@@ -1052,7 +1052,7 @@ export const widgets: WidgetDef[] = [
           frame: () =>
             bs.forEach(({ r, fill, v }) => {
               fill.style.transform = `scaleX(${r.spring.value / 100})`;
-              v.textContent = `%${Math.round(r.spring.value)}`;
+              v.textContent = `${Math.round(r.spring.value)}%`;
             }),
         };
       }
@@ -1062,7 +1062,7 @@ export const widgets: WidgetDef[] = [
       });
       return {
         el: card('wc-stack wc-numbers', ...ns.map((x) => x.el)),
-        frame: () => ns.forEach(({ r, v }) => (v.textContent = `%${Math.round(r.spring.value)}`)),
+        frame: () => ns.forEach(({ r, v }) => (v.textContent = `${Math.round(r.spring.value)}%`)),
       };
     },
     compact() {
@@ -1083,15 +1083,15 @@ export const widgets: WidgetDef[] = [
       let t = 0;
       return {
         el: panelShell(
-          'CPU ve bellek',
-          h('div', { class: 'wp-duo' }, h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.magenta}`, text: 'İşlemci' }), cpu), h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.blue}`, text: 'Bellek' }), ram)),
+          'CPU & Memory',
+          h('div', { class: 'wp-duo' }, h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.magenta}`, text: 'Processor' }), cpu), h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.blue}`, text: 'Memory' }), ram)),
           svgWrap,
           trend,
-          h('div', { class: 'wp-foot', text: 'Güncelleme aralığı 1 ile 10 saniye arasında seçilir.' }),
+          h('div', { class: 'wp-foot', text: 'Update interval selectable from 1 to 10 seconds.' }),
         ),
         frame: (dt) => {
-          cpu.textContent = `%${Math.round(sim.cpu.value)}`;
-          ram.textContent = `%${Math.round(sim.ram.value)}`;
+          cpu.textContent = `${Math.round(sim.cpu.value)}%`;
+          ram.textContent = `${Math.round(sim.ram.value)}%`;
           t += dt;
           if (t < 0.5 && svgWrap.firstChild) return;
           t = 0;
@@ -1099,22 +1099,22 @@ export const widgets: WidgetDef[] = [
           svgWrap.innerHTML = `<svg viewBox="0 0 260 64" preserveAspectRatio="none"><path d="${s.area}" fill="var(--t-magenta)"/><path d="${s.line}" fill="none" stroke="var(--c-magenta)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
           const h8 = sim.cpuHistory.slice(-8);
           const diff = h8[h8.length - 1] - h8[0];
-          trend.textContent = `Son 15 saniye: ${Math.abs(diff) < 4 ? 'dengeli' : diff > 0 ? 'yükseliyor' : 'düşüyor'}`;
+          trend.textContent = `Last 15 seconds: ${Math.abs(diff) < 4 ? 'steady' : diff > 0 ? 'rising' : 'falling'}`;
         },
       };
     },
   },
-  /* ------------------------------------------------------------- Ağ */
+  /* ------------------------------------------------------------- Network */
   {
     id: 'network',
-    name: 'Ağ hızı',
-    category: 'Sistem',
-    description: 'Anlık indirme ve yükleme hızı, isterseniz grafikle.',
+    name: 'Network Speed',
+    category: 'System',
+    description: 'Real-time download and upload speeds, with an optional history graph.',
     icon: ICON.network,
     accent: ACCENT.blue,
     variants: [
-      { id: 'numbers', name: 'Yalnızca sayılar' },
-      { id: 'graph', name: 'Grafikli' },
+      { id: 'numbers', name: 'Numbers only' },
+      { id: 'graph', name: 'With graph' },
     ],
     card(i) {
       const d = h('span', { class: 'num' });
@@ -1130,8 +1130,8 @@ export const widgets: WidgetDef[] = [
       return {
         el,
         frame: (dt) => {
-          d.textContent = `${fmt1(sim.down.value)} MB/sn`;
-          u.textContent = `${Math.round(sim.up.value * 1000)} KB/sn`;
+          d.textContent = `${fmt1(sim.down.value)} MB/s`;
+          u.textContent = `${Math.round(sim.up.value * 1000)} KB/s`;
           if (i.variant !== 'graph') return;
           t += dt;
           if (t < 0.5) return;
@@ -1151,10 +1151,10 @@ export const widgets: WidgetDef[] = [
       const g = h('div', { class: 'spark' });
       let t = 1;
       return {
-        el: panelShell('Ağ hızı', h('div', { class: 'wp-duo' }, h('div', {}, h('div', { class: 'wp-label', text: 'İndirme' }), d), h('div', {}, h('div', { class: 'wp-label', text: 'Yükleme' }), u)), g, h('div', { class: 'wp-foot', text: 'Ölçüm yalnızca bu widget dock\'tayken çalışır.' })),
+        el: panelShell('Network Speed', h('div', { class: 'wp-duo' }, h('div', {}, h('div', { class: 'wp-label', text: 'Download' }), d), h('div', {}, h('div', { class: 'wp-label', text: 'Upload' }), u)), g, h('div', { class: 'wp-foot', text: 'Speed monitoring runs only while this widget is on the dock.' })),
         frame: (dt) => {
-          d.textContent = `${fmt1(sim.down.value)} MB/sn`;
-          u.textContent = `${Math.round(sim.up.value * 1000)} KB/sn`;
+          d.textContent = `${fmt1(sim.down.value)} MB/s`;
+          u.textContent = `${Math.round(sim.up.value * 1000)} KB/s`;
           t += dt;
           if (t < 0.5) return;
           t = 0;
@@ -1164,24 +1164,24 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* ---------------------------------------------------------- Durum */
+  /* ---------------------------------------------------------- System Status */
   {
     id: 'status',
-    name: 'Durum',
-    category: 'Sistem',
-    description: 'Pil, disk, bellek ve işlemci doluluk halkaları.',
+    name: 'System Status',
+    category: 'System',
+    description: 'Battery, disk, memory, and CPU utilization gauge rings.',
     icon: ICON.status,
     accent: ACCENT.green,
     variants: [
-      { id: 'rings', name: 'Halkalar' },
-      { id: 'percent', name: 'Yüzde halkası' },
-      { id: 'icons', name: 'Yalnızca ikon' },
+      { id: 'rings', name: 'Rings' },
+      { id: 'percent', name: 'Percentage ring' },
+      { id: 'icons', name: 'Icons only' },
     ],
     card(i) {
       const kinds = [
-        { k: 'battery' as const, s: sim.battery, label: 'Pil', warn: (v: number) => v < 20 },
+        { k: 'battery' as const, s: sim.battery, label: 'Battery', warn: (v: number) => v < 20 },
         { k: 'disk' as const, s: sim.disk, label: 'Disk', warn: (v: number) => v >= 90 },
-        { k: 'memory' as const, s: sim.ram, label: 'Bellek', warn: (v: number) => v >= 90 },
+        { k: 'memory' as const, s: sim.ram, label: 'Memory', warn: (v: number) => v >= 90 },
       ];
       const size = i.variant === 'icons' ? 32 : 26;
       const cells = kinds.map((x) => {
@@ -1201,14 +1201,14 @@ export const widgets: WidgetDef[] = [
             if (i.variant === 'percent') {
               g.inner.textContent = String(Math.round(v));
               cap.textContent = x.label;
-            } else cap.textContent = `%${Math.round(v)}`;
+            } else cap.textContent = `${Math.round(v)}%`;
           }),
       };
     },
     compact() {
       const r = ring(26, 2.6, ACCENT.green, TRACK.green);
       return {
-        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'Pil' })),
+        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'Battery' })),
         frame: () => {
           r.set(sim.battery.value);
           r.inner.textContent = String(Math.round(sim.battery.value));
@@ -1217,10 +1217,10 @@ export const widgets: WidgetDef[] = [
     },
     panel(_i, env) {
       const rows = [
-        { k: 'battery' as const, s: sim.battery, label: 'Pil', sub: 'Kalan yaklaşık 4 sa 20 dk' },
+        { k: 'battery' as const, s: sim.battery, label: 'Battery', sub: 'Approx. 4 hrs 20 min remaining' },
         { k: 'disk' as const, s: sim.disk, label: 'Disk (C:)', sub: '612 GB / 953 GB' },
-        { k: 'memory' as const, s: sim.ram, label: 'Bellek', sub: '16 GB' },
-        { k: 'cpu' as const, s: sim.cpu, label: 'İşlemci', sub: '8 çekirdek' },
+        { k: 'memory' as const, s: sim.ram, label: 'Memory', sub: '16 GB' },
+        { k: 'cpu' as const, s: sim.cpu, label: 'Processor', sub: '8 cores' },
       ].map((x) => {
         const g = ring(40, 4, ACCENT.green, TRACK.green);
         g.inner.innerHTML = `<span class="dg">${deviceGlyph(x.k)}</span>`;
@@ -1229,37 +1229,37 @@ export const widgets: WidgetDef[] = [
       });
       const drain = h('button', {
         class: 'wp-chip',
-        text: 'Pili azalt',
+        text: 'Drain battery',
         onclick: () => {
           sim.battery.target = sim.battery.target > 30 ? 14 : 86;
           env.refreshAll();
         },
       });
       return {
-        el: panelShell('Durum', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el)), h('div', { class: 'wp-note-row' }, h('span', { class: 'wp-muted', text: 'Pil %20 altına inince halka kırmızıya döner.' }), drain)),
+        el: panelShell('System Status', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el)), h('div', { class: 'wp-note-row' }, h('span', { class: 'wp-muted', text: 'Ring turns red when battery drops below 20%.' }), drain)),
         frame: () =>
           rows.forEach(({ x, g, v }) => {
             const val = x.s.value;
             g.set(val);
             g.color((x.k === 'battery' ? val < 20 : val >= 90) ? ACCENT.red : ACCENT.green);
-            v.textContent = `%${Math.round(val)}`;
+            v.textContent = `${Math.round(val)}%`;
           }),
-        refresh: () => (drain.textContent = sim.battery.target > 30 ? 'Pili azalt' : 'Pili doldur'),
+        refresh: () => (drain.textContent = sim.battery.target > 30 ? 'Drain battery' : 'Charge battery'),
       };
     },
   },
-  /* --------------------------------------------------- Hava durumu */
+  /* --------------------------------------------------- Weather */
   {
     id: 'weather',
-    name: 'Hava durumu',
-    category: 'Hava durumu',
-    description: 'Güncel durum ya da saatlik tahmin. Open-Meteo ile, API anahtarı gerekmez.',
+    name: 'Weather',
+    category: 'Weather',
+    description: 'Current weather and hourly forecast powered by Open-Meteo. No API key needed.',
     icon: ICON.weather,
     accent: ACCENT.cyan,
     variants: [
-      { id: 'current', name: 'Güncel' },
-      { id: 'condition', name: 'Durum' },
-      { id: 'hourly', name: 'Saatlik tahmin' },
+      { id: 'current', name: 'Current' },
+      { id: 'condition', name: 'Condition' },
+      { id: 'hourly', name: 'Hourly forecast' },
     ],
     card(i) {
       const w = sim.weather;
@@ -1272,7 +1272,7 @@ export const widgets: WidgetDef[] = [
       }
       if (i.variant === 'condition') {
         return {
-          el: card('wc-weather', h('span', { html: weatherIcon(w.code, 30) }), h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', html: `<span class="num">${w.temp}°</span> ${w.text}` }), h('div', { class: 'wc-sub num', text: `Y ${w.hi}° D ${w.lo}° · ${w.city}` }))),
+          el: card('wc-weather', h('span', { html: weatherIcon(w.code, 30) }), h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', html: `<span class="num">${w.temp}°</span> ${w.text}` }), h('div', { class: 'wc-sub num', text: `H ${w.hi}° L ${w.lo}° · ${w.city}` }))),
         };
       }
       return {
@@ -1288,10 +1288,10 @@ export const widgets: WidgetDef[] = [
       return {
         el: panelShell(
           w.city,
-          h('div', { class: 'wp-row' }, h('span', { html: weatherIcon(w.code, 56) }), h('div', {}, h('div', { class: 'wp-hero num', text: `${w.temp}°` }), h('div', { class: 'wp-muted num', text: `${w.text} · Y ${w.hi}° D ${w.lo}°` }))),
+          h('div', { class: 'wp-row' }, h('span', { html: weatherIcon(w.code, 56) }), h('div', {}, h('div', { class: 'wp-hero num', text: `${w.temp}°` }), h('div', { class: 'wp-muted num', text: `${w.text} · H ${w.hi}° L ${w.lo}°` }))),
           hours,
           h('div', { class: 'wp-days' }, ...w.daily.map((x) => h('div', { class: 'wp-day' }, h('span', { class: 'wp-strong', text: x.d }), h('span', { html: weatherIcon(x.c, 22) }), h('span', { class: 'num wp-muted', text: `${x.lo}°` }), h('span', { class: 'tempbar' }, h('i', { style: `left:${(x.lo - 10) * 6}%;right:${100 - (x.hi - 10) * 6}%` })), h('span', { class: 'num', text: `${x.hi}°` })))),
-          h('div', { class: 'wp-foot', text: 'Örnek veri. Uygulamada Open-Meteo kullanılır, veri 30 dakikada bir yenilenir.' }),
+          h('div', { class: 'wp-foot', text: 'Sample data. The desktop app uses Open-Meteo, refreshed every 30 minutes.' }),
         ),
         tick: (d) =>
           hours.replaceChildren(
@@ -1300,17 +1300,17 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* --------------------------------------------------- Ses Aygıtı & Mikser */
+  /* --------------------------------------------------- Audio & Mixer */
   {
     id: 'audio',
-    name: 'Ses Aygıtı & Mikser',
-    category: 'Medya',
-    description: 'Kulaklık ve hoparlör arasında tek tıkla geçiş, fare tekerleğiyle ses ayarı ve uygulama mikseri.',
+    name: 'Audio Device & Mixer',
+    category: 'Media',
+    description: 'Switch between headphones and speakers with a click, adjust volume via scroll wheel, plus app mixer.',
     icon: ICON.audio,
     accent: ACCENT.cyan,
     variants: [
-      { id: 'compact', name: 'Kompakt' },
-      { id: 'slider', name: 'Çubuklu' },
+      { id: 'compact', name: 'Compact' },
+      { id: 'slider', name: 'Slider' },
     ],
     card(i) {
       if (i.variant === 'slider') {
@@ -1319,10 +1319,10 @@ export const widgets: WidgetDef[] = [
             'wc-audio',
             glyph(ICON.audio, ACCENT.cyan),
             h('div', { class: 'wc-stack', style: 'min-width:70px' },
-              h('div', { class: 'wc-title', text: 'Kulaklık' }),
+              h('div', { class: 'wc-title', text: 'Headphones' }),
               h('div', { class: 'hbar', style: 'background:var(--w-track);margin-top:2px' }, h('i', { style: 'width:62%;background:var(--c-cyan)' }))
             ),
-            h('div', { class: 'num', style: 'font-size:11px;color:var(--text-2);margin-left:4px', text: '%62' })
+            h('div', { class: 'num', style: 'font-size:11px;color:var(--text-2);margin-left:4px', text: '62%' })
           ),
         };
       }
@@ -1331,15 +1331,15 @@ export const widgets: WidgetDef[] = [
           'wc-audio',
           glyph(ICON.audio, ACCENT.cyan),
           h('div', { class: 'wc-stack' },
-            h('div', { class: 'wc-title', text: 'Kulaklık' }),
-            h('div', { class: 'wc-sub num', style: 'color:var(--c-cyan)', text: '%62' })
+            h('div', { class: 'wc-title', text: 'Headphones' }),
+            h('div', { class: 'wc-sub num', style: 'color:var(--c-cyan)', text: '62%' })
           )
         ),
       };
     },
     compact() {
       return {
-        el: compactTile(glyph(ICON.audio, ACCENT.cyan), h('div', { class: 'wt-text num', text: '%62' })),
+        el: compactTile(glyph(ICON.audio, ACCENT.cyan), h('div', { class: 'wt-text num', text: '62%' })),
       };
     },
     panel() {
@@ -1357,30 +1357,30 @@ export const widgets: WidgetDef[] = [
             h('div', { class: 'wp-strong', text: a.name }),
             h('div', { class: 'hbar', style: 'background:var(--w-track);margin-top:4px' }, h('i', { style: `width:${a.vol}%;background:var(--c-cyan)` }))
           ),
-          h('div', { class: 'wp-num num', text: `%${a.vol}` })
+          h('div', { class: 'wp-num num', text: `${a.vol}%` })
         )
       );
       return {
         el: panelShell(
-          'Ses Mikseri',
-          h('div', { class: 'wp-hero-sub', text: 'Varsayılan: Kulaklık (HyperX Cloud II Wireless)' }),
+          'Audio Mixer',
+          h('div', { class: 'wp-hero-sub', text: 'Default: Headphones (HyperX Cloud II Wireless)' }),
           h('div', { class: 'wp-list' }, ...rows),
-          h('div', { class: 'wp-foot', text: 'Dock üzerinden sol tıkla mikser açılır, fare tekerleğiyle ses ayarlanır.' })
+          h('div', { class: 'wp-foot', text: 'Click on the dock to open the mixer; mouse wheel adjusts volume directly.' })
         ),
       };
     },
   },
-  /* --------------------------------------------------- Aygıt Pilleri */
+  /* --------------------------------------------------- Device Batteries */
   {
     id: 'battery-devices',
-    name: 'Aygıt Pilleri',
-    category: 'Sistem',
-    description: 'Bluetooth ve 2.4 GHz kablosuz kulaklık, fare ve klavyelerin anlık şarj seviyesi.',
+    name: 'Device Batteries',
+    category: 'System',
+    description: 'Real-time battery status for Bluetooth and 2.4 GHz wireless headphones, mice, and keyboards.',
     icon: ICON.batteryDevices,
     accent: ACCENT.green,
     variants: [
-      { id: 'single', name: 'Tekli' },
-      { id: 'multi', name: 'Çoklu' },
+      { id: 'single', name: 'Single' },
+      { id: 'multi', name: 'Multiple' },
     ],
     card(i) {
       if (i.variant === 'multi') {
@@ -1409,7 +1409,7 @@ export const widgets: WidgetDef[] = [
           r.el,
           h('div', { class: 'wc-stack' },
             h('div', { class: 'wc-title', text: 'Cloud II Wireless' }),
-            h('div', { class: 'wc-sub num', text: '%62' })
+            h('div', { class: 'wc-sub num', text: '62%' })
           )
         ),
       };
@@ -1420,13 +1420,13 @@ export const widgets: WidgetDef[] = [
       r.inner.classList.add('num');
       r.inner.textContent = '62';
       return {
-        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'Kulaklık' })),
+        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'Headphones' })),
       };
     },
     panel() {
       const devs = [
-        { name: 'HyperX Cloud II Wireless', p: 62, type: '2.4 GHz Kulaklık' },
-        { name: 'Logitech G PRO X Superlight', p: 85, type: 'Kablosuz Fare' },
+        { name: 'HyperX Cloud II Wireless', p: 62, type: '2.4 GHz Headphones' },
+        { name: 'Logitech G PRO X Superlight', p: 85, type: 'Wireless Mouse' },
       ];
       const rows = devs.map((d) => {
         const r = ring(34, 3.4, ACCENT.green, TRACK.green);
@@ -1441,25 +1441,25 @@ export const widgets: WidgetDef[] = [
             h('div', { class: 'wp-strong', text: d.name }),
             h('div', { class: 'wp-muted', text: d.type })
           ),
-          h('div', { class: 'wp-num num', text: `%${d.p}` })
+          h('div', { class: 'wp-num num', text: `${d.p}%` })
         );
       });
       return {
-        el: panelShell('Bağlı Aygıt Pilleri', h('div', { class: 'wp-list' }, ...rows)),
+        el: panelShell('Connected Device Batteries', h('div', { class: 'wp-list' }, ...rows)),
       };
     },
   },
-  /* --------------------------------------------------- Çöp Kutusu */
+  /* --------------------------------------------------- Recycle Bin */
   {
     id: 'recycle-bin',
-    name: 'Çöp Kutusu',
-    category: 'Sistem',
-    description: 'macOS tarzı çöp sepeti. Sürükle-bırak ile dosya silme, doluluk göstergesi ve sağ tıkla boşaltma.',
+    name: 'Recycle Bin',
+    category: 'System',
+    description: 'macOS-style trash can. Drag-and-drop file deletion, fullness indicator, and right-click to empty.',
     icon: ICON.recycleBin,
     accent: ACCENT.blue,
     variants: [
-      { id: 'icon', name: 'İkon' },
-      { id: 'details', name: 'Detaylı' },
+      { id: 'icon', name: 'Icon' },
+      { id: 'details', name: 'Detailed' },
     ],
     card(i) {
       if (i.variant === 'details') {
@@ -1468,8 +1468,8 @@ export const widgets: WidgetDef[] = [
             'wc-recycle-bin',
             glyph(ICON.recycleBin, ACCENT.blue),
             h('div', { class: 'wc-stack' },
-              h('div', { class: 'wc-title', text: 'Çöp Kutusu' }),
-              h('div', { class: 'wc-sub num', text: '3 öğe · 142 MB' })
+              h('div', { class: 'wc-title', text: 'Recycle Bin' }),
+              h('div', { class: 'wc-sub num', text: '3 items · 142 MB' })
             )
           ),
         };
@@ -1483,15 +1483,15 @@ export const widgets: WidgetDef[] = [
     },
     compact() {
       return {
-        el: compactTile(glyph(ICON.recycleBin, ACCENT.blue), h('div', { class: 'wt-text', text: 'Çöp' })),
+        el: compactTile(glyph(ICON.recycleBin, ACCENT.blue), h('div', { class: 'wt-text', text: 'Trash' })),
       };
     },
     panel() {
       return {
         el: panelShell(
-          'Çöp Kutusu',
-          h('div', { class: 'wp-hero-sub', text: '3 öğe · 142 MB' }),
-          h('div', { class: 'wp-foot', text: 'Dosyaları silmek için dock üzerindeki çöp kutusuna sürükleyip bırakabilirsiniz.' })
+          'Recycle Bin',
+          h('div', { class: 'wp-hero-sub', text: '3 items · 142 MB' }),
+          h('div', { class: 'wp-foot', text: 'Drag and drop files onto the dock icon to delete them.' })
         ),
       };
     },
@@ -1505,9 +1505,9 @@ function dayPct(d: Date) {
 }
 
 function periodPct(d: Date, name: string) {
-  if (name === 'Gün') return dayPct(d);
-  if (name === 'Hafta') return ((((d.getDay() + 6) % 7) + dayPct(d) / 100) / 7) * 100;
-  if (name === 'Ay') {
+  if (name === 'Day' || name === 'Gün') return dayPct(d);
+  if (name === 'Week' || name === 'Hafta') return ((((d.getDay() + 6) % 7) + dayPct(d) / 100) / 7) * 100;
+  if (name === 'Month' || name === 'Ay') {
     const days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
     return ((d.getDate() - 1 + dayPct(d) / 100) / days) * 100;
   }
@@ -1521,12 +1521,12 @@ function focusStep(i: Instance, dt: number, env: Env) {
   if (!st.running) return;
   st.left -= dt;
   if (st.left <= 0) {
-    const toBreak = st.phase === 'Odak';
-    st.phase = toBreak ? 'Mola' : 'Odak';
+    const toBreak = st.phase === 'Focus' || st.phase === 'Odak';
+    st.phase = toBreak ? 'Break' : 'Focus';
     st.total = toBreak ? 5 * 60 : 25 * 60;
     st.left = st.total;
     st.running = false;
-    env.toast?.(toBreak ? 'Odak süresi bitti' : 'Mola bitti', toBreak ? '5 dakikalık mola zamanı.' : 'Yeni bir odak turuna hazırsın.');
+    env.toast?.(toBreak ? 'Focus session ended' : 'Break ended', toBreak ? 'Time for a 5-minute break.' : 'Ready for a new focus sprint.');
     env.refreshAll();
   }
 }
@@ -1538,7 +1538,7 @@ function countdownStep(i: Instance, dt: number, env: Env) {
   if (st.left <= 0) {
     st.left = 0;
     st.running = false;
-    env.toast?.('Geri sayım bitti', `${st.label} hazır.`);
+    env.toast?.('Countdown finished', `${st.label} is ready.`);
     env.refreshAll();
   }
 }

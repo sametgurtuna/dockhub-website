@@ -36,7 +36,7 @@ export function buildMiniDock(stage: HTMLElement): MiniDock {
     const b = h('div', { class: 'db db-clock' }, h('span', { class: 't' }), h('span', { class: 'd', 'data-clock-date': '' }));
     const set = (d: Date) => {
       b.firstElementChild!.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-      b.lastElementChild!.textContent = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+      b.lastElementChild!.textContent = `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
     };
     set(new Date());
     onSecond(set);
@@ -225,7 +225,7 @@ export function initMinis() {
   const stages = [...document.querySelectorAll<HTMLElement>('[data-mini]')];
   const tbClocks = document.querySelectorAll<HTMLElement>('[data-mini-clock]');
   const setClocks = (d: Date) =>
-    tbClocks.forEach((c) => (c.innerHTML = `<span>${pad(d.getHours())}:${pad(d.getMinutes())}</span><span>${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</span>`));
+    tbClocks.forEach((c) => (c.innerHTML = `<span>${pad(d.getHours())}:${pad(d.getMinutes())}</span><span>${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}</span>`));
   setClocks(new Date());
   onSecond(setClocks);
   const minis = new Map<HTMLElement, { m: MiniDock; timer: number; cycle?: ReturnType<Cycle> }>();

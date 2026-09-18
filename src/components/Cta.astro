@@ -5,25 +5,25 @@ import { icons } from '../lib/icons';
 import { site } from '../lib/site';
 ---
 
-<section class="section cta-section" id="indir">
+<section class="section cta-section" id="download">
   <div class="wrap">
     <div class="cta reveal">
       <Bloom id="bloom-cta" class="cta-bloom" />
       <div class="cta-inner">
         <Wordmark class="cta-logo" />
-        <h2 class="cta-title">Masaüstünü evin yap.</h2>
-        <p class="cta-lead">Ücretsiz, açık kaynak ve yönetici izni istemez. Beğenmezsen tek tıkla eski görev çubuğuna dönersin.</p>
+        <h2 class="cta-title">Make your desktop feel like home.</h2>
+        <p class="cta-lead">Free, open source, and never asks for administrator privileges. If you don't love it, your original taskbar is only one click away.</p>
         <div class="cta-actions">
           <a class="btn btn-primary" href={site.downloadUrl}>
             <span set:html={icons.windows} />
-            Ücretsiz indir
+            Download for Free
           </a>
           <a class="btn btn-glass" href={site.githubUrl}>
             <span set:html={icons.github} />
-            Kaynak kodu
+            Source Code
           </a>
         </div>
-        <p class="cta-fine">Windows 10 1809 ve üstü · Kurulum gereken her şeyi içerir, Windows açılışında kendiliğinden başlar</p>
+        <p class="cta-fine">Windows 10 1809 and up · Self-contained installer, starts with Windows</p>
       </div>
     </div>
   </div>

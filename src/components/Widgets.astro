@@ -3,21 +3,21 @@ import { widgets } from '../scripts/widgets';
 import { icons } from '../lib/icons';
 import { site } from '../lib/site';
 
-const cats = ['Saatler', 'Hatırlatıcılar', 'Notlar', 'Medya', 'Sistem', 'Hava durumu'] as const;
+const cats = ['Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'] as const;
 const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.category === c).length]));
 ---
 
-<section class="section" id="widgetlar">
+<section class="section" id="widgets">
   <div class="wrap">
     <div class="section-head reveal">
-      <h2 class="section-title">Bol widget. Hepsi dahil.</h2>
+      <h2 class="section-title">Packed with widgets. All built-in.</h2>
       <p class="section-lead">
-        {widgets.length} widget, çoğu birden fazla görünümle. Aynı widget'ı istediğin kadar ekle; her kopyanın kendi ayarları olur.
+        {widgets.length} widgets, most featuring multiple styles and views. Add multiple instances of any widget—each instance keeps its own independent settings.
       </p>
     </div>
 
-    <div class="filters reveal" role="tablist" aria-label="Widget kategorileri" data-filters>
-      <button type="button" role="tab" aria-selected="true" data-filter="*">Tümü <span>{widgets.length}</span></button>
+    <div class="filters reveal" role="tablist" aria-label="Widget categories" data-filters>
+      <button type="button" role="tab" aria-selected="true" data-filter="*">All <span>{widgets.length}</span></button>
       {cats.map((c) => <button type="button" role="tab" aria-selected="false" data-filter={c}>{c} <span>{counts[c]}</span></button>)}
     </div>
 
@@ -28,7 +28,7 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
             <div class="wtile-stage">
               <div class="stage stage-strip" data-theme="dark" data-size="large" data-edge="bottom" data-layout="floating" data-mode="replace" data-backdrop="blur" data-phase="ready">
                 <div class="strip">
-                  <div class="widget-btn" data-preview role="button" tabindex="0" aria-label={`${w.name} önizlemesi: tıklayınca ${w.variants.length > 1 ? 'görünüm değişir' : 'çalışır'}`} />
+                  <div class="widget-btn" data-preview role="button" tabindex="0" aria-label={`${w.name} preview: click to ${w.variants.length > 1 ? 'cycle style' : 'trigger'}`} />
                 </div>
               </div>
             </div>
@@ -37,7 +37,7 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
               <p>{w.description}</p>
               <div class="wtile-foot">
                 {w.variants.length > 1 ? (
-                  <div class="chips" role="radiogroup" aria-label={`${w.name} görünümleri`}>
+                  <div class="chips" role="radiogroup" aria-label={`${w.name} variants`}>
                     {w.variants.map((v, i) => (
                       <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-variant={v.id}>
                         {v.name}
@@ -45,11 +45,11 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
                     ))}
                   </div>
                 ) : (
-                  <span class="single">Tek görünüm</span>
+                  <span class="single">Single style</span>
                 )}
                 <button class="add" type="button" data-add>
                   <span class="add-ic" set:html={icons.plus} />
-                  <span class="add-label">Demoya ekle</span>
+                  <span class="add-label">Add to demo</span>
                 </button>
               </div>
             </div>
@@ -59,7 +59,7 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
     </div>
 
     <p class="idea reveal">
-      Aklında başka bir widget mı var? <a href={site.githubUrl}>GitHub'da bir öneri aç</a>, yenileri düzenli olarak ekleniyor.
+      Have an idea for a new widget? <a href={site.githubUrl}>Open a request on GitHub</a>—new widgets and styles are added regularly.
     </p>
   </div>
 </section>

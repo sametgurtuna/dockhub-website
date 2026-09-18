@@ -14,7 +14,7 @@ function gear(cx: number, cy: number, outer: number, inner: number, teeth: numbe
 
 const svg = (body: string) => `<svg viewBox="0 0 48 48" aria-hidden="true">${body}</svg>`;
 
-/** Gradyanlar sayfadaki tek bir <svg> tanım bloğunda durur (AppDefs.astro); ikonlar id ile başvurur. */
+/** Gradients live in a single <svg> definition block on the page (Base.astro); icons reference them by id. */
 export const appDefs = `
 <linearGradient id="g-ex-back" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5B82E"/><stop offset="1" stop-color="#D9920F"/></linearGradient>
 <linearGradient id="g-ex-front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE48F"/><stop offset="1" stop-color="#FFC73D"/></linearGradient>
@@ -88,22 +88,22 @@ export interface AppDef {
 }
 
 export const dockApps: AppDef[] = [
-  { id: 'explorer', name: 'Dosya Gezgini' },
-  { id: 'browser', name: 'Tarayıcı' },
+  { id: 'explorer', name: 'File Explorer' },
+  { id: 'browser', name: 'Browser' },
   { id: 'terminal', name: 'Terminal' },
-  { id: 'notepad', name: 'Not Defteri' },
-  { id: 'music', name: 'Medya Oynatıcı' },
+  { id: 'notepad', name: 'Notepad' },
+  { id: 'music', name: 'Media Player' },
 ];
 
 export const appNames: Record<AppId, string> = {
-  explorer: 'Dosya Gezgini',
-  browser: 'Tarayıcı',
+  explorer: 'File Explorer',
+  browser: 'Browser',
   terminal: 'Terminal',
-  notepad: 'Not Defteri',
-  photos: 'Fotoğraflar',
-  music: 'Medya Oynatıcı',
-  settings: 'Ayarlar',
-  calculator: 'Hesap Makinesi',
-  bin: 'Geri Dönüşüm Kutusu',
-  pc: 'Bu bilgisayar',
+  notepad: 'Notepad',
+  photos: 'Photos',
+  music: 'Media Player',
+  settings: 'Settings',
+  calculator: 'Calculator',
+  bin: 'Recycle Bin',
+  pc: 'This PC',
 };

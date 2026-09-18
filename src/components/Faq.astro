@@ -4,64 +4,64 @@ import { site } from '../lib/site';
 
 const faqs = [
   {
-    q: 'Windows görev çubuğuma ne olur?',
-    a: 'DockHub modunda görev çubuğu gizlenir ve otomatik gizle moduna alınır; Explorer kapatılmaz. DockHub kapanınca, çökünce ya da oturum kapanırken görev çubuğu eski haline döner. "İkisi birlikte" modunda ise görev çubuğuna hiç dokunulmaz.',
+    q: 'What happens to my Windows taskbar?',
+    a: 'In "Replace" mode, the taskbar is smoothly hidden and set to auto-hide; Explorer is never terminated. When DockHub exits, crashes, or during logoff, your taskbar immediately returns to its original state. In "Both together" mode, the Windows taskbar is left completely untouched.',
   },
   {
-    q: 'Yönetici izni gerekiyor mu?',
-    a: 'Hayır. Uygulama normal kullanıcı olarak çalışır. Yönetici olarak çalıştırmaman önerilir, çünkü yükseltilmiş bir pencereye Explorer\'dan sürükle-bırak yapılamaz.',
+    q: 'Does DockHub require administrator privileges?',
+    a: 'No. DockHub runs purely as a standard user process. Running as administrator is actually discouraged, because Windows prevents drag-and-drop between unelevated Explorer windows and elevated processes.',
   },
   {
-    q: 'Uygulama çökerse ya da zorla kapatılırsa ne olur?',
-    a: 'Bir hata olduğunda görev çubuğu hemen geri getirilir. Görev Yöneticisi\'nden sonlandırma ya da elektrik kesintisi gibi durumlarda görev çubuğu otomatik gizli kalır, fare alt kenara gelince açılır. Bir sonraki açılışta ya da "DockHub.exe --restore-taskbar" komutuyla orijinal durum geri yüklenir.',
+    q: 'What if the app crashes or is forcibly killed?',
+    a: 'The built-in crash handler restores the taskbar before the process exits. In the event of a sudden power loss or force-kill via Task Manager, the taskbar remains in auto-hide mode and will slide open when your mouse hovers the screen edge. On your next session or by running "DockHub.exe --restore-taskbar", the original state is cleanly restored.',
   },
   {
-    q: 'Hangi Windows sürümlerinde çalışır?',
-    a: 'Windows 10 1809 (build 17763) ve üstünde. Yuvarlak köşeler ve Mica ayarlar penceresi için Windows 11 22H2 ve üstü önerilir. Kurulum dosyası gereken .NET bileşenlerini içinde getirir; ayrıca bir şey kurman gerekmez.',
+    q: 'Which Windows versions are supported?',
+    a: 'Windows 10 1809 (build 17763) and higher. For rounded corners and Mica blur materials, Windows 11 22H2 or newer is recommended. The installer bundles all required .NET runtime components—no prerequisites needed.',
   },
   {
-    q: 'Windows açılınca kendiliğinden başlar mı?',
-    a: 'Evet. Kurulum, DockHub\'ı varsayılan olarak Windows\'a girişte başlatır. İstersen kurulum sırasında ya da Ayarlar › Genel bölümünden kapatabilirsin.',
+    q: 'Does it launch automatically on startup?',
+    a: 'Yes. By default, the installer configures DockHub to start with Windows. You can easily toggle this off during installation or at any time in Settings › General.',
   },
   {
-    q: 'Widget nasıl eklenir, görünümü nasıl değişir?',
-    a: 'Dock\'ta boş bir alana sağ tıklayıp "Widget ekle" de ya da Ayarlar içindeki Widget galerisinde + düğmesine bas. Görünümü değiştirmek için widget\'a sağ tıklayıp Görünüm menüsünü kullan.',
+    q: 'How do I add widgets and change their appearance?',
+    a: 'Right-click any empty space on the dock and select "Add widget", or browse the Widget Gallery in Settings and click the "+" button. To change a widget\'s style, right-click it directly on the dock and choose an option from the "Appearance" submenu.',
   },
   {
-    q: 'İnternet bağlantısı kullanıyor mu?',
-    a: 'Yalnızca hava durumu için Open-Meteo\'ya ve şehir araması için onun konum servisine istek yapılır. API anahtarı ya da hesap gerekmez, başka hiçbir yere veri gönderilmez.',
+    q: 'Does it use an internet connection?',
+    a: 'Internet access is used solely for the weather widget (via Open-Meteo) and geocoding city search. No API keys or accounts are required, and no telemetry, tracking, or personal data is ever collected or sent.',
   },
   {
-    q: 'Ayarlarım nerede saklanıyor?',
-    a: 'Tüm ayarlar ve dock öğeleri %AppData%\\DockHub\\config.json dosyasında durur. Notlar, anımsatıcılar ve su sayacı aynı klasörün data alt klasöründedir. Dosyalar önce geçici olarak yazılıp sonra yerine taşındığı için yarıda kalan bir yazma dosyayı bozmaz.',
+    q: 'Where are my settings stored?',
+    a: 'All preferences and dock configurations reside in %AppData%\\DockHub\\config.json. User data such as notes, reminders, and hydration counters are kept in the data subfolder. Files are written atomically using safe temp files to prevent corruption.',
   },
   {
-    q: 'Windows 11\'in ağ, ses ve pil simgeleri görünüyor mu?',
-    a: 'Bu simgeler Explorer\'ın içindedir; dock\'ta klasik karşılıkları gösterilir. Hızlı ayarlar paneline saate ya da dock\'a sağ tıklayarak veya Win+A ile ulaşabilirsin.',
+    q: 'Do the Windows 11 network, volume, and battery flyouts work?',
+    a: 'DockHub displays native tray counterparts right on the dock. You can access Windows\' native Quick Settings panel by right-clicking the clock or dock, or by pressing Win+A.',
   },
   {
-    q: 'Birden fazla monitörde çalışır mı?',
-    a: 'Dock tek bir monitörde gösterilir ve hangi ekranda duracağını sen seçersin. Monitör başına DPI desteklenir.',
+    q: 'Does it support multi-monitor setups?',
+    a: 'Yes. DockHub displays on your designated monitor of choice, with full per-monitor DPI scaling support.',
   },
   {
-    q: 'StartAllBack ya da ExplorerPatcher ile birlikte kullanabilir miyim?',
-    a: 'Önerilmez. Görev çubuğunu değiştiren diğer araçlar (StartAllBack, ExplorerPatcher, RetroBar gibi) DockHub ile aynı anda çalıştırılmamalıdır.',
+    q: 'Can I use it alongside StartAllBack or ExplorerPatcher?',
+    a: 'It is not recommended. Running multiple third-party tools that hook or modify the Windows taskbar simultaneously can cause conflicts.',
   },
   {
-    q: 'Ücretli mi?',
-    a: 'Hayır. DockHub ücretsiz ve açık kaynaktır.',
+    q: 'Is it completely free?',
+    a: 'Yes. DockHub is 100% free and open source under the MIT license.',
   },
 ];
 ---
 
-<section class="section" id="sss">
+<section class="section" id="faq">
   <div class="wrap faq">
     <div class="faq-head reveal">
-      <h2 class="section-title">Bilmen gereken birkaç şey.</h2>
-      <p class="section-lead">Cevabını bulamadığın bir şey mi var?</p>
+      <h2 class="section-title">Frequently asked questions.</h2>
+      <p class="section-lead">Can't find the answer you're looking for?</p>
       <a class="btn btn-quiet faq-cta" href={site.githubUrl}>
         <span set:html={icons.github} />
-        GitHub'da sor
+        Ask on GitHub
       </a>
     </div>
     <div class="faq-list">

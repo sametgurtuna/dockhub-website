@@ -32,17 +32,17 @@ export const sim = {
   media: { index: 0, playing: true, pos: 48 },
   hydration: { count: 4, goal: 8, next: 25 * 60 },
   reminders: [
-    { id: 'r1', title: 'Faturayı öde', time: '15:00', done: false },
-    { id: 'r2', title: 'Annemi ara', time: '18:30', done: false },
-    { id: 'r3', title: 'Tasarım incelemesi', time: 'Yarın 10:30', done: false },
+    { id: 'r1', title: 'Pay electric bill', time: '3:00 PM', done: false },
+    { id: 'r2', title: 'Call mom', time: '6:30 PM', done: false },
+    { id: 'r3', title: 'Design review', time: 'Tomorrow 10:30 AM', done: false },
   ],
   weather: {
-    city: 'İstanbul',
+    city: 'Seattle',
     temp: 18,
     hi: 21,
     lo: 14,
     code: 'partly' as WeatherCode,
-    text: 'Parçalı bulutlu',
+    text: 'Partly cloudy',
     hourly: [
       { h: 1, t: 18, c: 'partly' as WeatherCode },
       { h: 2, t: 19, c: 'sun' as WeatherCode },
@@ -52,11 +52,11 @@ export const sim = {
       { h: 6, t: 16, c: 'rain' as WeatherCode },
     ],
     daily: [
-      { d: 'Bugün', hi: 21, lo: 14, c: 'partly' as WeatherCode },
-      { d: 'Cum', hi: 19, lo: 13, c: 'rain' as WeatherCode },
-      { d: 'Cmt', hi: 22, lo: 14, c: 'sun' as WeatherCode },
-      { d: 'Paz', hi: 23, lo: 15, c: 'sun' as WeatherCode },
-      { d: 'Pzt', hi: 20, lo: 14, c: 'cloud' as WeatherCode },
+      { d: 'Today', hi: 21, lo: 14, c: 'partly' as WeatherCode },
+      { d: 'Fri', hi: 19, lo: 13, c: 'rain' as WeatherCode },
+      { d: 'Sat', hi: 22, lo: 14, c: 'sun' as WeatherCode },
+      { d: 'Sun', hi: 23, lo: 15, c: 'sun' as WeatherCode },
+      { d: 'Mon', hi: 20, lo: 14, c: 'cloud' as WeatherCode },
     ],
   },
 };
@@ -153,10 +153,14 @@ export function onSecond(f: SecondFn) {
   return () => secondSubs.delete(f);
 }
 
-export const TR_DAYS = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
-export const TR_DAYS_LONG = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-export const TR_MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
-export const TR_MONTHS_LONG = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+export const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const DAYS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export const TR_DAYS = DAYS;
+export const TR_DAYS_LONG = DAYS_LONG;
+export const TR_MONTHS = MONTHS;
+export const TR_MONTHS_LONG = MONTHS_LONG;
 
 export const pad = (n: number) => String(n).padStart(2, '0');
 export const hhmm = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -164,4 +168,4 @@ export const mmss = (sec: number) => {
   const s = Math.max(0, Math.ceil(sec));
   return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
 };
-export const fmt1 = (v: number) => v.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+export const fmt1 = (v: number) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
