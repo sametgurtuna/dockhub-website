@@ -5,6 +5,13 @@ import { site } from '../lib/site';
 
 const cats = ['Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'] as const;
 const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.category === c).length]));
+
+const featured: Record<string, string> = {
+  media: '✨ v0.3.1 Live Pop-up & Seekbar',
+  clock: '✨ v0.3.1 Live Pop-up with Seconds',
+  audio: '🔊 One-Click Output & Mixer',
+  'battery-devices': '🔋 Bluetooth & Wireless Charge',
+};
 ---
 
 <section class="section" id="widgets">
@@ -24,7 +31,17 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
     <div class="wgrid" data-wgrid>
       {
         widgets.map((w) => (
-          <article class="wtile" data-cat={w.category} data-id={w.id} style={`--accent-w2:${w.accent}`}>
+          <article
+            class={`wtile ${w.id in featured ? 'wtile-featured' : ''}`}
+            data-cat={w.category}
+            data-id={w.id}
+            style={`--accent-w2:${w.accent}`}
+          >
+            {w.id in featured && (
+              <div class="wtile-badge">
+                <span>{featured[w.id]}</span>
+              </div>
+            )}
             <div class="wtile-stage">
               <div class="stage stage-strip" data-theme="dark" data-size="large" data-edge="bottom" data-layout="floating" data-mode="replace" data-backdrop="blur" data-phase="ready">
                 <div class="strip">
@@ -114,9 +131,11 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
   .wgrid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-auto-flow: dense;
+    gap: 20px;
   }
   .wtile {
+    position: relative;
     display: grid;
     grid-template-rows: auto 1fr;
     border-radius: 20px;
@@ -124,7 +143,32 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
     box-shadow: inset 0 0 0 1px var(--line);
     overflow: hidden;
     view-transition-class: wtile;
-    transition: box-shadow var(--t-med) var(--ease-out);
+    transition: box-shadow var(--t-med) var(--ease-out), border-color var(--t-fast);
+  }
+  .wtile-featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(16, 24, 38, 0.85) 0%, rgba(10, 14, 22, 0.75) 100%) !important;
+    border-color: rgba(76, 194, 255, 0.28) !important;
+    box-shadow: 0 20px 40px -15px rgba(0, 103, 192, 0.25), inset 0 1px 0 rgba(76, 194, 255, 0.3) !important;
+  }
+  .wtile-featured .wtile-stage :global(.stage-strip) {
+    height: 175px;
+  }
+  .wtile-badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 2;
+  }
+  .wtile-badge span {
+    font-size: 0.75rem;
+    font-weight: 650;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: rgba(76, 194, 255, 0.15);
+    border: 1px solid rgba(76, 194, 255, 0.4);
+    color: #c4ebff;
+    backdrop-filter: blur(12px);
   }
   .wtile:hover {
     box-shadow: inset 0 0 0 1px var(--line-strong);
@@ -277,9 +321,12 @@ const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.ca
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  @media (max-width: 640px) {
+  @media (max-width: 720px) {
     .wgrid {
       grid-template-columns: 1fr;
+    }
+    .wtile-featured {
+      grid-column: span 1;
     }
     .filters {
       flex-wrap: nowrap;
