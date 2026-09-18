@@ -90,12 +90,14 @@ const tbApps = ['explorer', 'browser', 'terminal', 'notepad'] as const;
     <div class="layer" data-layer></div>
     <div class="toasts" data-toasts aria-live="polite"></div>
   </div>
-  <div class="stage-overlay">
-    <slot name="overlay" />
-  </div>
+  {Astro.slots.has('overlay') && (
+    <div class="stage-overlay">
+      <slot name="overlay" />
+    </div>
+  )}
 </div>
 
-<slot name="between" />
+{Astro.slots.has('between') && <slot name="between" />}
 
 <div class="demo-bar" data-demo-bar>
   <div class="seg-group">

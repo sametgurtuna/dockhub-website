@@ -16,18 +16,46 @@ import { site } from '../lib/site';
         <div class="cta-actions">
           <a class="btn btn-primary" href={site.downloadUrl}>
             <span set:html={icons.windows} />
-            Ücretsiz indir
+            Ücretsiz indir (v0.3.1)
           </a>
-          <a class="btn btn-glass" href={site.githubUrl}>
+          <button class="btn-terminal" type="button" data-copy-cmd="winget install DockHub" aria-label="Terminal komutunu kopyala">
+            <span class="prompt">&gt;</span>
+            <code>winget install DockHub</code>
+            <span class="copy-ic" set:html={icons.copy} />
+          </button>
+          <a class="btn btn-glass" href={site.githubUrl} target="_blank" rel="noopener">
             <span set:html={icons.github} />
-            Kaynak kodu
+            GitHub
           </a>
         </div>
-        <p class="cta-fine">Windows 10 1809 ve üstü · Kurulum gereken her şeyi içerir, Windows açılışında kendiliğinden başlar</p>
+        <p class="cta-fine">Windows 10 ve 11 · Kurulum gereken her şeyi içerir · Açık kaynak & ücretsiz</p>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('#indir [data-copy-cmd]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const cmd = btn.dataset.copyCmd;
+      if (!cmd) return;
+      try {
+        await navigator.clipboard.writeText(cmd);
+        btn.classList.add('is-copied');
+        const copyIc = btn.querySelector('.copy-ic');
+        if (copyIc) {
+          copyIc.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+        }
+        setTimeout(() => {
+          btn.classList.remove('is-copied');
+          if (copyIc) {
+            copyIc.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>`;
+          }
+        }, 2000);
+      } catch {}
+    });
+  });
+</script>
 
 <style>
   .cta {
