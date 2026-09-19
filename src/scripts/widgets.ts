@@ -255,6 +255,7 @@ const ICON = {
   audio: 'M11,4 L6,8 H3 A1,1 0 0 0 2,9 V15 A1,1 0 0 0 3,16 H6 L11,20 A1,1 0 0 0 12.5,19.2 V4.8 A1,1 0 0 0 11,4 Z M16,8 A5,5 0 0 1 16,16 M19,5 A9,9 0 0 1 19,19',
   batteryDevices: 'M4,7 H18 A2,2 0 0 1 20,9 V15 A2,2 0 0 1 18,17 H4 A2,2 0 0 1 2,15 V9 A2,2 0 0 1 4,7 Z M20,11 H22 V13 H20 Z',
   recycleBin: 'M3,6 H21 M8,6 V4 A2,2 0 0 1 10,2 H14 A2,2 0 0 1 16,4 V6 M19,6 V20 A2,2 0 0 1 17,22 H7 A2,2 0 0 1 5,20 V6 Z M10,11 V17 M14,11 V17',
+  group: 'M3,7 H21 V19 A2,2 0 0 1 19,21 H5 A2,2 0 0 1 3,19 Z M3,7 L7,3 H13 L15,5',
 };
 
 const cities = [
@@ -1492,6 +1493,83 @@ export const widgets: WidgetDef[] = [
           'Recycle Bin',
           h('div', { class: 'wp-hero-sub', text: '3 items · 142 MB' }),
           h('div', { class: 'wp-foot', text: 'Drag and drop files onto the dock icon to delete them.' })
+        ),
+      };
+    },
+  },
+  /* --------------------------------------------------- Widget & App Groups */
+  {
+    id: 'group',
+    name: 'Widget & App Groups',
+    category: 'System',
+    description: 'Group apps and widgets into neat folders. Click to expand with a staggered, spring-animated fan out effect.',
+    icon: ICON.group,
+    accent: ACCENT.blue,
+    variants: [
+      { id: 'folder', name: 'Folder' },
+      { id: 'fan', name: 'Fan preview' },
+    ],
+    card(i) {
+      if (i.variant === 'fan') {
+        const miniIcons = [
+          glyph(ICON.music, ACCENT.pink),
+          glyph(ICON.weather, ACCENT.cyan),
+          glyph(ICON.stopwatch, ACCENT.orange),
+        ];
+        return {
+          el: card(
+            'wc-group-fan',
+            h('div', { style: 'display:flex;align-items:center;gap:4px;' }, ...miniIcons),
+            h('div', { class: 'wc-stack' },
+              h('div', { class: 'wc-title', text: 'Dev & Media' }),
+              h('div', { class: 'wc-sub num', text: '3 items' })
+            )
+          ),
+        };
+      }
+      const g2x2 = h('div', { style: 'display:grid;grid-template-columns:14px 14px;gap:2px;padding:2px;place-items:center;' },
+        glyph(ICON.music, ACCENT.pink),
+        glyph(ICON.weather, ACCENT.cyan),
+        glyph(ICON.stopwatch, ACCENT.orange),
+        glyph(ICON.network, ACCENT.blue)
+      );
+      return {
+        el: card(
+          'wc-square',
+          g2x2
+        ),
+      };
+    },
+    compact() {
+      return {
+        el: compactTile(glyph(ICON.group, ACCENT.blue), h('div', { class: 'wt-text', text: 'Folder' })),
+      };
+    },
+    panel() {
+      const items = [
+        { name: 'Now Playing', cat: 'Widget', icon: ICON.music, color: ACCENT.pink },
+        { name: 'Weather', cat: 'Widget', icon: ICON.weather, color: ACCENT.cyan },
+        { name: 'Stopwatch', cat: 'Widget', icon: ICON.stopwatch, color: ACCENT.orange },
+        { name: 'VS Code', cat: 'Application', icon: ICON.network, color: ACCENT.blue },
+      ];
+      const rows = items.map((x) =>
+        h(
+          'div',
+          { class: 'wp-list-row' },
+          glyph(x.icon, x.color),
+          h('div', { class: 'grow' },
+            h('div', { class: 'wp-strong', text: x.name }),
+            h('div', { class: 'wp-muted', text: x.cat })
+          ),
+          h('button', { class: 'wp-chip', text: 'Launch' })
+        )
+      );
+      return {
+        el: panelShell(
+          'Folder: Dev & Media',
+          h('div', { class: 'wp-hero-sub', text: 'Click folder on dock to fan out with spring wave animations' }),
+          h('div', { class: 'wp-list' }, ...rows),
+          h('div', { class: 'wp-foot', text: 'Drag apps or widgets onto any folder to group them. Right-click to rename or dissolve.' })
         ),
       };
     },

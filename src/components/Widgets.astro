@@ -7,8 +7,9 @@ const cats = ['Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'] as c
 const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.category === c).length]));
 
 const featured: Record<string, string> = {
-  media: '✨ v0.4.0 Live Pop-up & Seekbar',
-  clock: '✨ v0.4.0 Live Pop-up with Seconds',
+  group: '✨ v0.5.0 Staggered Fan & Folders',
+  media: '✨ Live Pop-up & Seekbar',
+  clock: '✨ Live Pop-up with Seconds',
   audio: '🔊 One-Click Output & Mixer',
   'battery-devices': '🔋 Bluetooth & Wireless Charge',
 };
