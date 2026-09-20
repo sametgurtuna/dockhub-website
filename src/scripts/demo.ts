@@ -5,10 +5,26 @@ import { appIcons, appNames, type AppId } from '../lib/apps';
 import { onSecond, setVisible, pad, sim, tracks } from './sim';
 
 type Edge = 'bottom' | 'top' | 'left' | 'right';
+type GroupChild = { key: string; kind: 'app'; app: AppId } | { key: string; kind: 'widget'; inst: Instance };
 type Item =
   | { key: string; kind: 'app'; app: AppId }
   | { key: string; kind: 'sep' }
-  | { key: string; kind: 'widget'; inst: Instance };
+  | { key: string; kind: 'widget'; inst: Instance }
+  | { key: string; kind: 'group'; name: string; accent: string; children: GroupChild[] };
+
+const GROUP_ACCENTS = ['var(--c-blue)', 'var(--c-green)', 'var(--c-orange)', 'var(--c-pink)', 'var(--c-purple)', 'var(--c-cyan)'];
+
+function childName(c: GroupChild): string {
+  return c.kind === 'app' ? appNames[c.app] : widgetById[c.inst.id].name;
+}
+function childAccent(c: GroupChild): string {
+  return c.kind === 'app' ? 'var(--c-blue)' : widgetById[c.inst.id].accent;
+}
+function childGlyphHtml(c: GroupChild): string {
+  if (c.kind === 'app') return `<span class="grp-mini-app">${appIcons[c.app]}</span>`;
+  const def = widgetById[c.inst.id];
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="${def.accent}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${def.icon}"/></svg>`;
+}
 
 type Entry =
   | 'sep'
@@ -60,10 +76,22 @@ export function initDemo() {
 
   const apps = () => [app('explorer'), app('browser'), app('terminal'), app('notepad')];
   const sep = (): Item => ({ key: nextKey(), kind: 'sep' });
+  const wc = (id: string, variant?: string): GroupChild => w(id, variant) as GroupChild;
+  const group = (name: string, accent: string, children: GroupChild[]): Item => ({ key: nextKey(), kind: 'group', name, accent, children });
   let items: Item[] =
     stage.offsetWidth < 600
-      ? [w('clock', 'analog'), w('weather', 'current'), w('system', 'rings'), w('hydration', 'timer'), w('media', 'compact'), sep(), ...apps(), w('notes')]
-      : [...apps(), sep(), w('clock', 'analog'), w('media', 'full'), w('weather', 'current'), w('system', 'rings'), w('hydration', 'timer'), w('notes')];
+      ? [w('clock', 'analog'), w('weather', 'current'), w('system', 'rings'), w('hydration', 'timer'), w('media', 'compact'), sep(), ...apps(), group('Extras', GROUP_ACCENTS[2], [wc('ai-usage', 'rings'), wc('recycle-bin', 'icon')])]
+      : [
+          ...apps(),
+          sep(),
+          w('clock', 'analog'),
+          w('media', 'full'),
+          w('weather', 'current'),
+          w('system', 'rings'),
+          w('hydration', 'timer'),
+          w('notes'),
+          group('Extras', GROUP_ACCENTS[2], [wc('ai-usage', 'rings'), wc('audio', 'compact'), wc('recycle-bin', 'icon'), wc('battery-devices', 'single')]),
+        ];
 
   const shell = stage.closest<HTMLElement>('[data-stage-shell]');
   const syncEngaged = () => {
@@ -108,6 +136,22 @@ export function initDemo() {
         e.preventDefault();
         e.stopPropagation();
         appMenu(it, e);
+      });
+      return { el: h('div', { class: 'dock-item', 'data-key': it.key }, btn), btn };
+    }
+    if (it.kind === 'group') {
+      const btn = h('button', {
+        class: 'db group-btn',
+        type: 'button',
+        'aria-label': `${it.name} folder, ${it.children.length} items`,
+        style: `--group-accent:${it.accent}`,
+      });
+      renderGroupTile(btn, it);
+      btn.addEventListener('click', () => toggleGroupFan(it, btn));
+      btn.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        groupMenu(it, btn, e);
       });
       return { el: h('div', { class: 'dock-item', 'data-key': it.key }, btn), btn };
     }
@@ -266,6 +310,11 @@ export function initDemo() {
     let longPress = 0;
     const touch = e.pointerType !== 'mouse';
     const pointerId = e.pointerId;
+    let mergeTarget: HTMLElement | null = null;
+    const clearMergeTarget = () => {
+      mergeTarget?.classList.remove('is-group-target');
+      mergeTarget = null;
+    };
 
     const begin = () => {
       dragging = true;
@@ -293,18 +342,44 @@ export function initDemo() {
         begin();
       }
       ev.preventDefault();
+      const canGroup = !dragEl.classList.contains('dock-sep');
+      let candidate: HTMLElement | null = null;
+      let overTarget: HTMLElement | null = null;
+      if (canGroup) {
+        const prevPointerEvents = dragEl.style.pointerEvents;
+        dragEl.style.pointerEvents = 'none';
+        const stack = document.elementsFromPoint(ev.clientX, ev.clientY) as HTMLElement[];
+        dragEl.style.pointerEvents = prevPointerEvents;
+        const cand = stack.map((el) => el.closest<HTMLElement>('.dock-item')).find((el) => el && itemsEl.contains(el)) ?? null;
+        if (cand && cand !== dragEl && !cand.classList.contains('dock-sep')) {
+          candidate = cand;
+          const r = cand.getBoundingClientRect();
+          const pad = axisX ? r.width * 0.28 : r.height * 0.28;
+          const inner = axisX ? ev.clientX > r.left + pad && ev.clientX < r.right - pad : ev.clientY > r.top + pad && ev.clientY < r.bottom - pad;
+          if (inner) overTarget = cand;
+        }
+      }
+      if (overTarget !== mergeTarget) {
+        clearMergeTarget();
+        mergeTarget = overTarget;
+        mergeTarget?.classList.add('is-group-target');
+      }
       const desired = startCenter + delta + (scrollPos() - startScroll);
-      const kids = [...itemsEl.children] as HTMLElement[];
-      const others = kids.filter((k) => k !== dragEl);
-      let idx = others.findIndex((k) => pos(k) > desired);
-      if (idx < 0) idx = others.length;
-      if (kids.indexOf(dragEl) !== idx) {
-        const before = new Map(others.map((k) => [k, pos(k)]));
-        itemsEl.insertBefore(dragEl, others[idx] ?? null);
-        others.forEach((k) => {
-          const d = before.get(k)! - pos(k);
-          if (d) k.animate([{ transform: axisX ? `translateX(${d}px)` : `translateY(${d}px)` }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.1,0.9,0.2,1)' });
-        });
+      // Reordering is paused while hovering anywhere over another item (not just the
+      // inner merge zone) so the DOM doesn't shuffle out from under a merge attempt.
+      if (!mergeTarget && !candidate) {
+        const kids = [...itemsEl.children] as HTMLElement[];
+        const others = kids.filter((k) => k !== dragEl);
+        let idx = others.findIndex((k) => pos(k) > desired);
+        if (idx < 0) idx = others.length;
+        if (kids.indexOf(dragEl) !== idx) {
+          const before = new Map(others.map((k) => [k, pos(k)]));
+          itemsEl.insertBefore(dragEl, others[idx] ?? null);
+          others.forEach((k) => {
+            const d = before.get(k)! - pos(k);
+            if (d) k.animate([{ transform: axisX ? `translateX(${d}px)` : `translateY(${d}px)` }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.1,0.9,0.2,1)' });
+          });
+        }
       }
       const off = desired - pos(dragEl);
       dragEl.style.transform = axisX ? `translateX(${off}px)` : `translateY(${off}px)`;
@@ -326,6 +401,13 @@ export function initDemo() {
       const t = dragEl.style.transform;
       dragEl.style.transform = '';
       dragEl.classList.remove('is-dragging');
+      const dropTarget = mergeTarget;
+      clearMergeTarget();
+      if (dropTarget) {
+        mergeIntoGroup(dropTarget.dataset.key!, dragEl.dataset.key!);
+        evalHide();
+        return;
+      }
       if (t) dragEl.animate([{ transform: t }, { transform: 'none' }], { duration: 250, easing: 'cubic-bezier(0.1,0.9,0.2,1)' });
       const order = [...itemsEl.children].map((k) => (k as HTMLElement).dataset.key);
       items = order.map((k) => items.find((i) => i.key === k)!).filter(Boolean);
@@ -706,6 +788,161 @@ export function initDemo() {
     const def = widgetById[it.inst.id];
     const view = def.panel(it.inst, env);
     openFlyout(view.el, { kind: `w-${it.key}`, anchor, views: [view], cls: def.id === 'notes' ? 'note-fly' : '', focus: def.id === 'notes' ? 'textarea' : undefined });
+  }
+
+  /* ------------------------------------------------------------ groups */
+
+  function renderGroupTile(btn: HTMLElement, it: Extract<Item, { kind: 'group' }>) {
+    const shown = it.children.slice(0, 4);
+    btn.replaceChildren(
+      h('span', {
+        class: `group-grid group-grid-${Math.min(shown.length, 4) || 1}`,
+        html: shown.length ? shown.map((c) => `<span class="group-mini">${childGlyphHtml(c)}</span>`).join('') : '<span class="group-mini group-mini-empty"></span>',
+      }),
+    );
+  }
+
+  function findGroup(key: string) {
+    const it = items.find((i) => i.key === key);
+    return it && it.kind === 'group' ? it : undefined;
+  }
+
+  function mergeIntoGroup(targetKey: string, draggedKey: string) {
+    const targetIdx = items.findIndex((i) => i.key === targetKey);
+    const draggedIdx = items.findIndex((i) => i.key === draggedKey);
+    if (targetIdx < 0 || draggedIdx < 0 || targetKey === draggedKey) return;
+    const target = items[targetIdx];
+    const dragged = items[draggedIdx];
+    if (dragged.kind === 'sep' || dragged.kind === 'group') return;
+
+    unmount(recs.get(draggedKey)?.view);
+    recs.get(draggedKey)?.el.remove();
+    recs.delete(draggedKey);
+
+    if (target.kind === 'group') {
+      items.splice(draggedIdx, 1);
+      target.children.push(dragged);
+      const rec = recs.get(targetKey);
+      if (rec) renderGroupTile(rec.btn, target);
+      toast('Added to folder', `${childName(dragged)} was added to “${target.name}”.`);
+    } else if (target.kind === 'app' || target.kind === 'widget') {
+      const group: Item = { key: nextKey(), kind: 'group', name: 'Folder', accent: GROUP_ACCENTS[Math.floor(Math.random() * GROUP_ACCENTS.length)], children: [target, dragged] };
+      unmount(recs.get(targetKey)?.view);
+      recs.get(targetKey)?.el.remove();
+      recs.delete(targetKey);
+      const insertAt = Math.min(targetIdx, draggedIdx);
+      items = items.filter((i) => i.key !== targetKey && i.key !== draggedKey);
+      items.splice(Math.min(insertAt, items.length), 0, group);
+      toast('Folder created', `“${childName(target)}” and “${childName(dragged)}” grouped together.`);
+    } else return;
+    render();
+  }
+
+  function toggleGroupFan(it: Extract<Item, { kind: 'group' }>, anchor: HTMLElement) {
+    if (fly && fly.kind === `group-${it.key}`) {
+      closeFlyout();
+      return;
+    }
+    const draw = () => {
+      const tiles = it.children.map((c, idx) => {
+        const mini = h('button', {
+          class: c.kind === 'app' ? 'db app-btn group-fan-item' : 'widget-btn group-fan-item',
+          type: 'button',
+          'aria-label': childName(c),
+          title: childName(c),
+          style: `--fan-i:${idx}`,
+        });
+        if (c.kind === 'app') {
+          mini.append(h('span', { class: 'app-ico', html: appIcons[c.app] }));
+          mini.addEventListener('click', () => {
+            toggleApp(c.app, mini);
+            closeFlyout();
+          });
+        } else {
+          const def = widgetById[c.inst.id];
+          const view = def.compact(c.inst, env);
+          mini.append(view.el);
+          mount(view);
+          mini.addEventListener('click', () => openWidgetPanel(c, mini));
+        }
+        mini.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openMenu(
+            [{ head: childName(c) }, { label: 'Remove from folder', icon: 'close', run: () => removeFromGroup(it.key, c.key) }],
+            e,
+          );
+        });
+        return mini;
+      });
+      return h('div', { class: 'group-fan', style: `--n:${tiles.length}` }, ...tiles);
+    };
+    const content = draw();
+    openFlyout(content, { kind: `group-${it.key}`, anchor, cls: 'group-fan-fly' });
+  }
+
+  function removeFromGroup(groupKey: string, childKey: string) {
+    const group = findGroup(groupKey);
+    if (!group) return;
+    const idx = group.children.findIndex((c) => c.key === childKey);
+    if (idx < 0) return;
+    const [child] = group.children.splice(idx, 1);
+    const groupIdx = items.findIndex((i) => i.key === groupKey);
+    if (group.children.length === 0) {
+      items.splice(groupIdx, 1, child);
+    } else {
+      items.splice(groupIdx + 1, 0, child);
+    }
+    if (child.kind === 'widget') track(child.inst, env);
+    closeFlyout();
+    render(child.key);
+    toast('Removed from folder', `${childName(child)} moved back to the dock.`);
+  }
+
+  function groupMenu(it: Extract<Item, { kind: 'group' }>, btn: HTMLElement, e: MouseEvent | null) {
+    const entries: Entry[] = [
+      { head: it.name },
+      {
+        label: 'Color',
+        icon: 'sparkle',
+        sub: GROUP_ACCENTS.map((c, idx) => ({ label: `Color ${idx + 1}`, checked: it.accent === c, run: () => { it.accent = c; btn.style.setProperty('--group-accent', c); } })),
+      },
+      { label: 'Rename…', icon: 'settings', run: () => openRenameGroup(it, btn) },
+      'sep',
+      {
+        label: 'Ungroup',
+        icon: 'widgets',
+        run: () => {
+          const idx = items.findIndex((i) => i.key === it.key);
+          if (idx < 0) return;
+          items.splice(idx, 1, ...it.children);
+          it.children.forEach((c) => { if (c.kind === 'widget') track(c.inst, env); });
+          render();
+          toast('Ungrouped', `“${it.name}” was dissolved.`);
+        },
+      },
+      { label: 'Remove from dock', icon: 'close', danger: true, run: () => { it.children.forEach((c) => c.kind === 'widget' && untrack(c.inst)); removeItem(it.key); } },
+    ];
+    openMenu(entries, e, btn);
+  }
+
+  function openRenameGroup(it: Extract<Item, { kind: 'group' }>, anchor: HTMLElement) {
+    const input = h('input', { class: 'grp-rename-input', type: 'text', value: it.name, maxlength: '24' }) as HTMLInputElement;
+    const save = () => {
+      it.name = input.value.trim() || 'Folder';
+      const rec = recs.get(it.key);
+      if (rec) rec.btn.setAttribute('aria-label', `${it.name} folder, ${it.children.length} items`);
+      closeFlyout();
+    };
+    const content = h(
+      'div',
+      { class: 'grp-rename' },
+      h('div', { class: 'grp-rename-title', text: 'Rename folder' }),
+      input,
+      h('button', { class: 'wp-chip', text: 'Save', onclick: save }),
+    );
+    input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') save(); });
+    openFlyout(content, { kind: `rename-${it.key}`, anchor, cls: 'grp-rename-fly', focus: 'input' });
   }
 
   /* ------------------------------------------------------------ start */

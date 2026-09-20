@@ -3,15 +3,15 @@ import { widgets } from '../scripts/widgets';
 import { icons } from '../lib/icons';
 import { site } from '../lib/site';
 
-const cats = ['Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'] as const;
+const cats = ['Clocks', 'Reminders', 'Notes', 'Media', 'System', 'AI', 'Weather'] as const;
 const counts = Object.fromEntries(cats.map((c) => [c, widgets.filter((w) => w.category === c).length]));
 
 const featured: Record<string, string> = {
-  group: '✨ v0.5.0 Staggered Fan & Folders',
   media: '✨ Live Pop-up & Seekbar',
   clock: '✨ Live Pop-up with Seconds',
   audio: '🔊 One-Click Output & Mixer',
   'battery-devices': '🔋 Bluetooth & Wireless Charge',
+  'ai-usage': '✨ New in v0.5.0',
 };
 ---
 

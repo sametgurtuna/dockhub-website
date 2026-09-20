@@ -162,7 +162,7 @@ function tickBar(count: number) {
 
 /* ------------------------------------------------------------ registry */
 
-export type Category = 'Clocks' | 'Reminders' | 'Notes' | 'Media' | 'System' | 'Weather';
+export type Category = 'Clocks' | 'Reminders' | 'Notes' | 'Media' | 'System' | 'Weather' | 'AI';
 
 export interface Instance {
   uid: string;
@@ -256,6 +256,7 @@ const ICON = {
   batteryDevices: 'M4,7 H18 A2,2 0 0 1 20,9 V15 A2,2 0 0 1 18,17 H4 A2,2 0 0 1 2,15 V9 A2,2 0 0 1 4,7 Z M20,11 H22 V13 H20 Z',
   recycleBin: 'M3,6 H21 M8,6 V4 A2,2 0 0 1 10,2 H14 A2,2 0 0 1 16,4 V6 M19,6 V20 A2,2 0 0 1 17,22 H7 A2,2 0 0 1 5,20 V6 Z M10,11 V17 M14,11 V17',
   group: 'M3,7 H21 V19 A2,2 0 0 1 19,21 H5 A2,2 0 0 1 3,19 Z M3,7 L7,3 H13 L15,5',
+  ai: 'M12,3 L14.2,9.2 L20.8,9.2 L15.5,13.1 L17.5,19.3 L12,15.6 L6.5,19.3 L8.5,13.1 L3.2,9.2 L9.8,9.2 Z',
 };
 
 const cities = [
@@ -1497,80 +1498,102 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
-  /* --------------------------------------------------- Widget & App Groups */
+  /* --------------------------------------------------- AI Usage */
   {
-    id: 'group',
-    name: 'Widget & App Groups',
-    category: 'System',
-    description: 'Group apps and widgets into neat folders. Click to expand with a staggered, spring-animated fan out effect.',
-    icon: ICON.group,
-    accent: ACCENT.blue,
+    id: 'ai-usage',
+    name: 'AI Usage',
+    category: 'AI',
+    description: 'Claude Code subscription usage: 5-hour and weekly limits, refreshed in the background every 5 minutes.',
+    icon: ICON.ai,
+    accent: ACCENT.orange,
     variants: [
-      { id: 'folder', name: 'Folder' },
-      { id: 'fan', name: 'Fan preview' },
+      { id: 'rings', name: 'Rings' },
+      { id: 'numbers', name: 'Numbers' },
+      { id: 'bars', name: 'Bars' },
     ],
+    init() {
+      return { hour: 34, week: 58 };
+    },
     card(i) {
-      if (i.variant === 'fan') {
-        const miniIcons = [
-          glyph(ICON.music, ACCENT.pink),
-          glyph(ICON.weather, ACCENT.cyan),
-          glyph(ICON.stopwatch, ACCENT.orange),
-        ];
+      const metrics = [
+        { key: 'hour' as const, label: '5-hour' },
+        { key: 'week' as const, label: 'Weekly' },
+      ];
+      if (i.variant === 'bars') {
+        const bs = metrics.map((m) => {
+          const fill = h('i', { style: `background:${ACCENT.orange}` });
+          const v = h('span', { class: 'num' });
+          return { m, fill, v, el: h('div', { class: 'wc-barrow' }, h('span', { class: 'wc-cap', text: m.label }), h('div', { class: 'hbar', style: `background:${TRACK.orange}` }, fill), v) };
+        });
         return {
-          el: card(
-            'wc-group-fan',
-            h('div', { style: 'display:flex;align-items:center;gap:4px;' }, ...miniIcons),
-            h('div', { class: 'wc-stack' },
-              h('div', { class: 'wc-title', text: 'Dev & Media' }),
-              h('div', { class: 'wc-sub num', text: '3 items' })
-            )
-          ),
+          el: card('wc-stack wc-bars', ...bs.map((x) => x.el)),
+          refresh: () =>
+            bs.forEach(({ m, fill, v }) => {
+              fill.style.transform = `scaleX(${i.state[m.key] / 100})`;
+              v.textContent = `${Math.round(i.state[m.key])}%`;
+            }),
         };
       }
-      const g2x2 = h('div', { style: 'display:grid;grid-template-columns:14px 14px;gap:2px;padding:2px;place-items:center;' },
-        glyph(ICON.music, ACCENT.pink),
-        glyph(ICON.weather, ACCENT.cyan),
-        glyph(ICON.stopwatch, ACCENT.orange),
-        glyph(ICON.network, ACCENT.blue)
-      );
+      if (i.variant === 'numbers') {
+        const nums = metrics.map((m) => h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title num' }), h('div', { class: 'wc-sub', text: m.label })));
+        return {
+          el: card('wc-ai-numbers', glyph(ICON.ai, ACCENT.orange), ...nums),
+          refresh: () => nums.forEach((n, idx) => (n.firstElementChild!.textContent = `${Math.round(i.state[metrics[idx].key])}%`)),
+        };
+      }
+      const rings = metrics.map((m) => {
+        const g = ring(26, 3, ACCENT.orange, TRACK.orange);
+        g.inner.classList.add('num');
+        const cap = h('div', { class: 'wc-cap', text: m.label });
+        return { m, g, cap, el: h('div', { class: 'wc-ringcell' }, g.el, cap) };
+      });
       return {
-        el: card(
-          'wc-square',
-          g2x2
-        ),
+        el: card('wc-rings wc-ai', ...rings.map((r) => r.el)),
+        refresh: () =>
+          rings.forEach(({ m, g }) => {
+            g.set(i.state[m.key]);
+            g.inner.textContent = String(Math.round(i.state[m.key]));
+          }),
       };
     },
-    compact() {
+    compact(i) {
+      const g = ring(26, 2.6, ACCENT.orange, TRACK.orange);
       return {
-        el: compactTile(glyph(ICON.group, ACCENT.blue), h('div', { class: 'wt-text', text: 'Folder' })),
+        el: compactTile(g.el, h('div', { class: 'wt-text', text: '5h' })),
+        refresh: () => {
+          g.set(i.state.hour);
+          g.inner.textContent = String(Math.round(i.state.hour));
+        },
       };
     },
-    panel() {
-      const items = [
-        { name: 'Now Playing', cat: 'Widget', icon: ICON.music, color: ACCENT.pink },
-        { name: 'Weather', cat: 'Widget', icon: ICON.weather, color: ACCENT.cyan },
-        { name: 'Stopwatch', cat: 'Widget', icon: ICON.stopwatch, color: ACCENT.orange },
-        { name: 'VS Code', cat: 'Application', icon: ICON.network, color: ACCENT.blue },
+    panel(i, env) {
+      const metrics = [
+        { key: 'hour' as const, label: '5-hour limit', sub: 'Resets a few hours after your first message in the window' },
+        { key: 'week' as const, label: 'Weekly limit', sub: 'Resets every 7 days' },
       ];
-      const rows = items.map((x) =>
-        h(
-          'div',
-          { class: 'wp-list-row' },
-          glyph(x.icon, x.color),
-          h('div', { class: 'grow' },
-            h('div', { class: 'wp-strong', text: x.name }),
-            h('div', { class: 'wp-muted', text: x.cat })
-          ),
-          h('button', { class: 'wp-chip', text: 'Launch' })
-        )
-      );
+      const rows = metrics.map((m) => {
+        const g = ring(40, 4, ACCENT.orange, TRACK.orange);
+        g.inner.classList.add('num');
+        const v = h('div', { class: 'wp-num num' });
+        return { m, g, v, el: h('div', { class: 'wp-list-row' }, g.el, h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: m.label }), h('div', { class: 'wp-muted', text: m.sub })), v) };
+      });
+      const refreshBtn = h('button', {
+        class: 'wp-chip',
+        text: 'Refresh now',
+        onclick: () => {
+          i.state.hour = Math.min(100, Math.round(i.state.hour + 6 + Math.random() * 10));
+          i.state.week = Math.min(100, Math.round(i.state.week + 2 + Math.random() * 6));
+          env.refreshAll();
+        },
+      });
       return {
-        el: panelShell(
-          'Folder: Dev & Media',
-          h('div', { class: 'wp-hero-sub', text: 'Click folder on dock to fan out with spring wave animations' }),
-          h('div', { class: 'wp-list' }, ...rows),
-          h('div', { class: 'wp-foot', text: 'Drag apps or widgets onto any folder to group them. Right-click to rename or dissolve.' })
-        ),
+        el: panelShell('AI Usage', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el)), h('div', { class: 'wp-note-row' }, h('span', { class: 'wp-muted', text: "Reads Claude Code's own usage via 'claude -p /usage'." }), refreshBtn)),
+        refresh: () =>
+          rows.forEach(({ m, g, v }) => {
+            g.set(i.state[m.key]);
+            g.inner.textContent = String(Math.round(i.state[m.key]));
+            v.textContent = `${Math.round(i.state[m.key])}%`;
+          }),
       };
     },
   },
