@@ -1,0 +1,294 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+interface Shot {
+  file: string;
+  w: number;
+  h: number;
+  title: string;
+  body: string;
+  span?: boolean;
+}
+
+const shots: Shot[] = [
+  {
+    file: 'dock-overview.jpg',
+    w: 1600,
+    h: 900,
+    title: 'The dock, on a real desktop',
+    body: 'Pinned apps, a sticky note, headset battery, media controls, a clock, AI usage rings, an app folder and live weather. All in one bar.',
+    span: true,
+  },
+  {
+    file: 'groups-folder.jpg',
+    w: 770,
+    h: 460,
+    title: 'Folders that fan open',
+    body: 'Drag any two items together to make a folder. Click it to expand, then rename it or give it a color.',
+  },
+  {
+    file: 'window-preview.jpg',
+    w: 1000,
+    h: 520,
+    title: 'Live window previews',
+    body: 'Hover a running app for a real thumbnail of its window, with a close button right there.',
+  },
+  {
+    file: 'jump-list.jpg',
+    w: 900,
+    h: 420,
+    title: 'Jump Lists',
+    body: 'Right-click an app for its recent files and tasks, plus run as administrator and pin controls.',
+  },
+  {
+    file: 'widget-gallery.jpg',
+    w: 1400,
+    h: 788,
+    title: 'Widget gallery',
+    body: 'Every widget previewed live with its real data. Press the plus button and it grows into the dock.',
+  },
+  {
+    file: 'light-vertical.jpg',
+    w: 1400,
+    h: 788,
+    title: 'Light theme, vertical dock',
+    body: 'Move the dock to any edge. On the left or right, widgets collapse into compact tiles.',
+  },
+  {
+    file: 'start-menu.jpg',
+    w: 1400,
+    h: 788,
+    title: 'The real Start menu',
+    body: 'The Start button opens the genuine Windows Start menu. Search and the Windows key work exactly as before.',
+  },
+  {
+    file: 'settings.jpg',
+    w: 1400,
+    h: 788,
+    title: 'Settings for everything',
+    body: 'Theme, glass, tint, size, shape, edge margin, width, alignment, screen edge and monitor.',
+  },
+  {
+    file: 'explorer-pin.jpg',
+    w: 1400,
+    h: 788,
+    title: 'Pin from File Explorer',
+    body: 'Right-click any program or shortcut and send it straight to the dock.',
+  },
+];
+---
+
+<section class="section" id="shots">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title">Real screenshots, not mockups.</h2>
+      <p class="section-lead">
+        Every image below is DockHub running on Windows 11. Click any shot to see it full size.
+      </p>
+    </div>
+
+    <div class="shot-grid">
+      {
+        shots.map((s) => (
+          <figure class={`shot reveal ${s.span ? 'shot-wide' : ''}`}>
+            <button class="shot-view" type="button" data-shot={`${base}shots/${s.file}`} data-shot-title={s.title}>
+              <img src={`${base}shots/${s.file}`} width={s.w} height={s.h} loading="lazy" decoding="async" alt={s.title} />
+            </button>
+            <figcaption>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<dialog class="shot-modal" data-shot-modal aria-label="Screenshot viewer">
+  <button class="shot-close" type="button" data-shot-close aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"
+      ><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg
+    >
+  </button>
+  <img data-shot-img src="" alt="" />
+</dialog>
+
+<script>
+  const modal = document.querySelector<HTMLDialogElement>('[data-shot-modal]');
+  const img = document.querySelector<HTMLImageElement>('[data-shot-img]');
+  if (modal && img) {
+    document.querySelectorAll<HTMLButtonElement>('[data-shot]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        img.src = btn.dataset.shot ?? '';
+        img.alt = btn.dataset.shotTitle ?? '';
+        modal.showModal();
+      });
+    });
+    modal.querySelector('[data-shot-close]')?.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+    modal.addEventListener('close', () => {
+      img.src = '';
+    });
+  }
+</script>
+
+<style>
+  .shot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2.2vw, 26px);
+  }
+  .shot {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    margin: 0;
+    border-radius: 24px;
+    background: var(--bg-raised);
+    box-shadow: inset 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+  .shot-wide {
+    grid-column: span 3;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    grid-template-rows: auto;
+    align-items: center;
+  }
+  .shot-view {
+    display: block;
+    width: 100%;
+    padding: 14px 14px 0;
+    cursor: zoom-in;
+  }
+  .shot-wide .shot-view {
+    padding: 18px;
+  }
+  .shot-view img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    background: rgb(0 0 0 / 0.25);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 18px 44px -24px rgb(0 0 0 / 0.85);
+    transition: transform var(--t-med) var(--ease-out);
+  }
+  .shot:not(.shot-wide) .shot-view img {
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+  }
+  .shot-view:hover img {
+    transform: translateY(-3px) scale(1.01);
+  }
+  .shot-view:focus-visible {
+    outline: none;
+  }
+  .shot-view:focus-visible img {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  figcaption {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 18px 22px 24px;
+  }
+  .shot-wide figcaption {
+    padding: 24px 40px 24px 12px;
+  }
+  figcaption h3 {
+    font-size: 1.0625rem;
+    letter-spacing: -0.015em;
+  }
+  .shot-wide figcaption h3 {
+    font-size: clamp(1.4rem, 2.2vw, 1.875rem);
+    line-height: 1.12;
+    letter-spacing: -0.028em;
+  }
+  figcaption p {
+    color: var(--text-2);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 46ch;
+  }
+  .shot-wide figcaption p {
+    font-size: 1.0625rem;
+  }
+
+  .shot-modal {
+    width: min(94vw, 1500px);
+    max-width: none;
+    max-height: 92vh;
+    padding: 0;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    overflow: visible;
+  }
+  .shot-modal::backdrop {
+    background: rgb(2 4 10 / 0.82);
+    backdrop-filter: blur(6px);
+  }
+  .shot-modal img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      0 40px 120px -40px rgb(0 0 0 / 0.9);
+  }
+  .shot-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    color: #fff;
+    background: rgb(255 255 255 / 0.12);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+  }
+  .shot-close:hover {
+    background: rgb(255 255 255 / 0.2);
+  }
+  .shot-close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (max-width: 1080px) {
+    .shot-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .shot-wide {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 760px) {
+    .shot-grid {
+      grid-template-columns: 1fr;
+    }
+    .shot-wide {
+      grid-column: span 1;
+      grid-template-columns: 1fr;
+    }
+    .shot-wide .shot-view {
+      padding: 14px 14px 0;
+    }
+    .shot-wide figcaption {
+      padding: 18px 22px 24px;
+    }
+    .shot-close {
+      top: 8px;
+      right: 8px;
+    }
+  }
+</style>
