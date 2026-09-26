@@ -62,7 +62,7 @@ const tbApps = ['explorer', 'browser', 'terminal', 'notepad'] as const;
     <nav class="dock" data-dock aria-label="DockHub">
       <div class="dock-zone dock-start">
         <button class="db db-start" type="button" data-start aria-label="Start" set:html={windowsLogo('wl-dock')} />
-        <button class="db db-icon" type="button" data-search aria-label="Search" set:html={icons.search} />
+        <button class="db db-icon" type="button" data-search aria-label="Quick launcher" title="Quick launcher (Win + Alt + Space in the app)" set:html={icons.search} />
       </div>
       <div class="dock-center">
         <button class="dock-arrow dock-arrow-prev" type="button" tabindex="-1" aria-label="Scroll left" data-scroll="-1" set:html={icons.chevronLeft} />
@@ -74,13 +74,15 @@ const tbApps = ['explorer', 'browser', 'terminal', 'notepad'] as const;
       <div class="dock-zone dock-end">
         <div class="dock-tray" data-tray>
           <button class="db db-tray" type="button" data-tray-more aria-label="Show hidden icons" set:html={icons.chevronUp} />
+          <button class="db db-tray db-lang" type="button" data-lang aria-label="Input language: English. Click to switch">ENG</button>
           <button class="db db-tray" type="button" data-quick aria-label="Network, sound and battery" >
             <span set:html={icons.wifi} /><span data-vol-ic set:html={icons.volume} /><span set:html={icons.battery} />
           </button>
         </div>
-        <button class="db db-clock" type="button" data-clock aria-label="Clock and notifications">
+        <button class="db db-clock" type="button" data-clock aria-label="Clock and 2 notifications">
           <span data-clock-time>--:--</span>
           <span data-clock-date>--/--/----</span>
+          <span class="clock-badge" data-notif-count>2</span>
         </button>
         <button class="db-desktop" type="button" data-show-desktop aria-label="Show desktop"></button>
       </div>

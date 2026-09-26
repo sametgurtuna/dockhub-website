@@ -24,12 +24,24 @@ const faqs = [
     a: 'Yes. By default, the installer configures DockHub to start with Windows. You can easily toggle this off during installation or at any time in Settings › General.',
   },
   {
+    q: 'Do maximized windows cover the dock?',
+    a: 'No. Like the Windows taskbar, the dock reserves its band of the screen: maximized windows stop at the dock at any display scaling and on every display that has a dock. DockHub rechecks it after display and Explorer changes and repairs it by itself.',
+  },
+  {
     q: 'How do I add widgets and change their appearance?',
     a: 'Right-click any empty space on the dock and select "Add widget", or browse the Widget Gallery in Settings and click the "+" button. To change a widget\'s style, right-click it directly on the dock and choose an option from the "Appearance" submenu.',
   },
   {
     q: 'Do Win + 1…9 and the other taskbar shortcuts work?',
-    a: 'Yes. Win + 1…9 and Win + 0 open, switch to or minimize the dock\'s first ten apps, with Shift for a new window, Ctrl + Shift to run as administrator and Alt for the jump list. Hold Win to see the numbers. You can also set your own shortcuts for showing the dock, opening settings, pinning an app, auto-hide and volume in Settings › General › Keyboard shortcuts.',
+    a: 'Yes. Win + 1…9 and Win + 0 open, switch to or minimize the dock\'s first ten apps, with Shift for a new window, Ctrl + Shift to run as administrator and Alt for the jump list. Hold Win to see the numbers. You can also set your own shortcuts for showing the dock, the quick launcher, opening settings, pinning an app, auto-hide, volume and the microphone in Settings › Keyboard shortcuts.',
+  },
+  {
+    q: 'What is the quick launcher?',
+    a: 'A Spotlight-style search box that opens with Win + Alt + Space (or the search button, if you choose so in Settings › Taskbar). It finds apps, open windows, DockHub and Windows settings, recent files and dock commands, does quick math like 200*15%, and searches the web for anything else.',
+  },
+  {
+    q: 'Can a profile switch by itself?',
+    a: 'Yes. A profile can switch in when a given number of displays is connected, while an app runs (for example steam or cs2), or during set hours, weekdays only if you like. When the app closes or the hours end, DockHub goes back to the profile you had.',
   },
   {
     q: 'I removed something by mistake. Can I get it back?',
@@ -37,7 +49,7 @@ const faqs = [
   },
   {
     q: 'Does it use an internet connection?',
-    a: 'Only for the features that need it: the weather widget and city search (Open-Meteo), exchange rates (Frankfurter, ECB data), your own calendar link, the AI usage widget, and a once-a-day update check on GitHub that you can turn off in Settings › About. Web widgets can only reach the hosts they declare. No accounts, no telemetry, no tracking.',
+    a: 'Only for the features that need it: the weather widget and city search (Open-Meteo), exchange rates (Frankfurter, ECB data), your own calendar link, Todoist if you connect the To do widget, the AI usage widget with Claude Code (Codex and Gemini CLI are read from their local logs), and a once-a-day update check on GitHub that you can turn off in Settings › About. Web widgets can only reach the hosts they declare. No accounts, no telemetry, no tracking.',
   },
   {
     q: 'How do updates work?',
@@ -45,11 +57,11 @@ const faqs = [
   },
   {
     q: 'Where are my settings stored?',
-    a: 'In %AppData%\\DockHub\\config.json, with notes, reminders and counters in the data subfolder. Files are written atomically, and DockHub keeps a backup from each of the last 7 days and loads the newest one by itself if the settings file is ever damaged. Settings › General exports everything to a .zip you can import on another PC.',
+    a: 'In %AppData%\\DockHub\\config.json, with notes, reminders and counters in the data subfolder. Files are written atomically, and DockHub keeps a backup from each of the last 7 days and loads the newest one by itself if the settings file is ever damaged. Settings › Backup and troubleshooting exports everything to a .zip you can import on another PC.',
   },
   {
     q: 'Do the network, volume and battery icons work?',
-    a: 'Yes. Windows 11 keeps its real icons inside Explorer, so since v0.7 DockHub draws its own. Scroll the volume icon to change the volume, middle-click to mute, right-click to switch the output device. The battery icon shows the charge and time left. Clicking them opens Windows\' Quick Settings, as does Win + A.',
+    a: 'Yes. Windows 11 keeps its real icons inside Explorer, so since v0.7 DockHub draws its own. Scroll the volume icon to change the volume, middle-click to mute, right-click to switch the output device. The battery icon shows the charge and time left. Clicking them opens Windows\' Quick Settings, as does Win + A. Since v0.8 the tray also shows your keyboard language (click or scroll to switch), a microphone icon you can click to mute, and the number of waiting notifications next to the clock, with a moon while Do Not Disturb is on.',
   },
   {
     q: 'Does it support multi-monitor setups?',
@@ -61,11 +73,15 @@ const faqs = [
   },
   {
     q: 'Can I write my own widget?',
-    a: 'Yes. A web widget is a folder with a manifest.json and an HTML page. It follows the dock\'s theme and gets settings, storage, notifications and a right-click menu through a small window.dockhub API. Share it as a .dockwidget file; users see its permissions before installing it. The guide is docs/widget-sdk.md in the repository.',
+    a: 'Yes. A web widget is a folder with a manifest.json and an HTML page. It follows the dock\'s theme and gets settings, storage, notifications and a right-click menu through a small window.dockhub API. Share it as a .dockwidget file or simply a link (a manifest.json or a GitHub folder): users paste it in Settings › Widget gallery › Install from link and see its permissions before installing. The guide is docs/widget-sdk.md in the repository.',
   },
   {
     q: 'Can I use it alongside StartAllBack or ExplorerPatcher?',
     a: 'It is not recommended. Running multiple third-party tools that hook or modify the Windows taskbar simultaneously can cause conflicts.',
+  },
+  {
+    q: 'Can I install it with winget?',
+    a: 'Once the package is accepted into the Windows Package Manager repository: winget install SametGurtuna.DockHub. Until then, use the installer from GitHub Releases.',
   },
   {
     q: 'Is it completely free?',

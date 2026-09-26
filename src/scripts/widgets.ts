@@ -261,7 +261,36 @@ const ICON = {
   stack: 'M4,8 L12,4 L20,8 L12,12 Z M4,12 L12,16 L20,12 M4,16 L12,20 L20,16',
   currency: 'M12,3 A9,9 0 1 1 11.99,3 Z M15,8.5 C14,7.5 13,7.2 12,7.2 C10.2,7.2 9,8.2 9,9.6 C9,12.8 15,11.4 15,14.4 C15,15.8 13.8,16.8 12,16.8 C10.8,16.8 9.7,16.3 9,15.4 M12,5.5 V7.2 M12,16.8 V18.5',
   ai: 'M12,3 L14.2,9.2 L20.8,9.2 L15.5,13.1 L17.5,19.3 L12,15.6 L6.5,19.3 L8.5,13.1 L3.2,9.2 L9.8,9.2 Z',
+  gpu: 'M4,7 H20 V17 H4 Z M8,17 V20 M16,17 V20 M8,10 H10 V14 H8 Z M13,10 H16 V14 H13 Z M2,10 H4 M2,14 H4',
+  sun: 'M12,8 A4,4 0 1 1 11.99,8 Z M12,2 V4 M12,20 V22 M4.9,4.9 L6.3,6.3 M17.7,17.7 L19.1,19.1 M2,12 H4 M20,12 H22 M4.9,19.1 L6.3,17.7 M17.7,6.3 L19.1,4.9',
+  radios: 'M5,12.5 A10,10 0 0 1 19,12.5 M8,15.5 A5.5,5.5 0 0 1 16,15.5 M12,19 H12.01 M2,9.5 A14,14 0 0 1 22,9.5',
+  camera: 'M4,8 A2,2 0 0 1 6,6 H8 L9.5,4 H14.5 L16,6 H18 A2,2 0 0 1 20,8 V17 A2,2 0 0 1 18,19 H6 A2,2 0 0 1 4,17 Z M12,9.5 A3.2,3.2 0 1 1 11.99,9.5 Z',
+  todo: 'M4,6.5 L5.5,8 L8,5 M4,12.5 L5.5,14 L8,11 M4,18.5 L5.5,20 L8,17 M11,7 H20 M11,13 H20 M11,19 H17',
+  bluetooth: 'M7,7 L17,16 L12,20.5 V3.5 L17,8 L7,17',
+  scissors: 'M6,6 A2.5,2.5 0 1 1 5.99,6 Z M6,18 A2.5,2.5 0 1 1 5.99,18 Z M8,7.5 L20,17 M8,16.5 L20,7',
+  folder: 'M4,7.5 A1.5,1.5 0 0 1 5.5,6 H9.5 L11.5,8 H18.5 A1.5,1.5 0 0 1 20,9.5 V18 A1.5,1.5 0 0 1 18.5,19.5 H5.5 A1.5,1.5 0 0 1 4,18 Z',
 };
+
+/* 0.8.0 widgets share a little state so the dock, the gallery and the panels stay in sync. */
+const display = { level: 70, night: false };
+const radios = { wifi: true, bt: false };
+interface Todo {
+  id: number;
+  text: string;
+  when?: string;
+  overdue?: boolean;
+}
+let todoSeq = 10;
+const todos: Todo[] = [
+  { id: 1, text: 'Reply to Deniz', when: '10:00' },
+  { id: 2, text: 'Book the dentist', overdue: true },
+  { id: 3, text: 'Review the release notes' },
+  { id: 4, text: 'Buy milk' },
+];
+const svgIcon = (path: string) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+const iconBtn = (path: string, label: string, onclick: (e: Event) => void, cls = '') =>
+  h('button', { class: `mc-btn ${cls}`, type: 'button', 'aria-label': label, title: label, html: svgIcon(path), onclick });
 
 const cities = [
   { name: 'Istanbul', short: 'IST', off: 0 },
@@ -351,7 +380,7 @@ function meetingsFrom(d: Date): Meeting[] {
 
 type Clip = { kind: 'text' | 'link' | 'image'; text: string; when: string; pinned?: boolean; art?: number };
 const clips: Clip[] = [
-  { kind: 'text', text: 'git push origin v0.7.0', when: 'Just now' },
+  { kind: 'text', text: 'git push origin v0.8.0', when: 'Just now' },
   { kind: 'link', text: 'github.com/sametgurtuna/DockHub', when: '2 min ago' },
   { kind: 'image', text: 'Screenshot 1280 × 720', when: '9 min ago', art: 1 },
   { kind: 'text', text: 'Ship the new widgets on Friday', when: '24 min ago', pinned: true },
@@ -363,7 +392,7 @@ const files: DlFile[] = [
   { name: 'Quarterly report.pdf', ext: 'pdf', size: '2.4 MB', when: '3 min ago' },
   { name: 'Holiday photo.jpg', ext: 'jpg', size: '4.1 MB', when: '18 min ago' },
   { name: 'Budget 2027.xlsx', ext: 'xlsx', size: '86 KB', when: '1 hour ago' },
-  { name: 'DockHub-Setup-0.7.0-x64.exe', ext: 'exe', size: '58.6 MB', when: '2 hours ago' },
+  { name: 'DockHub-Setup-0.8.0-x64.exe', ext: 'exe', size: '58.6 MB', when: '2 hours ago' },
   { name: 'Slides.pptx', ext: 'pptx', size: '12 MB', when: 'Yesterday' },
   { name: 'Assets.zip', ext: 'zip', size: '31 MB', when: 'Yesterday' },
 ];
@@ -1229,6 +1258,144 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
+  /* ------------------------------------------------------------ To do */
+  {
+    id: 'todo',
+    name: 'To Do',
+    category: 'Productivity',
+    description: "Today's tasks: a simple list kept on your PC, or today's and overdue tasks from Todoist. Tick to complete, type to add.",
+    icon: ICON.todo,
+    accent: ACCENT.green,
+    variants: [
+      { id: 'list', name: 'List' },
+      { id: 'count', name: 'Count' },
+    ],
+    card(i, env) {
+      if (i.variant === 'count') {
+        const n = h('div', { class: 'wc-big num' });
+        const next = h('div', { class: 'wc-sub' });
+        return {
+          el: card('wc-clip wc-todo', glyph(ICON.todo, ACCENT.green), h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: 'To do' }), next), n),
+          refresh: () => {
+            n.textContent = String(todos.length);
+            next.textContent = todos[0]?.text ?? 'All done for today';
+          },
+        };
+      }
+      const rows = h('div', { class: 'wc-stack todo-rows' });
+      return {
+        el: card('wc-todo', rows),
+        refresh: () =>
+          rows.replaceChildren(
+            ...(todos.length
+              ? todos.slice(0, 2).map((t) =>
+                  h(
+                    'div',
+                    { class: 'todo-row' },
+                    h('button', {
+                      class: `mc-btn todo-check ${t.overdue ? 'late' : ''}`,
+                      type: 'button',
+                      'aria-label': `Mark "${t.text}" as done`,
+                      onclick: () => {
+                        todos.splice(todos.indexOf(t), 1);
+                        env.refreshAll();
+                      },
+                    }),
+                    h('span', { text: t.text }),
+                  ),
+                )
+              : [h('div', { class: 'wc-sub', text: 'All done for today' })]),
+            todos.length > 2 ? h('div', { class: 'wc-sub', text: `+${todos.length - 2} more` }) : null,
+          ),
+      };
+    },
+    compact() {
+      const t = h('div', { class: 'wt-text num' });
+      return { el: compactTile(glyph(ICON.todo, ACCENT.green), t), refresh: () => (t.textContent = todos.length ? String(todos.length) : '') };
+    },
+    panel(_i, env) {
+      const list = h('div', { class: 'wp-list' });
+      const input = h('input', { class: 'todo-input', type: 'text', placeholder: 'Type a task and press Enter', 'aria-label': 'New task' }) as HTMLInputElement;
+      input.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || !input.value.trim()) return;
+        todos.push({ id: ++todoSeq, text: input.value.trim() });
+        input.value = '';
+        env.refreshAll();
+      });
+      const render = () =>
+        list.replaceChildren(
+          ...(todos.length
+            ? todos.map((t) =>
+                h(
+                  'div',
+                  { class: 'wp-list-row todo-prow' },
+                  h('button', {
+                    class: `mc-btn todo-check ${t.overdue ? 'late' : ''}`,
+                    type: 'button',
+                    'aria-label': `Mark "${t.text}" as done`,
+                    onclick: () => {
+                      todos.splice(todos.indexOf(t), 1);
+                      env.toast?.('Task completed', t.text);
+                      env.refreshAll();
+                    },
+                  }),
+                  h('div', { class: 'grow wp-strong', text: t.text }),
+                  t.overdue ? h('span', { class: 'wp-muted todo-late', text: 'Overdue' }) : t.when ? h('span', { class: 'wp-muted num', text: t.when }) : null,
+                ),
+              )
+            : [h('div', { class: 'wp-muted', text: 'All done for today' })]),
+        );
+      return {
+        el: panelShell('Today', list, input, h('div', { class: 'wp-foot', text: 'Sample tasks. In the app the list lives on your PC, or comes from Todoist with your API token.' })),
+        refresh: render,
+      };
+    },
+  },
+  /* ------------------------------------------------------- Screenshot */
+  {
+    id: 'screenshot',
+    name: 'Screenshot',
+    category: 'Productivity',
+    description: 'One click opens the Windows snipping overlay; the other saves every screen to Pictures › Screenshots and copies it.',
+    icon: ICON.camera,
+    accent: ACCENT.pink,
+    variants: [
+      { id: 'buttons', name: 'Buttons' },
+      { id: 'icon', name: 'Icon only' },
+    ],
+    card(i, env) {
+      if (i.variant === 'icon') return { el: card('wc-square', glyph(ICON.camera, ACCENT.pink)) };
+      return {
+        el: card(
+          'wc-shot',
+          iconBtn(ICON.scissors, 'Snip an area, a window or the screen', () => env.toast?.('Snipping', 'In the app this opens the Windows snipping overlay.')),
+          iconBtn(ICON.gpu, 'Capture all screens now', () => env.toast?.('Screenshot saved', 'Screenshot 2026-09-26 101542.png · copied to the clipboard')),
+          iconBtn(ICON.folder, 'Open the Screenshots folder', () => env.toast?.('Screenshots', 'Opens Pictures › Screenshots.')),
+        ),
+      };
+    },
+    compact() {
+      return { el: compactTile(glyph(ICON.camera, ACCENT.pink)) };
+    },
+    primary(_i, env) {
+      env.toast?.('Snipping', 'In the app this opens the Windows snipping overlay.');
+    },
+    panel(_i, env) {
+      return {
+        el: panelShell(
+          'Screenshot',
+          h(
+            'div',
+            { class: 'wp-chips' },
+            h('button', { class: 'wp-chip on', type: 'button', text: 'Snip', onclick: () => env.toast?.('Snipping', 'In the app this opens the Windows snipping overlay.') }),
+            h('button', { class: 'wp-chip', type: 'button', text: 'All screens', onclick: () => env.toast?.('Screenshot saved', 'Saved to Pictures › Screenshots and copied.') }),
+            h('button', { class: 'wp-chip', type: 'button', text: 'In 5 seconds', onclick: () => env.toast?.('Countdown', 'The widget counts down 5, 4, 3… before capturing.') }),
+          ),
+          h('div', { class: 'wp-foot', text: 'Optional delay with a countdown on the widget. Saved captures come with Open and Show in folder buttons.' }),
+        ),
+      };
+    },
+  },
   /* -------------------------------------------------- Now Playing */
   {
     id: 'media',
@@ -1792,12 +1959,232 @@ export const widgets: WidgetDef[] = [
       };
     },
   },
+  /* --------------------------------------------------------------- GPU */
+  {
+    id: 'gpu',
+    name: 'GPU',
+    category: 'System',
+    description: 'Graphics card load and video memory, from the same counters Task Manager uses.',
+    icon: ICON.gpu,
+    accent: ACCENT.green,
+    variants: [
+      { id: 'rings', name: 'Rings' },
+      { id: 'numbers', name: 'Numbers' },
+      { id: 'bars', name: 'Bars' },
+    ],
+    card(i) {
+      const total = 8;
+      const rows = [
+        { label: 'GPU', value: () => sim.gpu.value, text: () => `${Math.round(sim.gpu.value)}%`, short: () => String(Math.round(sim.gpu.value)), color: ACCENT.green, track: TRACK.green },
+        { label: 'VRAM', value: () => (sim.vram.value / total) * 100, text: () => `${fmt1(sim.vram.value)} GB`, short: () => fmt1(sim.vram.value), color: ACCENT.purple, track: TRACK.blue },
+      ];
+      if (i.variant === 'rings') {
+        const rs = rows.map((r) => {
+          const g = ring(32, 3.2, r.color, r.track);
+          g.inner.classList.add('num');
+          return { r, g, el: h('div', { class: 'wc-ringcell' }, g.el, h('div', { class: 'wc-cap', text: r.label })) };
+        });
+        return {
+          el: card('wc-rings', ...rs.map((x) => x.el)),
+          frame: () =>
+            rs.forEach(({ r, g }) => {
+              g.set(r.value());
+              g.inner.textContent = r.short();
+            }),
+        };
+      }
+      if (i.variant === 'bars') {
+        const bs = rows.map((r) => {
+          const fill = h('i', { style: `background:${r.color}` });
+          const v = h('span', { class: 'num' });
+          return { r, fill, v, el: h('div', { class: 'wc-barrow' }, h('span', { class: 'wc-cap', text: r.label }), h('div', { class: 'hbar', style: `background:${r.track}` }, fill), v) };
+        });
+        return {
+          el: card('wc-stack wc-bars', ...bs.map((x) => x.el)),
+          frame: () =>
+            bs.forEach(({ r, fill, v }) => {
+              fill.style.transform = `scaleX(${r.value() / 100})`;
+              v.textContent = r.text();
+            }),
+        };
+      }
+      const ns = rows.map((r) => {
+        const v = h('span', { class: 'num' });
+        return { r, v, el: h('div', { class: 'wc-numrow' }, h('span', { class: 'wc-cap', style: `color:${r.color}`, text: r.label }), v) };
+      });
+      return {
+        el: card('wc-stack wc-numbers', ...ns.map((x) => x.el)),
+        frame: () => ns.forEach(({ r, v }) => (v.textContent = r.text())),
+      };
+    },
+    compact() {
+      const r = ring(26, 2.6, ACCENT.green, TRACK.green);
+      return {
+        el: compactTile(r.el, h('div', { class: 'wt-text', text: 'GPU' })),
+        frame: () => {
+          r.set(sim.gpu.value);
+          r.inner.textContent = String(Math.round(sim.gpu.value));
+        },
+      };
+    },
+    panel() {
+      const load = h('span', { class: 'wp-hero num' });
+      const mem = h('span', { class: 'wp-hero num' });
+      return {
+        el: panelShell(
+          'GPU',
+          h('div', { class: 'wp-duo' }, h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.green}`, text: 'Load' }), load), h('div', {}, h('div', { class: 'wp-label', style: `color:${ACCENT.purple}`, text: 'Video memory' }), mem)),
+          h('div', { class: 'wp-muted', text: 'Sample graphics card · 8 GB' }),
+          h('div', { class: 'wp-foot', text: 'The busiest engine (3D, video, copy) counts as the load, like in Task Manager.' }),
+        ),
+        frame: () => {
+          load.textContent = `${Math.round(sim.gpu.value)}%`;
+          mem.textContent = `${fmt1(sim.vram.value)} GB`;
+        },
+      };
+    },
+  },
+  /* -------------------------------------------------------- Brightness */
+  {
+    id: 'display',
+    name: 'Brightness',
+    category: 'System',
+    description: 'Scroll to change the brightness of laptop screens and DDC/CI monitors, and see when night light is on.',
+    icon: ICON.sun,
+    accent: ACCENT.yellow,
+    variants: [
+      { id: 'slider', name: 'Slider' },
+      { id: 'icon', name: 'Icon only' },
+    ],
+    card(i, env) {
+      const fill = h('i', { style: `background:${ACCENT.yellow}` });
+      const v = h('span', { class: 'num' });
+      const moon = h('span', { class: 'ic-sm br-moon', html: icons.moon });
+      const el =
+        i.variant === 'icon'
+          ? card('wc-square wc-bright', glyph(ICON.sun, ACCENT.yellow), v)
+          : card('wc-bright', glyph(ICON.sun, ACCENT.yellow), h('div', { class: 'hbar', style: `background:${TRACK.orange}` }, fill), v, moon);
+      el.addEventListener(
+        'wheel',
+        (e) => {
+          e.preventDefault();
+          display.level = Math.max(0, Math.min(100, display.level + (e.deltaY < 0 ? 5 : -5)));
+          env.refreshAll();
+        },
+        { passive: false },
+      );
+      el.title = 'Scroll to change, click for more';
+      return {
+        el,
+        refresh: () => {
+          fill.style.transform = `scaleX(${display.level / 100})`;
+          v.textContent = i.variant === 'icon' ? String(display.level) : `${display.level}%`;
+          moon.hidden = !display.night;
+        },
+      };
+    },
+    compact() {
+      const r = ring(26, 2.6, ACCENT.yellow, TRACK.orange);
+      return {
+        el: compactTile(r.el),
+        refresh: () => {
+          r.set(display.level);
+          r.inner.textContent = String(display.level);
+        },
+      };
+    },
+    panel(_i, env) {
+      const value = h('span', { class: 'wp-strong num' });
+      const slider = h('input', { type: 'range', min: '0', max: '100', 'aria-label': 'Brightness' }) as HTMLInputElement;
+      slider.addEventListener('input', () => {
+        display.level = +slider.value;
+        env.refreshAll();
+      });
+      const night = h('button', {
+        class: 'wp-chip',
+        type: 'button',
+        onclick: () => {
+          display.night = !display.night;
+          env.refreshAll();
+        },
+      });
+      return {
+        el: panelShell('Brightness', h('div', { class: 'wp-row br-row' }, h('span', { class: 'ic-sm', html: icons.sun }), slider, value), h('div', { class: 'wp-chips' }, night), h('div', { class: 'wp-foot', text: 'External monitors need DDC/CI turned on in their own menu.' })),
+        refresh: () => {
+          slider.value = String(display.level);
+          value.textContent = `${display.level}%`;
+          night.textContent = display.night ? 'Night light: on' : 'Night light: off';
+          night.classList.toggle('on', display.night);
+        },
+      };
+    },
+  },
+  /* ----------------------------------------------- Wi-Fi and Bluetooth */
+  {
+    id: 'radios',
+    name: 'Wi-Fi & Bluetooth',
+    category: 'System',
+    description: 'Turn Wi-Fi and Bluetooth on or off in one click, like Quick Settings.',
+    icon: ICON.radios,
+    accent: ACCENT.blue,
+    variants: [
+      { id: 'buttons', name: 'Buttons' },
+      { id: 'icons', name: 'Icon only' },
+    ],
+    card(i, env) {
+      const make = (key: 'wifi' | 'bt', path: string, name: string) => {
+        const b = iconBtn(path, name, () => {
+          radios[key] = !radios[key];
+          env.refreshAll();
+        });
+        const label = h('span', { class: 'wc-sub' });
+        return { key, b, label, name, el: i.variant === 'icons' ? b : h('div', { class: 'radio-cell' }, b, h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: name }), label)) };
+      };
+      const items = [make('wifi', ICON.radios, 'Wi-Fi'), make('bt', ICON.bluetooth, 'Bluetooth')];
+      return {
+        el: card('wc-radios', ...items.map((x) => x.el)),
+        refresh: () =>
+          items.forEach(({ key, b, label, name }) => {
+            b.classList.toggle('rd-on', radios[key]);
+            b.setAttribute('aria-pressed', String(radios[key]));
+            b.title = `${name}: ${radios[key] ? 'On' : 'Off'}`;
+            label.textContent = radios[key] ? 'On' : 'Off';
+          }),
+      };
+    },
+    compact() {
+      const t = h('div', { class: 'wt-text' });
+      return { el: compactTile(glyph(ICON.radios, ACCENT.blue), t), refresh: () => (t.textContent = radios.bt ? 'BT' : '') };
+    },
+    panel(_i, env) {
+      const chip = (key: 'wifi' | 'bt', name: string) =>
+        h('button', {
+          class: 'wp-chip',
+          type: 'button',
+          onclick: () => {
+            radios[key] = !radios[key];
+            env.refreshAll();
+          },
+        });
+      const wifi = chip('wifi', 'Wi-Fi');
+      const bt = chip('bt', 'Bluetooth');
+      return {
+        el: panelShell('Wi-Fi & Bluetooth', h('div', { class: 'wp-chips' }, wifi, bt), h('div', { class: 'wp-foot', text: 'Uses the Windows radio API. If Windows says no, the buttons open the matching Settings page.' })),
+        refresh: () => {
+          wifi.textContent = `Wi-Fi: ${radios.wifi ? 'on' : 'off'}`;
+          bt.textContent = `Bluetooth: ${radios.bt ? 'on' : 'off'}`;
+          wifi.classList.toggle('on', radios.wifi);
+          bt.classList.toggle('on', radios.bt);
+        },
+      };
+    },
+  },
   /* --------------------------------------------------- AI Usage */
   {
     id: 'ai-usage',
     name: 'AI Usage',
     category: 'AI',
-    description: 'Claude Code subscription usage: 5-hour and weekly limits, refreshed in the background every 5 minutes.',
+    description: 'Limits of your AI coding assistant: Claude Code or OpenAI Codex (5-hour and weekly), or Gemini CLI requests today.',
     icon: ICON.ai,
     accent: ACCENT.orange,
     variants: [
@@ -1806,7 +2193,7 @@ export const widgets: WidgetDef[] = [
       { id: 'bars', name: 'Bars' },
     ],
     init() {
-      return { hour: 34, week: 58 };
+      return { hour: 34, week: 58, provider: 'Claude Code' };
     },
     card(i) {
       const metrics = [
@@ -1871,6 +2258,25 @@ export const widgets: WidgetDef[] = [
         const v = h('div', { class: 'wp-num num' });
         return { m, g, v, el: h('div', { class: 'wp-list-row' }, g.el, h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: m.label }), h('div', { class: 'wp-muted', text: m.sub })), v) };
       });
+      const providers: Record<string, { hour: number; week: number; note: string }> = {
+        'Claude Code': { hour: 34, week: 58, note: "Reads Claude Code's own usage via 'claude -p /usage'." },
+        Codex: { hour: 12, week: 41, note: 'Read from the session logs the Codex CLI keeps in ~/.codex. No extra process.' },
+        'Gemini CLI': { hour: 23, week: 23, note: 'Requests today against your daily limit, read from ~/.gemini. No extra process.' },
+      };
+      const note = h('span', { class: 'wp-muted' });
+      const chips = Object.keys(providers).map((name) =>
+        h('button', {
+          class: 'wp-chip',
+          type: 'button',
+          text: name,
+          onclick: () => {
+            i.state.provider = name;
+            i.state.hour = providers[name].hour;
+            i.state.week = providers[name].week;
+            env.refreshAll();
+          },
+        }),
+      );
       const refreshBtn = h('button', {
         class: 'wp-chip',
         text: 'Refresh now',
@@ -1881,13 +2287,20 @@ export const widgets: WidgetDef[] = [
         },
       });
       return {
-        el: panelShell('AI Usage', h('div', { class: 'wp-list' }, ...rows.map((r) => r.el)), h('div', { class: 'wp-note-row' }, h('span', { class: 'wp-muted', text: "Reads Claude Code's own usage via 'claude -p /usage'." }), refreshBtn)),
-        refresh: () =>
-          rows.forEach(({ m, g, v }) => {
+        el: panelShell('AI Usage', h('div', { class: 'wp-chips' }, ...chips), h('div', { class: 'wp-list' }, ...rows.map((r) => r.el)), h('div', { class: 'wp-note-row' }, note, refreshBtn)),
+        refresh: () => {
+          const gemini = i.state.provider === 'Gemini CLI';
+          chips.forEach((c) => c.classList.toggle('on', c.textContent === i.state.provider));
+          note.textContent = providers[i.state.provider]?.note ?? '';
+          rows.forEach(({ m, g, v, el }, idx) => {
+            el.hidden = gemini && idx === 1;
+            (el.querySelector('.wp-strong') as HTMLElement).textContent = gemini ? 'Requests today' : m.label;
+            (el.querySelector('.wp-muted') as HTMLElement).textContent = gemini ? '230 of 1,000 requests' : m.sub;
             g.set(i.state[m.key]);
             g.inner.textContent = String(Math.round(i.state[m.key]));
             v.textContent = `${Math.round(i.state[m.key])}%`;
-          }),
+          });
+        },
       };
     },
   },

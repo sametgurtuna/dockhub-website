@@ -3861,3 +3861,240 @@
   border-radius: inherit;
   background: var(--accent-w);
 }
+
+/* ---------------------------------------------------------------- 0.8.0 widgets */
+.mc-btn.rd-on {
+  background: var(--accent-w);
+  color: var(--on-accent);
+}
+.mc-btn.rd-on:hover {
+  background: var(--accent-w);
+  opacity: 0.9;
+}
+.wc-radios {
+  gap: 12px;
+}
+.radio-cell {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.wc-radios .mc-btn {
+  border-radius: 50%;
+  background: var(--dock-hover);
+}
+.wc-radios .mc-btn.rd-on {
+  background: var(--accent-w);
+}
+.wc-shot {
+  gap: 2px;
+  padding-inline: 6px;
+}
+.wc-bright {
+  gap: 7px;
+  min-width: calc(150px * var(--k));
+}
+.wc-bright .hbar {
+  min-width: calc(60px * var(--k));
+}
+.wc-bright.wc-square {
+  min-width: 0;
+  flex-direction: column;
+  gap: 0;
+  font-size: calc(9px * var(--k));
+}
+.br-moon {
+  color: var(--c-orange);
+}
+.br-row input {
+  flex: 1;
+}
+.wc-todo {
+  gap: 8px;
+}
+.wc-todo .wc-big {
+  margin-left: 4px;
+}
+.wc-todo .wc-title,
+.wc-todo .wc-sub {
+  max-width: calc(120px * var(--k));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.todo-rows {
+  gap: 2px;
+  max-width: calc(170px * var(--k));
+}
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.todo-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.todo-check {
+  flex: none;
+  width: calc(12px * var(--k));
+  height: calc(12px * var(--k));
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--c-green);
+}
+.todo-check.late {
+  box-shadow: inset 0 0 0 1.5px var(--c-red);
+}
+.todo-check:hover {
+  background: var(--t-green);
+}
+.todo-prow .todo-check {
+  width: 18px;
+  height: 18px;
+}
+.todo-late {
+  color: var(--c-red);
+}
+.todo-input {
+  width: 100%;
+  height: 32px;
+  margin-top: 10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  color: var(--w-text);
+  background: var(--popup-hover);
+  box-shadow: inset 0 0 0 1px var(--popup-border);
+}
+.todo-input:focus {
+  outline: 2px solid var(--accent-w);
+  outline-offset: -1px;
+}
+
+/* ---------------------------------------------------------------- quick launcher (0.8) */
+.ql {
+  width: 440px;
+  max-width: calc(100vw - 48px);
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+}
+.ql-list {
+  display: grid;
+  gap: 2px;
+}
+.ql-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 42px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  text-align: start;
+  color: var(--w-text);
+}
+.ql-row:hover,
+.ql-row.on {
+  background: var(--popup-hover);
+}
+.ql-row.on {
+  box-shadow: inset 3px 0 0 var(--accent-w);
+}
+.ql-ic {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--w-text-2);
+}
+.ql-ic svg {
+  width: 100%;
+  height: 100%;
+}
+.ql-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ql-text b {
+  font-weight: 560;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ql-text small {
+  color: var(--w-text-2);
+  font-size: 11.5px;
+}
+.ql-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 2px 4px 0;
+  font-size: 11px;
+  color: var(--w-text-3);
+}
+.ql-foot kbd {
+  padding: 1px 5px;
+  border-radius: 4px;
+  font: inherit;
+  background: var(--popup-hover);
+  box-shadow: inset 0 0 0 1px var(--popup-border);
+}
+
+/* ---------------------------------------------------------------- tray indicators (0.8) */
+.db-lang {
+  min-width: 34px;
+  padding: 0 6px;
+  justify-content: center;
+  font-size: calc(10.5px * var(--k));
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.db-clock {
+  position: relative;
+}
+.clock-badge {
+  position: absolute;
+  top: 3px;
+  left: -4px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--on-accent);
+  background: var(--accent-w);
+}
+.clock-badge.dnd {
+  padding: 0;
+  color: var(--w-text);
+  background: transparent;
+}
+.clock-badge svg {
+  width: 11px;
+  height: 11px;
+}
+.clock-badge[hidden] {
+  display: none;
+}
+.notif-top .notif-row .wp-muted {
+  text-align: start;
+  padding: 0;
+}
+.notif-row {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--popup-hover);
+}
+.notif-actions {
+  display: flex;
+  gap: 6px;
+}

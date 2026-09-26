@@ -1036,7 +1036,171 @@ export function initDemo() {
   }
 
   $('[data-start]').addEventListener('click', (e) => startMenu(e.currentTarget as HTMLElement));
-  $('[data-search]').addEventListener('click', (e) => startMenu(e.currentTarget as HTMLElement, true));
+  /* ---------------------------------------------------------- launcher (0.8) */
+
+  /** Quick math like the app: + - * / ^ %, parentheses, decimal comma or point. */
+  function calc(text: string): number | null {
+    const src = text.replace(/\s+/g, '').replace(/^=/, '').replace(/,/g, '.').replace(/×/g, '*').replace(/÷/g, '/');
+    if (!/\d/.test(src) || !/[-+*/^%(]/.test(src) || !/^[\d.+\-*/^%()]+$/.test(src)) return null;
+    let i = 0;
+    const peek = () => src[i];
+    const num = (): number => {
+      if (peek() === '(') {
+        i++;
+        const v = expr();
+        if (peek() !== ')') throw 0;
+        i++;
+        return v;
+      }
+      if (peek() === '-') {
+        i++;
+        return -unary();
+      }
+      const m = /^\d+(\.\d+)?/.exec(src.slice(i));
+      if (!m) throw 0;
+      i += m[0].length;
+      return +m[0];
+    };
+    const unary = (): number => {
+      let v = num();
+      while (peek() === '%') {
+        i++;
+        v /= 100;
+      }
+      return v;
+    };
+    const pow = (): number => {
+      const b = unary();
+      if (peek() === '^') {
+        i++;
+        return Math.pow(b, pow());
+      }
+      return b;
+    };
+    const term = (): number => {
+      let v = pow();
+      while (peek() === '*' || peek() === '/') {
+        const op = src[i++];
+        const r = pow();
+        if (op === '/' && r === 0) throw 0;
+        v = op === '*' ? v * r : v / r;
+      }
+      return v;
+    };
+    const expr = (): number => {
+      let v = term();
+      while (peek() === '+' || peek() === '-') {
+        const op = src[i++];
+        const r = term();
+        v = op === '+' ? v + r : v - r;
+      }
+      return v;
+    };
+    try {
+      const v = expr();
+      return i === src.length && Number.isFinite(v) ? v : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function launcher(anchor: HTMLElement) {
+    type Entry = { title: string; sub: string; ic: string; keys?: string; run: () => void };
+    const appEntries: Entry[] = (['explorer', 'browser', 'terminal', 'notepad', 'music', 'photos', 'calculator', 'settings', 'pc'] as AppId[]).map((id) => ({
+      title: appNames[id],
+      sub: 'App',
+      ic: appIcons[id],
+      run: () => openApp(id),
+    }));
+    const cmd = (title: string, keys: string, run: () => void): Entry => ({ title, sub: 'DockHub command', ic: dockLogo(`dl-l-${keys.length}`), keys, run });
+    const settingsPage = (title: string, keys: string): Entry => ({ title, sub: 'DockHub settings', ic: icons.settings, keys, run: () => openApp('dock-settings') });
+    const winSetting = (title: string, keys: string): Entry => ({ title, sub: 'Windows settings', ic: icons.monitor, keys, run: () => toast('Windows settings', `${title} opens in the Settings app.`) });
+    const entries: Entry[] = [
+      ...appEntries,
+      cmd(state.autohide ? 'Turn off auto-hide' : 'Turn on auto-hide', 'hide', () => set('autohide', !state.autohide)),
+      cmd('Show desktop', 'minimize desktop', showDesktop),
+      cmd('Mute sound', 'volume audio', () => toast('Sound muted', 'Press the volume icon with the middle button to unmute.')),
+      cmd('New virtual desktop', 'desktop', () => toast('Desktop 2', 'A new virtual desktop was created.')),
+      cmd('Switch to the Gaming profile', 'profile', () => toast('Gaming profile', 'Your gaming dock is active.')),
+      settingsPage('Appearance', 'theme glass size text'),
+      settingsPage('Profiles', 'work gaming rules'),
+      settingsPage('Widget gallery', 'add widgets'),
+      winSetting('Display', 'brightness resolution scale'),
+      winSetting('Night light', 'blue light'),
+      winSetting('Bluetooth and devices', 'bluetooth'),
+    ];
+    const score = (e: Entry, q: string) => {
+      const t = e.title.toLowerCase();
+      if (t.startsWith(q)) return 100;
+      if (t.includes(` ${q}`)) return 80;
+      if (t.includes(q)) return 60;
+      if (e.keys?.includes(q)) return 45;
+      let at = 0;
+      for (const ch of q.replace(/\s/g, '')) {
+        at = t.indexOf(ch, at) + 1;
+        if (!at) return 0;
+      }
+      return q.length > 1 ? 30 : 0;
+    };
+
+    const input = h('input', { type: 'search', placeholder: 'Search apps, settings and commands, or calculate', 'aria-label': 'Quick launcher' }) as HTMLInputElement;
+    const list = h('div', { class: 'ql-list', role: 'listbox' });
+    let shown: Entry[] = [];
+    let sel = 0;
+    const draw = () => {
+      const q = input.value.trim().toLowerCase();
+      const math = calc(q);
+      shown = [];
+      if (math !== null) {
+        const out = Math.round(math * 1e10) / 1e10;
+        const text = out.toLocaleString('en-US', { maximumFractionDigits: 10 });
+        shown.push({ title: `= ${text}`, sub: 'Press Enter to copy the result', ic: icons.copy, run: () => { navigator.clipboard?.writeText(String(out)).catch(() => {}); toast('Copied', text); } });
+      }
+      shown.push(
+        ...(q ? entries.map((e) => ({ e, s: score(e, q) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s).map((x) => x.e) : entries.slice(0, 6)),
+      );
+      if (q && math === null) shown.push({ title: `Search the web for “${input.value.trim()}”`, sub: 'Opens your browser', ic: icons.search, run: () => openApp('browser') });
+      shown = shown.slice(0, 8);
+      sel = Math.min(sel, Math.max(0, shown.length - 1));
+      list.replaceChildren(
+        ...shown.map((e, idx) =>
+          h(
+            'button',
+            { class: `ql-row ${idx === sel ? 'on' : ''}`, type: 'button', role: 'option', 'aria-selected': String(idx === sel), onclick: () => { closeFlyout(); e.run(); } },
+            h('span', { class: 'ql-ic', html: e.ic }),
+            h('span', { class: 'ql-text' }, h('b', { text: e.title }), h('small', { text: e.sub })),
+          ),
+        ),
+      );
+    };
+    input.addEventListener('input', () => {
+      sel = 0;
+      draw();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!shown.length) return;
+        sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length;
+        draw();
+      } else if (e.key === 'Enter' && shown[sel]) {
+        const entry = shown[sel];
+        closeFlyout();
+        entry.run();
+      }
+    });
+    draw();
+    const content = h(
+      'div',
+      { class: 'ql' },
+      h('label', { class: 'start-search' }, h('span', { html: icons.search }), input),
+      list,
+      h('div', { class: 'ql-foot' }, h('span', { text: 'Try “term”, “200*15%” or “hide”' }), h('span', {}, h('kbd', { text: 'Win' }), ' + ', h('kbd', { text: 'Alt' }), ' + ', h('kbd', { text: 'Space' }), ' in the app')),
+    );
+    openFlyout(content, { kind: 'launcher', anchor, cls: 'ql-fly', focus: 'input' });
+  }
+
+  $('[data-search]').addEventListener('click', (e) => launcher(e.currentTarget as HTMLElement));
 
   /* ------------------------------------------------------------- tray */
 
@@ -1118,17 +1282,81 @@ export function initDemo() {
     openFlyout(content, { kind: 'quick', anchor: e.currentTarget as HTMLElement, views: [view] });
   });
 
+  /* Input language (0.8): click or scroll to switch between installed keyboard languages. */
+  const langBtn = $('[data-lang]');
+  const langs = [
+    ['ENG', 'English (United States)'],
+    ['TUR', 'Türkçe (Q klavye)'],
+  ];
+  let lang = 0;
+  const switchLang = (step: number) => {
+    lang = (lang + step + langs.length) % langs.length;
+    langBtn.textContent = langs[lang][0];
+    langBtn.setAttribute('aria-label', `Input language: ${langs[lang][1]}. Click to switch`);
+    langBtn.title = `${langs[lang][1]}\nClick to switch, right-click for all languages`;
+  };
+  switchLang(0);
+  langBtn.addEventListener('click', () => switchLang(1));
+  langBtn.addEventListener('wheel', (e) => { e.preventDefault(); switchLang(e.deltaY < 0 ? -1 : 1); }, { passive: false });
+  langBtn.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openMenu(langs.map(([, name], idx) => ({ label: name, checked: idx === lang, run: () => switchLang(idx - lang) })), e);
+  });
+
+  /* Notification count and Do Not Disturb next to the clock (0.8). */
+  const notifBadge = $('[data-notif-count]');
+  const notes = [
+    { app: 'Calendar', title: 'Design review in 10 minutes', body: 'Room 4 · Teams link in the invite' },
+    { app: 'DockHub', title: 'Screenshot saved', body: 'Pictures › Screenshots' },
+  ];
+  let dnd = false;
+  const syncBadge = () => {
+    notifBadge.innerHTML = dnd ? icons.moon : String(notes.length);
+    notifBadge.hidden = !dnd && notes.length === 0;
+    notifBadge.classList.toggle('dnd', dnd);
+    clockBtn.setAttribute('aria-label', `Clock, ${dnd ? 'Do not disturb is on' : `${notes.length} notifications`}`);
+  };
   const clockBtn = $('[data-clock]');
   clockBtn.addEventListener('click', () => {
     const cal = widgetById.clock.panel(makeInstance('clock'), env);
+    const dndChip = h('button', {
+      class: `wp-chip ${dnd ? 'on' : ''}`,
+      type: 'button',
+      text: 'Do not disturb',
+      onclick: () => {
+        dnd = !dnd;
+        dndChip.classList.toggle('on', dnd);
+        syncBadge();
+      },
+    });
+    const list = h('div', { class: 'wp-list' });
+    const drawNotes = () =>
+      list.replaceChildren(
+        ...(notes.length
+          ? notes.map((n) => h('div', { class: 'wp-list-row notif-row' }, h('div', { class: 'grow' }, h('div', { class: 'wp-muted', text: n.app }), h('div', { class: 'wp-strong', text: n.title }), h('div', { class: 'wp-muted', text: n.body }))))
+          : [h('div', { class: 'wp-muted', text: 'No new notifications' })]),
+      );
+    drawNotes();
+    const clear = h('button', {
+      class: 'wp-chip',
+      type: 'button',
+      text: 'Clear all',
+      onclick: () => {
+        notes.length = 0;
+        drawNotes();
+        syncBadge();
+      },
+    });
     const content = h(
       'div',
       { class: 'notif' },
-      h('div', { class: 'notif-top' }, h('div', { class: 'start-head' }, 'Notifications', h('span', { text: 'Do not disturb' })), h('div', { class: 'wp-muted', text: 'No new notifications' })),
+      h('div', { class: 'notif-top' }, h('div', { class: 'start-head' }, 'Notifications', h('div', { class: 'notif-actions' }, dndChip, clear)), list),
       cal.el,
     );
     openFlyout(content, { kind: 'clock', anchor: clockBtn, views: [cal] });
   });
+  syncBadge();
   clockBtn.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     e.stopPropagation();

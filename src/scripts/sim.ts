@@ -23,6 +23,8 @@ export const tracks = [
 export const sim = {
   cpu: new Spring(23),
   ram: new Spring(61),
+  gpu: new Spring(31),
+  vram: new Spring(3.4),
   battery: new Spring(86),
   disk: new Spring(64),
   cpuHistory: Array.from({ length: 32 }, (_, i) => 20 + Math.sin(i / 3) * 6 + Math.random() * 6),
@@ -69,6 +71,8 @@ export function stepSim(dt: number, now: number) {
     lastRetarget = now;
     sim.cpu.target = walk(sim.cpu.target, 22, 6, 78);
     sim.ram.target = walk(sim.ram.target, 3, 52, 74);
+    sim.gpu.target = walk(sim.gpu.target, 26, 4, 92);
+    sim.vram.target = walk(sim.vram.target, 0.6, 2.1, 6.8);
     sim.down.target = walk(sim.down.target, 3.2, 0.4, 11.5);
     sim.up.target = walk(sim.up.target, 0.3, 0.05, 1.4);
     sim.cpuHistory.push(sim.cpu.target);
@@ -78,6 +82,8 @@ export function stepSim(dt: number, now: number) {
   }
   sim.cpu.step(dt);
   sim.ram.step(dt);
+  sim.gpu.step(dt);
+  sim.vram.step(dt);
   sim.down.step(dt);
   sim.up.step(dt);
   sim.battery.step(dt);
