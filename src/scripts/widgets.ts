@@ -162,7 +162,7 @@ function tickBar(count: number) {
 
 /* ------------------------------------------------------------ registry */
 
-export type Category = 'Clocks' | 'Reminders' | 'Notes' | 'Media' | 'System' | 'Weather' | 'AI';
+export type Category = 'Clocks' | 'Reminders' | 'Notes' | 'Productivity' | 'Media' | 'System' | 'Weather' | 'AI';
 
 export interface Instance {
   uid: string;
@@ -256,6 +256,10 @@ const ICON = {
   batteryDevices: 'M4,7 H18 A2,2 0 0 1 20,9 V15 A2,2 0 0 1 18,17 H4 A2,2 0 0 1 2,15 V9 A2,2 0 0 1 4,7 Z M20,11 H22 V13 H20 Z',
   recycleBin: 'M3,6 H21 M8,6 V4 A2,2 0 0 1 10,2 H14 A2,2 0 0 1 16,4 V6 M19,6 V20 A2,2 0 0 1 17,22 H7 A2,2 0 0 1 5,20 V6 Z M10,11 V17 M14,11 V17',
   group: 'M3,7 H21 V19 A2,2 0 0 1 19,21 H5 A2,2 0 0 1 3,19 Z M3,7 L7,3 H13 L15,5',
+  calendar: 'M4,6 H20 V20 H4 Z M4,10 H20 M8,3 V7 M16,3 V7 M8,14 H10 M14,14 H16',
+  clipboard: 'M8,4 H6 A2,2 0 0 0 4,6 V20 A2,2 0 0 0 6,22 H18 A2,2 0 0 0 20,20 V6 A2,2 0 0 0 18,4 H16 M9,2 H15 V6 H9 Z M8,12 H16 M8,16 H13',
+  stack: 'M4,8 L12,4 L20,8 L12,12 Z M4,12 L12,16 L20,12 M4,16 L12,20 L20,16',
+  currency: 'M12,3 A9,9 0 1 1 11.99,3 Z M15,8.5 C14,7.5 13,7.2 12,7.2 C10.2,7.2 9,8.2 9,9.6 C9,12.8 15,11.4 15,14.4 C15,15.8 13.8,16.8 12,16.8 C10.8,16.8 9.7,16.3 9,15.4 M12,5.5 V7.2 M12,16.8 V18.5',
   ai: 'M12,3 L14.2,9.2 L20.8,9.2 L15.5,13.1 L17.5,19.3 L12,15.6 L6.5,19.3 L8.5,13.1 L3.2,9.2 L9.8,9.2 Z',
 };
 
@@ -324,6 +328,61 @@ function mediaControls(env: Env, size: 'sm' | 'lg') {
     },
   };
 }
+
+/* ------------------------------------------------- productivity data */
+
+type Meeting = { title: string; where: string; online: boolean; color: string; start: Date; end: Date };
+function meetingsFrom(d: Date): Meeting[] {
+  // Anchored to the current time so the demo always has something coming up.
+  const base = new Date(d);
+  base.setSeconds(0, 0);
+  base.setMinutes(Math.floor(base.getMinutes() / 15) * 15);
+  const at = (mins: number, len: number, title: string, where: string, online: boolean, color: string): Meeting => {
+    const start = new Date(base.getTime() + mins * 60000);
+    return { title, where, online, color, start, end: new Date(start.getTime() + len * 60000) };
+  };
+  return [
+    at(-75, 30, 'Standup', 'Teams', true, '#5B8CFF'),
+    at(15, 30, 'Design review', 'Teams', true, '#5B8CFF'),
+    at(90, 60, 'Lunch with Deniz', 'Kadıköy', false, '#F5A55B'),
+    at(210, 45, '1:1 with Alex', 'Google Meet', true, '#34C759'),
+  ];
+}
+
+type Clip = { kind: 'text' | 'link' | 'image'; text: string; when: string; pinned?: boolean; art?: number };
+const clips: Clip[] = [
+  { kind: 'text', text: 'git push origin v0.7.0', when: 'Just now' },
+  { kind: 'link', text: 'github.com/sametgurtuna/DockHub', when: '2 min ago' },
+  { kind: 'image', text: 'Screenshot 1280 × 720', when: '9 min ago', art: 1 },
+  { kind: 'text', text: 'Ship the new widgets on Friday', when: '24 min ago', pinned: true },
+  { kind: 'text', text: 'Kadıköy, Moda Cd. No: 12', when: '1 hour ago' },
+];
+
+type DlFile = { name: string; ext: string; size: string; when: string };
+const files: DlFile[] = [
+  { name: 'Quarterly report.pdf', ext: 'pdf', size: '2.4 MB', when: '3 min ago' },
+  { name: 'Holiday photo.jpg', ext: 'jpg', size: '4.1 MB', when: '18 min ago' },
+  { name: 'Budget 2027.xlsx', ext: 'xlsx', size: '86 KB', when: '1 hour ago' },
+  { name: 'DockHub-Setup-0.7.0-x64.exe', ext: 'exe', size: '58.6 MB', when: '2 hours ago' },
+  { name: 'Slides.pptx', ext: 'pptx', size: '12 MB', when: 'Yesterday' },
+  { name: 'Assets.zip', ext: 'zip', size: '31 MB', when: 'Yesterday' },
+];
+const EXT_COLORS: Record<string, string> = { pdf: '#E5484D', jpg: '#30A46C', xlsx: '#1F7A45', exe: '#5B8CFF', pptx: '#E5702A', zip: '#8E7CC3' };
+function fileBadge(ext: string, big = false) {
+  return h('span', { class: `file-badge${big ? ' big' : ''}`, style: `--fc:${EXT_COLORS[ext] ?? '#8A94A6'}` }, h('b', { text: ext.toUpperCase() }));
+}
+
+type Rate = { base: string; quote: string; rate: number; change: number; trend: number[] };
+const rates: Rate[] = [
+  { base: 'USD', quote: 'TRY', rate: 41.37, change: 0.18, trend: [40.9, 40.95, 41.0, 41.02, 41.08, 41.05, 41.12, 41.18, 41.2, 41.22, 41.27, 41.3, 41.3, 41.37] },
+  { base: 'EUR', quote: 'TRY', rate: 48.62, change: -0.07, trend: [48.1, 48.3, 48.2, 48.4, 48.5, 48.45, 48.6, 48.7, 48.66, 48.72, 48.8, 48.7, 48.65, 48.62] },
+  { base: 'EUR', quote: 'USD', rate: 1.1752, change: -0.25, trend: [1.169, 1.171, 1.174, 1.173, 1.176, 1.179, 1.18, 1.178, 1.181, 1.183, 1.182, 1.179, 1.178, 1.1752] },
+];
+const fxSpark = (r: Rate, w: number, hgt: number) => {
+  const lo = Math.min(...r.trend);
+  const sp = sparkline(r.trend.map((v) => v - lo + (Math.max(...r.trend) - lo) * 0.15), w, hgt);
+  return `<svg viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" aria-hidden="true"><path d="${sp.area}" class="fx-area"/><path d="${sp.line}" class="fx-line"/></svg>`;
+};
 
 export const widgets: WidgetDef[] = [
   /* ----------------------------------------------------------- Clock */
@@ -932,6 +991,241 @@ export const widgets: WidgetDef[] = [
           wrap.style.setProperty('--note', noteColors[i.state.color]);
           chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.color === i.state.color)));
         },
+      };
+    },
+  },
+  /* ------------------------------------------------------- Calendar */
+  {
+    id: 'calendar',
+    name: 'Calendar',
+    category: 'Productivity',
+    description: 'Your next meeting from any iCal (.ics) link, with a Join button for Teams, Meet and Zoom. No sign-in needed.',
+    icon: ICON.calendar,
+    accent: ACCENT.red,
+    variants: [
+      { id: 'next', name: 'Next event' },
+      { id: 'agenda', name: "Today's agenda" },
+    ],
+    card(i, env) {
+      const bar = h('i', { class: 'meet-bar' });
+      const title = h('div', { class: 'wc-title' });
+      const sub = h('div', { class: 'wc-sub num' });
+      const join = h('span', {
+        class: 'meet-join',
+        text: 'Join',
+        onclick: (e: Event) => {
+          e.stopPropagation();
+          env.toast?.('Joining meeting', 'DockHub opens the Teams, Meet or Zoom link from the invite.');
+        },
+      });
+      const box = card('wc-meet', bar, h('div', { class: 'wc-stack grow' }, title, sub));
+      return {
+        el: box,
+        tick: (d) => {
+          const upcoming = meetingsFrom(d).filter((m) => m.end > d);
+          const n = upcoming[0];
+          if (!n) {
+            title.textContent = 'No more events';
+            sub.textContent = 'Enjoy the rest of the day';
+            join.remove();
+            return;
+          }
+          bar.style.background = n.color;
+          if (i.variant === 'agenda') {
+            title.textContent = `${upcoming.length} events left today`;
+            sub.textContent = `Next ${hhmm(n.start)} · ${n.title}`;
+            join.remove();
+            return;
+          }
+          const mins = Math.ceil((n.start.getTime() - d.getTime()) / 60000);
+          title.textContent = n.title;
+          sub.textContent = mins <= 0 ? `Now · until ${hhmm(n.end)}` : mins < 60 ? `in ${mins} min · ${n.where}` : `${hhmm(n.start)} · ${n.where}`;
+          if (n.online && mins <= 20) box.append(join);
+          else join.remove();
+        },
+      };
+    },
+    compact() {
+      const t = h('div', { class: 'wt-text num' });
+      return {
+        el: compactTile(glyph(ICON.calendar, ACCENT.red), t),
+        tick: (d) => {
+          const n = meetingsFrom(d).find((m) => m.end > d);
+          t.textContent = n ? hhmm(n.start) : '–';
+        },
+      };
+    },
+    panel(_i, env) {
+      const list = h('div', { class: 'wp-list' });
+      return {
+        el: panelShell("Today's agenda", list, h('div', { class: 'wp-foot', text: 'Sample events. The app reads any iCal (.ics) link and reminds you 5 minutes before each event.' })),
+        tick: (d) =>
+          list.replaceChildren(
+            ...meetingsFrom(d).map((m) =>
+              h(
+                'div',
+                { class: `wp-list-row ${m.end <= d ? 'is-done' : ''}` },
+                h('i', { class: 'meet-dot', style: `background:${m.color}` }),
+                h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: m.title }), h('div', { class: 'wp-muted num', text: `${hhmm(m.start)} – ${hhmm(m.end)} · ${m.where}` })),
+                m.online && m.end > d ? h('button', { class: 'wp-chip on', text: 'Join', onclick: () => env.toast?.('Joining meeting', `DockHub opens the ${m.where} link from the invite.`) }) : null,
+              ),
+            ),
+          ),
+      };
+    },
+  },
+  /* ------------------------------------------------ Clipboard history */
+  {
+    id: 'clipboard',
+    name: 'Clipboard History',
+    category: 'Productivity',
+    description: 'The last 25 texts and images you copied. Click to copy again, pin what you need. Password managers are never recorded.',
+    icon: ICON.clipboard,
+    accent: ACCENT.purple,
+    variants: [{ id: 'default', name: 'Standard' }],
+    card() {
+      const title = h('div', { class: 'wc-title' });
+      const sub = h('div', { class: 'wc-sub' });
+      return {
+        el: card('wc-clip', glyph(ICON.clipboard, ACCENT.purple), h('div', { class: 'wc-stack' }, title, sub)),
+        refresh: () => {
+          title.textContent = clips[0].text;
+          sub.textContent = `${clips.length} items · ${clips.filter((c) => c.pinned).length} pinned`;
+        },
+      };
+    },
+    compact() {
+      const t = h('div', { class: 'wt-text num' });
+      return { el: compactTile(glyph(ICON.clipboard, ACCENT.purple), t), refresh: () => (t.textContent = String(clips.length)) };
+    },
+    panel(_i, env) {
+      const list = h('div', { class: 'wp-list' });
+      const render = () =>
+        list.replaceChildren(
+          ...[...clips.filter((c) => c.pinned), ...clips.filter((c) => !c.pinned)].map((c) =>
+            h(
+              'div',
+              { class: 'wp-list-row clip-row' },
+              c.kind === 'image' ? h('span', { class: 'clip-thumb', html: albumArt(c.art ?? 0) }) : h('span', { class: 'clip-kind', text: c.kind === 'link' ? 'URL' : 'Aa' }),
+              h(
+                'button',
+                {
+                  class: 'grow clip-copy',
+                  type: 'button',
+                  onclick: () => {
+                    clips.splice(clips.indexOf(c), 1);
+                    clips.unshift(c);
+                    env.toast?.('Copied to clipboard', c.text);
+                    env.refreshAll();
+                  },
+                },
+                h('div', { class: 'wp-strong', text: c.text }),
+                h('div', { class: 'wp-muted', text: c.when }),
+              ),
+              h('button', {
+                class: `wp-chip ${c.pinned ? 'on' : ''}`,
+                type: 'button',
+                text: c.pinned ? 'Pinned' : 'Pin',
+                onclick: () => {
+                  c.pinned = !c.pinned;
+                  env.refreshAll();
+                },
+              }),
+            ),
+          ),
+        );
+      return { el: panelShell('Clipboard history', list, h('div', { class: 'wp-foot', text: 'Kept in memory only. Give it a shortcut in Settings › Keyboard shortcuts.' })), refresh: render };
+    },
+  },
+  /* ----------------------------------------------------- Folder stack */
+  {
+    id: 'stack',
+    name: 'Folder Stack',
+    category: 'Productivity',
+    description: 'The newest files in Downloads or any folder. Drag them straight into other apps.',
+    icon: ICON.stack,
+    accent: ACCENT.orange,
+    variants: [
+      { id: 'fan', name: 'Fan' },
+      { id: 'newest', name: 'Newest file' },
+    ],
+    card(i) {
+      if (i.variant === 'newest') {
+        return { el: card('wc-files', fileBadge(files[0].ext), h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: files[0].name }), h('div', { class: 'wc-sub', text: `Downloads · ${files[0].when}` }))) };
+      }
+      const fan = h('div', { class: 'stack-fan' }, ...files.slice(0, 3).reverse().map((f) => fileBadge(f.ext)));
+      return { el: card('wc-files', fan, h('div', { class: 'wc-stack' }, h('div', { class: 'wc-title', text: 'Downloads' }), h('div', { class: 'wc-sub', text: `${files.length} new files` }))) };
+    },
+    compact() {
+      return { el: compactTile(h('div', { class: 'stack-fan sm' }, ...files.slice(0, 3).reverse().map((f) => fileBadge(f.ext)))) };
+    },
+    panel(_i, env) {
+      return {
+        el: panelShell(
+          'Downloads',
+          h(
+            'div',
+            { class: 'stack-grid' },
+            ...files.map((f) =>
+              h(
+                'button',
+                { class: 'stack-file', type: 'button', draggable: 'true', title: `${f.name} · ${f.size}`, onclick: () => env.toast?.('Opening file', `${f.name} opens in its default app.`) },
+                fileBadge(f.ext, true),
+                h('span', { text: f.name }),
+              ),
+            ),
+          ),
+          h('div', { class: 'wp-foot', text: 'Sample files. In the app, drag a file out of the stack into Explorer, a browser or a chat.' }),
+        ),
+      };
+    },
+  },
+  /* --------------------------------------------------- Exchange rates */
+  {
+    id: 'currency',
+    name: 'Exchange Rates',
+    category: 'Productivity',
+    description: 'Daily European Central Bank rates with the change since yesterday and a two-week trend.',
+    icon: ICON.currency,
+    accent: ACCENT.green,
+    variants: [
+      { id: 'trend', name: 'With trend' },
+      { id: 'pair', name: 'One pair' },
+    ],
+    card(i) {
+      const r = rates[0];
+      const up = r.change >= 0;
+      return {
+        el: card(
+          'wc-fx',
+          h('div', { class: 'wc-stack' }, h('div', { class: 'wc-cap', text: `${r.base} → ${r.quote}` }), h('div', { class: 'wc-big num', text: r.rate.toFixed(2) })),
+          h('div', { class: 'wc-stack fx-side' }, i.variant === 'trend' ? h('span', { class: `fx-spark ${up ? 'up' : 'down'}`, html: fxSpark(r, 46, 16) }) : null, h('span', { class: `fx-chg num ${up ? 'up' : 'down'}`, text: `${up ? '▲' : '▼'} ${Math.abs(r.change).toFixed(2)}%` })),
+        ),
+      };
+    },
+    compact() {
+      return { el: compactTile(h('div', { class: 'wt-text num fx-mini', html: `<small>${rates[0].base}</small>${rates[0].rate.toFixed(1)}` })) };
+    },
+    panel() {
+      return {
+        el: panelShell(
+          'Exchange rates',
+          h(
+            'div',
+            { class: 'wp-list' },
+            ...rates.map((r) => {
+              const up = r.change >= 0;
+              return h(
+                'div',
+                { class: 'wp-list-row fx-row' },
+                h('div', { class: 'grow' }, h('div', { class: 'wp-strong', text: `${r.base} → ${r.quote}` }), h('div', { class: `wp-muted num fx-chg ${up ? 'up' : 'down'}`, text: `${up ? '▲' : '▼'} ${Math.abs(r.change).toFixed(2)}% since yesterday` })),
+                h('span', { class: `fx-spark ${up ? 'up' : 'down'}`, html: fxSpark(r, 90, 26) }),
+                h('div', { class: 'wp-strong num fx-rate', text: r.rate.toFixed(r.rate < 2 ? 4 : 2) }),
+              );
+            }),
+          ),
+          h('div', { class: 'wp-foot', text: 'Sample rates. The app uses the free Frankfurter API (ECB reference rates), updated once a day.' }),
+        ),
       };
     },
   },

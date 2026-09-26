@@ -76,12 +76,12 @@ export function initGallery() {
     add.addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('cd:add-widget', { detail: { id: def.id, variant: inst.variant } }));
       add.classList.add('is-done');
-      label.textContent = 'Added to dock';
+      label.textContent = 'Added';
       ic.innerHTML = icons.check;
       clearTimeout(t);
       t = window.setTimeout(() => {
         add.classList.remove('is-done');
-        label.textContent = 'Add to demo';
+        label.textContent = 'Add';
         ic.innerHTML = icons.plus;
       }, 1800);
     });

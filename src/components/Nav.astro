@@ -5,6 +5,7 @@ import { site } from '../lib/site';
 
 const links = [
   { href: '#demo', label: 'Demo' },
+  { href: '#new', label: "What's new" },
   { href: '#widgets', label: 'Widgets' },
   { href: '#shots', label: 'Screenshots' },
   { href: '#features', label: 'Features' },
@@ -16,15 +17,15 @@ const links = [
 <header class="nav" data-nav>
   <div class="nav-inner wrap">
     <a class="brand" href="#top" aria-label="DockHub home">
-      <Wordmark label={false} />
+      <Wordmark label={false} id="wm-nav" />
     </a>
     <nav class="nav-links" aria-label="Page sections">
       {links.map((l) => <a href={l.href}>{l.label}</a>)}
     </nav>
     <div class="nav-actions">
-      <a class="nav-gh" href={site.githubUrl} aria-label="GitHub repository" set:html={icons.github} />
+      <a class="nav-gh" href={site.githubUrl} aria-label="DockHub on GitHub" set:html={icons.github} />
       <a class="btn btn-primary nav-dl" href={site.downloadUrl}>
-        <span set:html={icons.windows} />
+        <span class="nav-dl-ic" set:html={icons.download} />
         <span>Download</span>
       </a>
     </div>
@@ -37,6 +38,24 @@ const links = [
     const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Mark the link of the section currently under the reading line.
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('.nav-links a')];
+    const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+    const spy = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          byId.get(en.target.id)?.setAttribute('aria-current', 'true');
+        });
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    byId.forEach((_, id) => {
+      const el = document.getElementById(id);
+      if (el) spy.observe(el);
+    });
   }
 </script>
 
@@ -88,6 +107,9 @@ const links = [
     color: var(--text);
     background: var(--surface-hover);
   }
+  .nav-links a[aria-current] {
+    color: var(--text);
+  }
   .nav-actions {
     display: flex;
     align-items: center;
@@ -115,10 +137,15 @@ const links = [
     padding-inline: 14px;
     font-size: 0.9375rem;
   }
-  .nav-dl span:first-child {
-    width: 15px;
-    height: 15px;
+  .nav-dl-ic {
+    width: 16px;
+    height: 16px;
     display: grid;
+  }
+  .nav-dl-ic :global(svg) {
+    width: 100%;
+    height: 100%;
+    stroke-width: 2;
   }
   @media (max-width: 860px) {
     .nav-links {

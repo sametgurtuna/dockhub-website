@@ -27,8 +27,8 @@ const scenarios = [
 
 const facts = [
   { title: 'No administrator privileges required', text: 'Runs as a standard user process. Explorer.exe is never terminated or injected.' },
-  { title: 'Atomic configuration writes', text: 'Settings are written to a temp file and moved atomically. Corrupted files are safely backed up.' },
-  { title: 'Network access strictly for weather', text: 'The only outbound HTTP requests query Open-Meteo. No user telemetry, accounts, or tracking.' },
+  { title: 'Atomic writes and daily backups', text: 'Settings are written atomically, the last 7 days are kept, and a damaged file is replaced by the newest backup. Every removal can be undone.' },
+  { title: 'Network only where a feature needs it', text: 'Weather, exchange rates, your calendar link and the daily update check. Web widgets reach only the hosts they declare. No telemetry, accounts or tracking.' },
 ] as const;
 ---
 
@@ -500,6 +500,20 @@ const facts = [
     line-height: 1.5;
   }
 
+  @media (max-width: 560px) {
+    .cmd {
+      padding: 14px;
+    }
+    .cmd-line {
+      width: 100%;
+      justify-content: space-between;
+    }
+    code {
+      font-size: 0.8125rem;
+      white-space: nowrap;
+      overflow-wrap: normal;
+    }
+  }
   @media (max-width: 960px) {
     .safety {
       grid-template-columns: 1fr;

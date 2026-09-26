@@ -2,291 +2,251 @@
 import Desktop from './Desktop.astro';
 import { icons } from '../lib/icons';
 import { site } from '../lib/site';
+import { widgets } from '../scripts/widgets';
 ---
 
 <section class="hero" id="top">
-  <!-- Ambient backdrop lighting -->
   <div class="hero-glow" aria-hidden="true"></div>
 
-  <div class="wrap hero-content">
-    <!-- Release Announcement Pill -->
-    <div class="hero-badge-wrap">
-      <a class="hero-badge" href="https://github.com/sametgurtuna/DockHub/releases/tag/v0.6.1" target="_blank" rel="noopener">
-        <span class="badge-tag">v0.6.1</span>
-        <span class="badge-text">Now Available: Multi-Monitor Support with Per-Display Dock Sizing</span>
-        <span class="badge-arrow">→</span>
-      </a>
-    </div>
-
-    <!-- Hero Title -->
+  <div class="wrap hero-head">
     <h1 class="hero-title">
-      <span class="line-white">Your Windows Taskbar.</span>
-      <span class="line-gradient">Reimagined.</span>
+      <span class="line"><span>Your taskbar,</span></span>
+      <span class="line"><span>rebuilt as a dock.</span></span>
     </h1>
 
-    <!-- Lead Subtitle -->
-    <p class="hero-lead">
-      Replace the default Windows taskbar with a fluid, glassmorphic dock packed with live widgets. Start menu, running apps, and system tray stay right where they belong.
-    </p>
+    <div class="hero-side">
+      <p class="hero-lead">
+        DockHub swaps the Windows taskbar for a glass dock with your apps, tray, clock and {widgets.length} live widgets. Close it and the
+        taskbar comes straight back.
+      </p>
 
-    <!-- Call to Actions -->
-    <div class="hero-cta">
-      <a class="btn btn-primary btn-hero-dl" href={site.downloadUrl}>
-        <span set:html={icons.windows} />
-        <span>Download for Free (v0.6.1)</span>
-      </a>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-hero" href={site.downloadUrl}>
+          <span class="btn-ic" set:html={icons.download} />
+          <span>Download for Windows</span>
+        </a>
+        <a class="btn btn-quiet btn-hero" href={site.githubUrl} target="_blank" rel="noopener">
+          <span class="btn-ic" set:html={icons.github} />
+          <span>GitHub</span>
+        </a>
+      </div>
 
-      <button class="btn-terminal" type="button" data-copy-cmd="winget install DockHub" aria-label="Copy terminal command">
-        <span class="prompt">&gt;</span>
-        <code>winget install DockHub</code>
-        <span class="copy-ic" set:html={icons.copy} />
-      </button>
-
-      <a class="btn btn-glass" href={site.githubUrl} target="_blank" rel="noopener">
-        <span set:html={icons.github} />
-        <span>GitHub</span>
-      </a>
-    </div>
-
-    <!-- Trust Metadata -->
-    <div class="hero-trust">
-      <span>Free & Open Source</span>
-      <span class="dot">·</span>
-      <span>Windows 10 & 11</span>
-      <span class="dot">·</span>
-      <span>No Admin Rights Needed</span>
-      <span class="dot">·</span>
-      <span>60 MB Installer</span>
+      <ul class="hero-meta" aria-label="At a glance">
+        <li><span class="meta-ic" set:html={icons.check} />Free and open source</li>
+        <li><span class="meta-ic" set:html={icons.check} />No admin rights needed</li>
+        <li><span class="meta-ic" set:html={icons.check} />Windows 10 and 11</li>
+        <li>
+          <a href={site.releaseUrl} target="_blank" rel="noopener">
+            <span class="meta-ic" set:html={icons.arrowRight} />What's new in v{site.version}
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 
-  <!-- Interactive Live Windows 11 Desktop (Unobstructed Stage) -->
-  <div class="hero-stage-wrap" id="demo">
-    <div class="demo-head reveal">
-      <span class="demo-kicker">Live Interactive Windows 11 Demo</span>
-      <h2 class="section-title">Go ahead, make it yours.</h2>
-      <p class="section-lead">
-        Everything on this mock desktop is live. Click widgets, right-click for menus, drag to reorder, or move to another screen edge.
-      </p>
-    </div>
-
-    <div class="hero-stage">
-      <Desktop />
-    </div>
-
+  <div class="wrap hero-stage" id="demo">
+    <Desktop />
     <p class="fine demo-note">
-      Interactive browser demo. The clock runs live; weather, system metrics, and tracks are simulated.
+      A live demo running in your browser: click widgets, right-click for menus, drag to reorder. The clock is real; weather,
+      system stats, music and meetings are simulated.
     </p>
   </div>
 </section>
 
-<script>
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-cmd]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const cmd = btn.dataset.copyCmd;
-      if (!cmd) return;
-      try {
-        await navigator.clipboard.writeText(cmd);
-        btn.classList.add('is-copied');
-        const copyIc = btn.querySelector('.copy-ic');
-        if (copyIc) {
-          copyIc.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
-        }
-        setTimeout(() => {
-          btn.classList.remove('is-copied');
-          if (copyIc) {
-            copyIc.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>`;
-          }
-        }, 2000);
-      } catch {}
-    });
-  });
-</script>
-
 <style>
   .hero {
     position: relative;
-    padding-top: clamp(24px, 5vw, 48px);
-    overflow: hidden;
+    padding-top: clamp(20px, 3.2vh, 40px);
   }
 
   .hero-glow {
     position: absolute;
-    inset: -120px 0 auto;
-    height: 900px;
+    inset: -68px 0 auto;
+    height: 1100px;
     background:
-      radial-gradient(55% 40% at 50% 12%, rgba(0, 103, 192, 0.28), transparent 70%),
-      radial-gradient(40% 30% at 50% 30%, rgba(76, 194, 255, 0.14), transparent 70%);
+      radial-gradient(48% 36% at 22% 8%, rgb(0 103 192 / 0.26), transparent 70%),
+      radial-gradient(60% 40% at 50% 62%, rgb(29 111 255 / 0.16), transparent 70%);
     pointer-events: none;
     z-index: -1;
   }
 
-  .hero-content {
+  .hero-head {
     display: grid;
-    justify-items: center;
-    text-align: center;
-    gap: 22px;
-    margin-bottom: clamp(48px, 7vw, 80px);
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+    align-items: end;
+    gap: 28px clamp(32px, 5vw, 72px);
+    margin-bottom: clamp(24px, 3.2vh, 36px);
   }
 
-  /* Badge */
-  .hero-badge-wrap {
-    display: flex;
-    justify-content: center;
-  }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 14px 5px 6px;
-    border-radius: 99px;
-    background: rgba(14, 18, 27, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    font-size: 0.875rem;
-    color: var(--text);
-    text-decoration: none;
-    transition: all var(--t-fast) var(--ease-out);
-  }
-  .hero-badge:hover {
-    background: rgba(22, 28, 40, 0.95);
-    border-color: rgba(76, 194, 255, 0.45);
-    box-shadow: 0 4px 20px -4px var(--glow-cyan), inset 0 1px 0 rgba(255, 255, 255, 0.16);
-    transform: translateY(-1px);
-  }
-  .badge-tag {
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 3px 9px;
-    border-radius: 99px;
-    background: linear-gradient(180deg, #5ecaff 0%, #1ea5f5 100%);
-    color: #001e38;
-    letter-spacing: 0.02em;
-  }
-  .badge-text {
-    color: #dbe4f4;
-    font-weight: 500;
-  }
-  .badge-arrow {
-    color: var(--accent);
-    transition: transform var(--t-fast);
-  }
-  .hero-badge:hover .badge-arrow {
-    transform: translateX(3px);
-  }
-
-  /* Typography */
   .hero-title {
-    font-size: clamp(2.75rem, 6.5vw, 5.5rem);
+    font-size: clamp(2.75rem, 5.6vw, 5.25rem);
     font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.035em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    text-wrap: nowrap;
   }
-  .line-white {
-    color: #ffffff;
+  .line {
+    display: block;
+    overflow: clip;
+    overflow-clip-margin: 0.12em;
+    padding-bottom: 0.04em;
   }
-  .line-gradient {
-    background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.62) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .line > span {
+    display: inline-block;
   }
-
-  .hero-lead {
-    max-width: 52ch;
-    font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
-    line-height: 1.5;
+  .line + .line > span {
     color: var(--text-2);
   }
 
-  /* CTAs */
+  @media (prefers-reduced-motion: no-preference) {
+    .line > span {
+      animation: rise 900ms var(--ease-out) both;
+    }
+    .line + .line > span {
+      animation-delay: 90ms;
+    }
+    .hero-side {
+      animation: fade 900ms var(--ease-out) 220ms both;
+    }
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .hero-side {
+    display: grid;
+    gap: 20px;
+    padding-bottom: 0.35rem;
+  }
+
+  .hero-lead {
+    font-size: clamp(1.0625rem, 1.25vw, 1.1875rem);
+    line-height: 1.5;
+    color: var(--text-2);
+    max-width: 40ch;
+  }
+
   .hero-cta {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-top: 6px;
+    gap: 10px;
   }
-  .btn-hero-dl {
+  .btn-hero {
     --btn-h: 50px;
-    padding-inline: 24px;
-    font-size: 1rem;
+    padding-inline: 22px;
   }
-  .btn-hero-dl :global(svg) {
-    width: 19px;
-    height: 19px;
+  .btn-ic {
+    display: grid;
+    width: 18px;
+    height: 18px;
+  }
+  .btn-ic :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  .btn-primary .btn-ic :global(svg) {
+    stroke-width: 2;
   }
 
-  /* Trust row */
-  .hero-trust {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 8px 14px;
-    font-size: 0.84375rem;
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 8px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
     color: var(--text-3);
   }
-  .hero-trust .dot {
-    color: rgba(255, 255, 255, 0.2);
+  .hero-meta li,
+  .hero-meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
-
-  /* Stage section */
-  .hero-stage-wrap {
-    width: min(100% - 2 * var(--gutter), 1440px);
-    margin-inline: auto;
-    position: relative;
+  .hero-meta a {
+    color: var(--text-2);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: color var(--t-fast) var(--ease-out);
   }
-
-  .demo-head {
-    display: grid;
-    justify-items: center;
-    text-align: center;
-    gap: 12px;
-    margin-bottom: clamp(24px, 4vw, 40px);
-  }
-  .demo-kicker {
-    font-size: 0.8125rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  .hero-meta a:hover {
     color: var(--accent);
+  }
+  .meta-ic {
+    display: grid;
+    width: 15px;
+    height: 15px;
+    color: var(--text-3);
+    transition: translate var(--t-med) var(--ease-out);
+  }
+  .meta-ic :global(svg) {
+    width: 100%;
+    height: 100%;
+    stroke-width: 2;
+  }
+  .hero-meta a .meta-ic {
+    color: var(--accent);
+  }
+  .hero-meta a:hover .meta-ic {
+    translate: 3px 0;
   }
 
   .hero-stage {
     position: relative;
-    border-radius: 22px;
-    box-shadow: var(--glow-stage);
+    scroll-margin-top: 84px;
   }
+  /* Sized so the whole desktop, dock included, lands inside the first viewport. */
   .hero-stage :global(.stage) {
-    height: clamp(540px, 76vh, 840px);
+    height: clamp(500px, calc(100svh - 372px), 760px);
   }
 
   .demo-note {
+    max-width: 62ch;
+    margin: 16px auto 0;
     text-align: center;
-    margin-top: 18px;
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 1023px) {
+    .hero-head {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
     .hero-title {
-      font-size: 2.5rem;
-      letter-spacing: -0.025em;
+      text-wrap: balance;
     }
-    .hero-cta {
-      flex-direction: column;
-      width: 100%;
+    .hero-side {
+      padding-bottom: 0;
     }
-    .hero-cta > * {
-      width: 100%;
-      justify-content: center;
+    .hero-lead {
+      max-width: 52ch;
     }
     .hero-stage :global(.stage) {
-      height: 480px;
+      height: clamp(480px, 62vh, 640px);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hero-title {
+      font-size: clamp(1.875rem, 10vw, 3.25rem);
+      text-wrap: nowrap;
+    }
+    .hero-cta > * {
+      flex: 1 1 100%;
+    }
+    .hero-meta {
+      grid-template-columns: 1fr;
+    }
+    .hero-stage :global(.stage) {
+      height: 520px;
     }
   }
 </style>

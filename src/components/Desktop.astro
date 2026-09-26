@@ -75,7 +75,7 @@ const tbApps = ['explorer', 'browser', 'terminal', 'notepad'] as const;
         <div class="dock-tray" data-tray>
           <button class="db db-tray" type="button" data-tray-more aria-label="Show hidden icons" set:html={icons.chevronUp} />
           <button class="db db-tray" type="button" data-quick aria-label="Network, sound and battery" >
-            <span set:html={icons.wifi} /><span set:html={icons.volume} /><span set:html={icons.battery} />
+            <span set:html={icons.wifi} /><span data-vol-ic set:html={icons.volume} /><span set:html={icons.battery} />
           </button>
         </div>
         <button class="db db-clock" type="button" data-clock aria-label="Clock and notifications">

@@ -88,9 +88,9 @@ export function initDemo() {
           w('media', 'full'),
           w('weather', 'current'),
           w('system', 'rings'),
+          w('calendar', 'next'),
           w('hydration', 'timer'),
-          w('notes'),
-          group('Extras', GROUP_ACCENTS[2], [wc('ai-usage', 'rings'), wc('audio', 'compact'), wc('recycle-bin', 'icon'), wc('battery-devices', 'single')]),
+          group('Extras', GROUP_ACCENTS[2], [wc('clipboard'), wc('stack', 'fan'), wc('currency', 'trend'), wc('notes'), wc('ai-usage', 'rings'), wc('recycle-bin', 'icon')]),
         ];
 
   const shell = stage.closest<HTMLElement>('[data-stage-shell]');
@@ -132,9 +132,12 @@ export function initDemo() {
         h('span', { class: 'app-ico', html: appIcons[it.app] }),
       );
       btn.addEventListener('click', () => toggleApp(it.app, btn));
+      btn.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && previewHover(it.app, btn, true));
+      btn.addEventListener('pointerleave', () => previewHover(it.app, btn, false));
       btn.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        hidePreview(true);
         appMenu(it, e);
       });
       return { el: h('div', { class: 'dock-item', 'data-key': it.key }, btn), btn };
@@ -209,15 +212,39 @@ export function initDemo() {
 
   function removeItem(key: string) {
     const rec = recs.get(key);
-    const it = items.find((i) => i.key === key);
+    const index = items.findIndex((i) => i.key === key);
+    const it = items[index];
     if (it?.kind === 'widget') untrack(it.inst);
     const done = () => {
       items = items.filter((i) => i.key !== key);
       render();
+      if (it && it.kind !== 'sep') offerUndo(it, index);
     };
     if (!rec || reduced()) return done();
     rec.el.classList.add('is-leaving');
     setTimeout(done, 220);
+  }
+
+  /** Like the app's undo toast: removed items come back in place, widget data included. */
+  function offerUndo(it: Item, index: number) {
+    const name = it.kind === 'app' ? appNames[it.app] : it.kind === 'group' ? `${it.name} folder` : it.kind === 'widget' ? widgetById[it.inst.id].name : 'Item';
+    toast(`${name} removed`, it.kind === 'widget' || it.kind === 'group' ? 'Its settings and data are kept for 7 days.' : 'You can pin it again at any time.', {
+      actions: [
+        {
+          label: 'Undo',
+          accent: true,
+          run: () => {
+            if (items.some((x) => x.key === it.key)) return;
+            if (it.kind === 'widget') track(it.inst, env);
+            if (it.kind === 'group') it.children.forEach((c) => c.kind === 'widget' && track(c.inst, env));
+            items.splice(Math.min(index, items.length), 0, it);
+            render(it.key);
+            setTimeout(() => recs.get(it.key)?.el.classList.remove('is-new'), 700);
+          },
+        },
+      ],
+      timeout: 8000,
+    });
   }
 
   function insertIndex() {
@@ -511,6 +538,7 @@ export function initDemo() {
       return null;
     }
     closeFlyout(true);
+    hidePreview(true);
     const el = h('div', { class: `flyout ${opts.cls ?? ''}`, role: 'dialog' }, content);
     el.style.visibility = 'hidden';
     layer.append(el);
@@ -1027,7 +1055,47 @@ export function initDemo() {
     openFlyout(grid, { kind: 'tray', anchor: e.currentTarget as HTMLElement });
   });
 
+  /* Volume on the dock (0.7): scroll to change, middle-click to mute. */
+  const vol = { level: 45, muted: false };
+  const quickBtn = $('[data-quick]');
+  const volIc = quickBtn.querySelector<HTMLElement>('[data-vol-ic]');
+  let volTip: HTMLElement | null = null;
+  let volTipTimer = 0;
+  function showVolume() {
+    if (volIc) volIc.innerHTML = vol.muted || vol.level === 0 ? icons.volumeMute : icons.volume;
+    quickBtn.setAttribute('aria-label', `Network, sound (${vol.muted ? 'muted' : `${vol.level}%`}) and battery`);
+    if (fly) return;
+    volTip?.remove();
+    volTip = h('div', { class: 'flyout vol-tip', role: 'status' }, h('b', { text: vol.muted ? 'Speakers · muted' : `Speakers · ${vol.level}%` }), h('span', { class: 'vol-bar' }, h('i', { style: `width:${vol.muted ? 0 : vol.level}%` })), h('small', { text: 'Scroll to change · middle-click to mute' }));
+    layer.append(volTip);
+    place(volTip, quickBtn);
+    clearTimeout(volTipTimer);
+    volTipTimer = window.setTimeout(() => {
+      volTip?.remove();
+      volTip = null;
+    }, 1400);
+  }
+  quickBtn.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      vol.muted = false;
+      vol.level = Math.max(0, Math.min(100, vol.level + (e.deltaY < 0 ? 2 : -2)));
+      showVolume();
+    },
+    { passive: false },
+  );
+  quickBtn.addEventListener('mousedown', (e) => e.button === 1 && e.preventDefault());
+  quickBtn.addEventListener('auxclick', (e) => {
+    if (e.button !== 1) return;
+    e.preventDefault();
+    vol.muted = !vol.muted;
+    showVolume();
+  });
+
   $('[data-quick]').addEventListener('click', (e) => {
+    volTip?.remove();
+    volTip = null;
     const tile = (ic: keyof typeof icons, label: string, on: boolean) => {
       const b = h('button', { class: `qt ${on ? 'on' : ''}`, type: 'button', 'aria-pressed': String(on) }, h('span', { html: icons[ic] }), label);
       b.addEventListener('click', () => {
@@ -1044,7 +1112,7 @@ export function initDemo() {
       { class: 'quick' },
       h('div', { class: 'quick-tiles' }, tile('wifi', 'Wi-Fi', true), tile('moon', 'Focus', false), tile('battery', 'Battery saver', false), tile('sun', 'Night light', false), tile('shield', 'Security', true), tile('monitor', 'Cast', false)),
       h('label', { class: 'quick-slider' }, h('span', { html: icons.sun }), h('input', { type: 'range', min: '0', max: '100', value: '70', 'aria-label': 'Brightness' })),
-      h('label', { class: 'quick-slider' }, h('span', { html: icons.volume }), h('input', { type: 'range', min: '0', max: '100', value: '45', 'aria-label': 'Volume' })),
+      h('label', { class: 'quick-slider' }, h('span', { html: vol.muted ? icons.volumeMute : icons.volume }), h('input', { type: 'range', min: '0', max: '100', value: String(vol.muted ? 0 : vol.level), 'aria-label': 'Volume', oninput: (ev: Event) => { vol.level = +(ev.target as HTMLInputElement).value; vol.muted = false; if (volIc) volIc.innerHTML = vol.level === 0 ? icons.volumeMute : icons.volume; } })),
       h('div', { class: 'quick-foot' }, h('span', {}, h('span', { html: icons.battery }), batt), h('button', { class: 'gallery-close', type: 'button', 'aria-label': 'Settings', html: icons.settings, onclick: () => { closeFlyout(); openApp('dock-settings'); } })),
     );
     openFlyout(content, { kind: 'quick', anchor: e.currentTarget as HTMLElement, views: [view] });
@@ -1093,7 +1161,7 @@ export function initDemo() {
   /* ---------------------------------------------------------- gallery */
 
   function openGallery(anchor: HTMLElement | null = null) {
-    const cats: (Category | 'All')[] = ['All', 'Clocks', 'Reminders', 'Notes', 'Media', 'System', 'Weather'];
+    const cats: (Category | 'All')[] = ['All', 'Clocks', 'Productivity', 'Reminders', 'Notes', 'Media', 'System', 'Weather', 'AI'];
     let cat: string = 'All';
     const list = h('div', { class: 'gallery-list' });
     const tabs = h('div', { class: 'gallery-tabs', role: 'tablist' });
@@ -1147,6 +1215,87 @@ export function initDemo() {
       list,
     );
     openFlyout(content, { kind: 'gallery', anchor, cls: 'gallery-fly' });
+  }
+
+  /* -------------------------------------------------- window previews */
+
+  let pv: { el: HTMLElement; key: AppId } | null = null;
+  let pvTimer = 0;
+
+  function previewHover(key: AppId, btn: HTMLElement, enter: boolean) {
+    clearTimeout(pvTimer);
+    if (!enter) {
+      pvTimer = window.setTimeout(() => hidePreview(), 260);
+      return;
+    }
+    if (!wins.has(key) || fly || stage!.dataset.phase !== 'ready') return;
+    if (pv?.key === key) return;
+    pvTimer = window.setTimeout(() => showPreview(key, btn), pv ? 0 : 420);
+  }
+
+  function hidePreview(immediate = false) {
+    clearTimeout(pvTimer);
+    if (!pv) return;
+    const el = pv.el;
+    pv = null;
+    if (immediate || reduced()) el.remove();
+    else {
+      el.classList.add('is-closing');
+      setTimeout(() => el.remove(), 150);
+    }
+  }
+
+  function showPreview(key: AppId, btn: HTMLElement) {
+    hidePreview(true);
+    const wv = wins.get(key);
+    if (!wv) return;
+    const ww = wv.el.offsetWidth;
+    const wh = wv.el.offsetHeight;
+    const k = Math.min(208 / ww, 128 / wh);
+    const clone = wv.el.cloneNode(true) as HTMLElement;
+    clone.classList.remove('is-min', 'is-inactive', 'is-closing', 'is-dragging');
+    clone.removeAttribute('role');
+    clone.removeAttribute('aria-label');
+    clone.setAttribute('inert', '');
+    Object.assign(clone.style, { left: '0px', top: '0px', transform: `scale(${k})`, transformOrigin: '0 0', zIndex: 'auto' });
+    const close = () => {
+      card.classList.add('is-closing');
+      setTimeout(() => {
+        closeWin(key);
+        hidePreview(true);
+      }, 150);
+    };
+    const card = h(
+      'div',
+      { class: 'pv-card', role: 'button', tabindex: '0', 'aria-label': `${appNames[key]}. Middle-click to close.` },
+      h(
+        'div',
+        { class: 'pv-head' },
+        h('span', { class: 'pv-ic', html: appIcons[key] }),
+        h('span', { class: 'pv-title', text: appNames[key] }),
+        h('button', { type: 'button', class: 'pv-close', 'aria-label': 'Close window', html: icons.close, onclick: (e: Event) => { e.stopPropagation(); close(); } }),
+      ),
+      h('div', { class: 'pv-thumb', style: `width:${Math.round(ww * k)}px;height:${Math.round(wh * k)}px` }, clone),
+    );
+    card.addEventListener('click', () => {
+      hidePreview(true);
+      openApp(key);
+    });
+    // Middle-click closes the window, as on the Windows taskbar (fixed in DockHub 0.7).
+    card.addEventListener('mousedown', (e) => e.button === 1 && e.preventDefault());
+    card.addEventListener('auxclick', (e) => {
+      if (e.button !== 1) return;
+      e.preventDefault();
+      close();
+    });
+    const el = h('div', { class: 'flyout win-preview' }, card, h('div', { class: 'pv-hint', text: 'Middle-click to close' }));
+    el.addEventListener('pointerenter', () => clearTimeout(pvTimer));
+    el.addEventListener('pointerleave', () => previewHover(key, btn, false));
+    el.style.visibility = 'hidden';
+    layer.append(el);
+    place(el, btn);
+    el.style.visibility = '';
+    pv = { el, key };
   }
 
   /* ---------------------------------------------------------- windows */
@@ -1278,6 +1427,7 @@ export function initDemo() {
 
   function toggleApp(key: AppId, btn: HTMLElement) {
     const wv = wins.get(key);
+    hidePreview(true);
     closeFlyout();
     if (!wv) {
       btn.classList.remove('is-bouncing');
@@ -1687,14 +1837,26 @@ export function initDemo() {
     setTimeout(() => stage!.classList.remove('is-entering'), 1500);
   }
 
+  /** Like the real app: the Windows taskbar is hidden first, then the dock appears in its place. */
+  let handoffTimer = 0;
   function startDock() {
-    stage!.dataset.phase = 'ready';
-    enter();
-    evalHide();
-    requestAnimationFrame(updateFades);
+    clearTimeout(handoffTimer);
+    if (reduced()) {
+      stage!.dataset.phase = 'ready';
+      evalHide();
+      return;
+    }
+    stage!.dataset.phase = 'handoff';
+    handoffTimer = window.setTimeout(() => {
+      stage!.dataset.phase = 'ready';
+      enter();
+      evalHide();
+      requestAnimationFrame(updateFades);
+    }, 420);
   }
 
   function exitDock(restore = false) {
+    clearTimeout(handoffTimer);
     closeFlyout();
     stage!.dataset.phase = 'exited';
     stage!.classList.remove('is-hidden');
@@ -1712,11 +1874,7 @@ export function initDemo() {
       stage!.dataset.phase = 'ready';
       return;
     }
-    setTimeout(() => {
-      stage!.dataset.phase = 'ready';
-      enter();
-      requestAnimationFrame(updateFades);
-    }, 1000);
+    setTimeout(startDock, 900);
     setTimeout(() => toast('DockHub is running', 'Replaced the taskbar. When you close it, the Windows taskbar returns automatically.'), 2400);
   }
 
@@ -1908,9 +2066,10 @@ export function initDemo() {
     (entries) => {
       const vis = entries.some((en) => en.isIntersecting);
       setVisible('stage', vis);
-      if (vis) boot();
+      if (entries.some((en) => en.intersectionRatio >= 0.6)) boot();
     },
-    { threshold: 0.2 },
+    // The boot waits until most of the desktop, dock edge included, is on screen.
+    { threshold: [0.2, 0.6] },
   );
   io.observe(stage);
 }

@@ -7,7 +7,7 @@ interface Shot {
   h: number;
   title: string;
   body: string;
-  span?: boolean;
+  span?: 'hero' | 'wide';
 }
 
 const shots: Shot[] = [
@@ -17,7 +17,15 @@ const shots: Shot[] = [
     h: 900,
     title: 'The dock, on a real desktop',
     body: 'Pinned apps, a sticky note, headset battery, media controls, a clock, AI usage rings, an app folder and live weather. All in one bar.',
-    span: true,
+    span: 'hero',
+  },
+  {
+    file: 'widget-gallery.jpg',
+    w: 1400,
+    h: 788,
+    title: 'Widget gallery',
+    body: 'Every widget previewed live with its real data. Press the plus button and it grows into the dock.',
+    span: 'wide',
   },
   {
     file: 'groups-folder.jpg',
@@ -41,11 +49,11 @@ const shots: Shot[] = [
     body: 'Right-click an app for its recent files and tasks, plus run as administrator and pin controls.',
   },
   {
-    file: 'widget-gallery.jpg',
+    file: 'start-menu.jpg',
     w: 1400,
     h: 788,
-    title: 'Widget gallery',
-    body: 'Every widget previewed live with its real data. Press the plus button and it grows into the dock.',
+    title: 'The real Start menu',
+    body: 'The Start button opens the genuine Windows Start menu. Search and the Windows key work exactly as before.',
   },
   {
     file: 'light-vertical.jpg',
@@ -53,13 +61,6 @@ const shots: Shot[] = [
     h: 788,
     title: 'Light theme, vertical dock',
     body: 'Move the dock to any edge. On the left or right, widgets collapse into compact tiles.',
-  },
-  {
-    file: 'start-menu.jpg',
-    w: 1400,
-    h: 788,
-    title: 'The real Start menu',
-    body: 'The Start button opens the genuine Windows Start menu. Search and the Windows key work exactly as before.',
   },
   {
     file: 'settings.jpg',
@@ -90,8 +91,8 @@ const shots: Shot[] = [
     <div class="shot-grid">
       {
         shots.map((s) => (
-          <figure class={`shot reveal ${s.span ? 'shot-wide' : ''}`}>
-            <button class="shot-view" type="button" data-shot={`${base}shots/${s.file}`} data-shot-title={s.title}>
+          <figure class:list={['shot', 'reveal', s.span && `shot-${s.span}`]}>
+            <button class="shot-view" type="button" data-shot={`${base}shots/${s.file}`} data-shot-title={s.title} aria-label={`${s.title}: view full size`}>
               <img src={`${base}shots/${s.file}`} width={s.w} height={s.h} loading="lazy" decoding="async" alt={s.title} />
             </button>
             <figcaption>
@@ -111,7 +112,7 @@ const shots: Shot[] = [
       ><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg
     >
   </button>
-  <img data-shot-img src="" alt="" />
+  <img data-shot-img alt="" />
 </dialog>
 
 <script>
@@ -130,7 +131,7 @@ const shots: Shot[] = [
       if (e.target === modal) modal.close();
     });
     modal.addEventListener('close', () => {
-      img.src = '';
+      img.removeAttribute('src');
     });
   }
 </script>
@@ -145,43 +146,60 @@ const shots: Shot[] = [
     display: grid;
     grid-template-rows: auto 1fr;
     margin: 0;
+    min-width: 0;
     border-radius: 24px;
     background: var(--bg-raised);
     box-shadow: inset 0 0 0 1px var(--line);
     overflow: hidden;
   }
-  .shot-wide {
-    grid-column: span 3;
+  .shot-hero {
+    grid-column: 1 / -1;
     grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
     grid-template-rows: auto;
     align-items: center;
   }
+  .shot-wide {
+    grid-column: span 2;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-rows: auto;
+    align-items: center;
+  }
+  .shot-wide .shot-view {
+    padding: 12px;
+  }
+  .shot-wide figcaption {
+    padding: 20px 32px 20px 12px;
+  }
   .shot-view {
     display: block;
     width: 100%;
-    padding: 14px 14px 0;
+    padding: 12px 12px 0;
     cursor: zoom-in;
+    border-radius: 12px;
   }
-  .shot-wide .shot-view {
-    padding: 18px;
+  .shot-hero .shot-view {
+    padding: 16px;
   }
   .shot-view img {
     display: block;
     width: 100%;
     height: auto;
     border-radius: 12px;
-    background: rgb(0 0 0 / 0.25);
-    box-shadow:
-      inset 0 0 0 1px var(--line),
-      0 18px 44px -24px rgb(0 0 0 / 0.85);
-    transition: transform var(--t-med) var(--ease-out);
+    background: radial-gradient(90% 80% at 50% 110%, rgb(0 103 192 / 0.18), transparent 70%), #060911;
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition:
+      transform var(--t-slow) var(--ease-out),
+      box-shadow var(--t-slow) var(--ease-out);
   }
-  .shot:not(.shot-wide) .shot-view img {
+  .shot:not(.shot-hero) .shot-view img {
     aspect-ratio: 16 / 10;
     object-fit: contain;
   }
   .shot-view:hover img {
-    transform: translateY(-3px) scale(1.01);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      0 18px 40px -24px rgb(0 0 0 / 0.9);
   }
   .shot-view:focus-visible {
     outline: none;
@@ -196,14 +214,14 @@ const shots: Shot[] = [
     gap: 8px;
     padding: 18px 22px 24px;
   }
-  .shot-wide figcaption {
+  .shot-hero figcaption {
     padding: 24px 40px 24px 12px;
   }
   figcaption h3 {
     font-size: 1.0625rem;
     letter-spacing: -0.015em;
   }
-  .shot-wide figcaption h3 {
+  .shot-hero figcaption h3 {
     font-size: clamp(1.4rem, 2.2vw, 1.875rem);
     line-height: 1.12;
     letter-spacing: -0.028em;
@@ -212,10 +230,13 @@ const shots: Shot[] = [
     color: var(--text-2);
     font-size: 0.9375rem;
     line-height: 1.5;
-    max-width: 46ch;
+    max-width: 52ch;
   }
-  .shot-wide figcaption p {
+  .shot-hero figcaption p {
     font-size: 1.0625rem;
+  }
+  :global(:root:has(.shot-modal[open])) {
+    overflow: hidden;
   }
 
   .shot-modal {
@@ -269,21 +290,29 @@ const shots: Shot[] = [
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .shot-wide {
-      grid-column: span 2;
+      grid-column: auto;
+      grid-template-columns: none;
+      grid-template-rows: auto 1fr;
+      align-items: stretch;
+    }
+    .shot-wide .shot-view {
+      padding: 12px 12px 0;
+    }
+    .shot-wide figcaption {
+      padding: 18px 22px 24px;
     }
   }
   @media (max-width: 760px) {
     .shot-grid {
       grid-template-columns: 1fr;
     }
-    .shot-wide {
-      grid-column: span 1;
+    .shot-hero {
       grid-template-columns: 1fr;
     }
-    .shot-wide .shot-view {
-      padding: 14px 14px 0;
+    .shot-hero .shot-view {
+      padding: 12px 12px 0;
     }
-    .shot-wide figcaption {
+    .shot-hero figcaption {
       padding: 18px 22px 24px;
     }
     .shot-close {

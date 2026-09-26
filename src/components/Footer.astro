@@ -9,14 +9,15 @@ const year = new Date().getFullYear();
   <div class="wrap foot">
     <div class="foot-brand">
       <a class="brand" href="#top" aria-label="DockHub, back to top">
-        <Wordmark label={false} />
+        <Wordmark label={false} id="wm-foot" />
       </a>
-      <p>A modern, fluid, widget-powered dock for Windows. Built with .NET 8 and WPF.</p>
+      <p>A glass, widget-powered dock for Windows. Built with .NET 8 and WPF.</p>
     </div>
     <nav class="foot-cols" aria-label="Footer links">
       <div>
         <h3>Product</h3>
         <a href="#demo">Live Demo</a>
+        <a href="#new">What's new</a>
         <a href="#widgets">Widgets</a>
         <a href="#features">Features</a>
         <a href={site.downloadUrl}>Download</a>
@@ -25,7 +26,8 @@ const year = new Date().getFullYear();
         <h3>Project</h3>
         <a href={site.githubUrl}>GitHub</a>
         <a href={site.readmeUrl}>Documentation</a>
-        <a href="#faq">FAQ</a>
+        <a href={site.releaseUrl}>Release notes</a>
+        <a href={site.issuesUrl}>Report an issue</a>
       </div>
       <div>
         <h3>Credits</h3>
@@ -61,8 +63,6 @@ const year = new Date().getFullYear();
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.625rem;
     text-decoration: none;
     justify-self: start;
     border-radius: 6px;

@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: 'Which Windows versions are supported?',
-    a: 'Windows 10 1809 (build 17763) and higher. For rounded corners and Mica blur materials, Windows 11 22H2 or newer is recommended. The installer bundles all required .NET runtime components—no prerequisites needed.',
+    a: 'Windows 10 1809 (build 17763) and higher. For rounded corners and Mica blur materials, Windows 11 22H2 or newer is recommended. The 60 MB installer bundles the .NET runtime, so there is nothing else to install.',
   },
   {
     q: 'Does it launch automatically on startup?',
@@ -28,20 +28,40 @@ const faqs = [
     a: 'Right-click any empty space on the dock and select "Add widget", or browse the Widget Gallery in Settings and click the "+" button. To change a widget\'s style, right-click it directly on the dock and choose an option from the "Appearance" submenu.',
   },
   {
+    q: 'Do Win + 1…9 and the other taskbar shortcuts work?',
+    a: 'Yes. Win + 1…9 and Win + 0 open, switch to or minimize the dock\'s first ten apps, with Shift for a new window, Ctrl + Shift to run as administrator and Alt for the jump list. Hold Win to see the numbers. You can also set your own shortcuts for showing the dock, opening settings, pinning an app, auto-hide and volume in Settings › General › Keyboard shortcuts.',
+  },
+  {
+    q: 'I removed something by mistake. Can I get it back?',
+    a: 'Yes. Click Undo on the notice next to the dock, choose Undo from the dock\'s right-click menu, or press Ctrl + Z in Settings. Widget data such as sticky notes is kept for 7 days, so it comes back too.',
+  },
+  {
     q: 'Does it use an internet connection?',
-    a: 'Internet access is used solely for the weather widget (via Open-Meteo) and geocoding city search. No API keys or accounts are required, and no telemetry, tracking, or personal data is ever collected or sent.',
+    a: 'Only for the features that need it: the weather widget and city search (Open-Meteo), exchange rates (Frankfurter, ECB data), your own calendar link, the AI usage widget, and a once-a-day update check on GitHub that you can turn off in Settings › About. Web widgets can only reach the hosts they declare. No accounts, no telemetry, no tracking.',
+  },
+  {
+    q: 'How do updates work?',
+    a: 'DockHub checks GitHub for a new release once a day. From Settings › About it downloads the installer, verifies its checksum and upgrades in place, keeping your settings.',
   },
   {
     q: 'Where are my settings stored?',
-    a: 'All preferences and dock configurations reside in %AppData%\\DockHub\\config.json. User data such as notes, reminders, and hydration counters are kept in the data subfolder. Files are written atomically using safe temp files to prevent corruption.',
+    a: 'In %AppData%\\DockHub\\config.json, with notes, reminders and counters in the data subfolder. Files are written atomically, and DockHub keeps a backup from each of the last 7 days and loads the newest one by itself if the settings file is ever damaged. Settings › General exports everything to a .zip you can import on another PC.',
   },
   {
-    q: 'Do the Windows 11 network, volume, and battery flyouts work?',
-    a: 'DockHub displays native tray counterparts right on the dock. You can access Windows\' native Quick Settings panel by right-clicking the clock or dock, or by pressing Win+A.',
+    q: 'Do the network, volume and battery icons work?',
+    a: 'Yes. Windows 11 keeps its real icons inside Explorer, so since v0.7 DockHub draws its own. Scroll the volume icon to change the volume, middle-click to mute, right-click to switch the output device. The battery icon shows the charge and time left. Clicking them opens Windows\' Quick Settings, as does Win + A.',
   },
   {
     q: 'Does it support multi-monitor setups?',
-    a: 'Yes. DockHub displays on your designated monitor of choice, with full per-monitor DPI scaling support.',
+    a: 'Yes. Turn on "Show on all displays" to get a dock on every monitor, each with its own size. The main display keeps your widgets and tray, running apps follow their windows, and docks come and go as you plug monitors in. A profile can even switch in when a given number of displays is connected.',
+  },
+  {
+    q: 'Is DockHub available in Turkish?',
+    a: 'Yes. Choose Türkçe in Settings › General › Language. "System" follows your Windows display language.',
+  },
+  {
+    q: 'Can I write my own widget?',
+    a: 'Yes. A web widget is a folder with a manifest.json and an HTML page. It follows the dock\'s theme and gets settings, storage, notifications and a right-click menu through a small window.dockhub API. Share it as a .dockwidget file; users see its permissions before installing it. The guide is docs/widget-sdk.md in the repository.',
   },
   {
     q: 'Can I use it alongside StartAllBack or ExplorerPatcher?',
@@ -49,7 +69,7 @@ const faqs = [
   },
   {
     q: 'Is it completely free?',
-    a: 'Yes. DockHub is 100% free and open source under the MIT license.',
+    a: 'Yes. DockHub is free to download and use, and its full source code is on GitHub.',
   },
 ];
 ---
@@ -59,7 +79,7 @@ const faqs = [
     <div class="faq-head reveal">
       <h2 class="section-title">Frequently asked questions.</h2>
       <p class="section-lead">Can't find the answer you're looking for?</p>
-      <a class="btn btn-quiet faq-cta" href={site.githubUrl}>
+      <a class="btn btn-quiet faq-cta" href={site.issuesUrl} target="_blank" rel="noopener">
         <span set:html={icons.github} />
         Ask on GitHub
       </a>

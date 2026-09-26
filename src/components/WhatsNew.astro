@@ -1,0 +1,590 @@
+---
+import { icons } from '../lib/icons';
+import { appIcons } from '../lib/apps';
+import { site } from '../lib/site';
+
+const numbered = ['explorer', 'browser', 'terminal', 'notepad', 'photos'] as const;
+---
+
+<section class="section" id="new">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="pill-new">New in v{site.version}</span>
+      <h2 class="section-title">The biggest update yet.</h2>
+      <p class="section-lead">
+        Keyboard shortcuts, undo for everything, profiles, four new widgets, a widget SDK, Turkish, and fixes for the problems you
+        reported most.
+      </p>
+    </div>
+
+    <div class="news">
+      <article class="nw nw-wide reveal">
+        <div class="nw-art nw-keys" aria-hidden="true">
+          <div class="keys-dock">
+            {
+              numbered.map((a, i) => (
+                <span class="kd-app">
+                  <span class="kd-ic" set:html={appIcons[a]} />
+                  <b class="kd-num">{i + 1}</b>
+                </span>
+              ))
+            }
+          </div>
+          <div class="keys-row">
+            <kbd class="k k-win" set:html={icons.windows} />
+            <span class="k-plus">+</span>
+            <kbd class="k">1</kbd>
+            <span class="k-dots">…</span>
+            <kbd class="k">9</kbd>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Win + 1…9, like the taskbar.</h3>
+          <p>
+            Open, switch to or minimize the dock's first ten apps. Shift opens a new window, Ctrl + Shift runs as administrator. Hold Win to
+            see the numbers. Add your own shortcuts for showing the dock, pinning an app, auto-hide and volume.
+          </p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-toast">
+            <span class="mt-ic" set:html={icons.restore} />
+            <span class="mt-text"><b>Sticky Notes removed</b><small>Your note is kept for 7 days</small></span>
+            <span class="mt-btn">Undo</span>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Undo anything.</h3>
+          <p>Removed a widget or folder by mistake? One click brings it back, notes included. Daily backups and a .zip export keep your setup safe.</p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-profiles">
+            <span class="mp on"><i style="--c:var(--c-blue)"></i>Work</span>
+            <span class="mp"><i style="--c:var(--c-green)"></i>Gaming</span>
+            <span class="mp"><i style="--c:var(--c-orange)"></i>Laptop</span>
+          </div>
+          <div class="mock-auto">2 displays connected → <b>Work</b></div>
+        </div>
+        <div class="nw-copy">
+          <h3>Profiles.</h3>
+          <p>Keep a dock for work, one for games and one for the laptop, each with its own items and look. Switch by menu, shortcut, or when you plug in a monitor.</p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-code">
+            <span class="c-dim">// github-stars/widget.js</span>
+            <span><span class="c-key">const</span> s = <span class="c-key">await</span> dockhub.settings.get();</span>
+            <span>el.textContent = <span class="c-str">`★ ${'{'}stars{'}'}`</span>;</span>
+            <span>dockhub.contextMenu.set([…]);</span>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Build your own widgets.</h3>
+          <p>
+            HTML, CSS and JavaScript are enough. Web widgets follow the dock's theme, and only reach the hosts they declare.{' '}
+            <a href={site.sdkUrl} target="_blank" rel="noopener">Read the SDK guide</a>.
+          </p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-tray">
+            <span class="tr-ic" set:html={icons.wifi} />
+            <span class="tr-ic tr-vol" set:html={icons.volume} />
+            <span class="tr-ic" set:html={icons.battery} />
+            <span class="tr-tip">Speakers · 64%<small>Scroll to change</small></span>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Volume and battery on the dock.</h3>
+          <p>Scroll the volume icon to change the volume, middle-click to mute, right-click to switch speakers. The battery icon shows the time left.</p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-lang">
+            <span class="ml on">Türkçe</span>
+            <span class="ml">English</span>
+          </div>
+          <div class="mock-a11y">
+            <span>Narrator</span><span>High contrast</span><span>Reduced motion</span>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Türkçe, and for everyone.</h3>
+          <p>A complete Turkish interface, screen reader names for every item, keyboard navigation with Win + Alt + T, high contrast support and calmer animations.</p>
+        </div>
+      </article>
+
+      <article class="nw nw-wide nw-fixes reveal">
+        <div class="nw-copy">
+          <h3>Fixed: the bugs you reported most.</h3>
+          <p>Thanks for every report. These are gone in v{site.version}.</p>
+        </div>
+        <ul class="fixes">
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Icons no longer disappear.</b> DockHub retries until Windows hands the icon over, after sleep and Explorer restarts too.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Discord shows up.</b> Apps that open hidden and appear later (Discord, apps restored from the tray) get their dock button.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Middle-click closes a preview's window,</b> just like on the Windows taskbar.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Pins survive app updates.</b> Discord, Slack and Store apps keep their pins after updating.</span></li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="news-more reveal">
+      <a class="btn btn-quiet" href={site.releaseUrl} target="_blank" rel="noopener">
+        Full release notes<span class="btn-ic" set:html={icons.arrowRight} />
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .pill-new {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 99px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgb(76 194 255 / 0.1);
+    box-shadow: inset 0 0 0 1px rgb(76 194 255 / 0.28);
+  }
+  .news {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .nw {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 22px;
+    padding: 22px;
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .nw-wide {
+    grid-column: span 2;
+    grid-template-rows: none;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+  }
+  .nw-copy h3 {
+    font-size: 1.25rem;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+  }
+  .nw-copy p {
+    color: var(--text-2);
+    font-size: 0.975rem;
+    line-height: 1.55;
+  }
+  .nw-copy a {
+    color: var(--accent);
+  }
+  .nw-art {
+    min-height: 150px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 14px;
+    border-radius: 14px;
+    background:
+      radial-gradient(120% 90% at 30% 0%, rgb(76 194 255 / 0.13), transparent 60%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.03), rgb(255 255 255 / 0.01));
+    box-shadow: inset 0 0 0 1px var(--line);
+    padding: 20px;
+    font-family: var(--font-ui);
+  }
+
+  /* keyboard */
+  .keys-dock {
+    display: flex;
+    gap: 6px;
+    padding: 7px 9px;
+    border-radius: 14px;
+    background: rgb(28 30 38 / 0.8);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.09),
+      0 12px 30px -12px rgb(0 0 0 / 0.8);
+  }
+  .kd-app {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+  }
+  .kd-ic :global(svg) {
+    width: 30px;
+    height: 30px;
+    display: block;
+  }
+  .kd-num {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #fff;
+    background: rgb(20 22 28 / 0.95);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+    animation: kd-pop 4s var(--ease-out) infinite;
+  }
+  .kd-app:nth-child(2) .kd-num {
+    animation-delay: 0.05s;
+  }
+  .kd-app:nth-child(3) .kd-num {
+    animation-delay: 0.1s;
+  }
+  .kd-app:nth-child(4) .kd-num {
+    animation-delay: 0.15s;
+  }
+  .kd-app:nth-child(5) .kd-num {
+    animation-delay: 0.2s;
+  }
+  @keyframes kd-pop {
+    0%,
+    12% {
+      opacity: 0;
+      scale: 0.6;
+    }
+    20%,
+    75% {
+      opacity: 1;
+      scale: 1;
+    }
+    85%,
+    100% {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
+  .kd-app:nth-child(3) {
+    background: rgb(255 255 255 / 0.08);
+    animation: kd-active 4s infinite;
+  }
+  @keyframes kd-active {
+    0%,
+    45% {
+      background: transparent;
+    }
+    50%,
+    80% {
+      background: rgb(255 255 255 / 0.1);
+    }
+    100% {
+      background: transparent;
+    }
+  }
+  .keys-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-3);
+  }
+  .k {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    font: 600 15px var(--font-ui);
+    color: var(--text);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.04));
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      inset 0 -2px 0 rgb(0 0 0 / 0.35);
+  }
+  .k-win :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* undo toast */
+  .mock-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(100%, 300px);
+    padding: 12px 12px 12px 14px;
+    border-radius: 10px;
+    background: rgb(36 38 46 / 0.92);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.1),
+      0 16px 34px -14px rgb(0 0 0 / 0.9);
+  }
+  .mt-ic {
+    color: var(--accent);
+    width: 20px;
+    height: 20px;
+    flex: none;
+  }
+  .mt-ic :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  .mt-text {
+    display: grid;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+  }
+  .mt-text small {
+    color: var(--text-2);
+    font-size: 11.5px;
+  }
+  .mt-btn {
+    height: 28px;
+    padding: 0 12px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent-ink);
+    background: var(--accent);
+  }
+
+  /* profiles */
+  .mock-profiles {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .mp {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-2);
+  }
+  .mp i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  .mp.on {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.09);
+  }
+  .mock-auto {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .mock-auto b {
+    color: var(--text-2);
+  }
+
+  /* code */
+  .mock-code {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    max-width: 320px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font: 12px/1.5 'Cascadia Code', Consolas, ui-monospace, monospace;
+    color: #d7dae3;
+    background: #0c0d12;
+    box-shadow: inset 0 0 0 1px var(--line);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .c-dim {
+    color: #6b7285;
+  }
+  .c-key {
+    color: #c792ea;
+  }
+  .c-str {
+    color: #c3e88d;
+  }
+
+  /* tray */
+  .mock-tray {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgb(28 30 38 / 0.85);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.09);
+    margin-top: 44px;
+  }
+  .tr-ic {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    color: var(--text);
+  }
+  .tr-ic :global(svg) {
+    width: 17px;
+    height: 17px;
+  }
+  .tr-vol {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .tr-tip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    translate: -50% 0;
+    display: grid;
+    gap: 1px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    white-space: nowrap;
+    background: rgb(44 46 54 / 0.97);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .tr-tip small {
+    color: var(--text-3);
+    font-size: 11px;
+  }
+
+  /* language */
+  .mock-lang {
+    display: flex;
+    gap: 6px;
+  }
+  .ml {
+    height: 32px;
+    padding: 0 14px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .ml.on {
+    color: var(--accent-ink);
+    background: var(--accent);
+    box-shadow: none;
+    font-weight: 600;
+  }
+  .mock-a11y {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  .mock-a11y span {
+    font-size: 11.5px;
+    padding: 4px 9px;
+    border-radius: 99px;
+    color: var(--text-2);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  /* fixes */
+  .nw-fixes {
+    grid-template-columns: none;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+  }
+  .fixes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+  }
+  .fixes li {
+    display: flex;
+    gap: 10px;
+    color: var(--text-2);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .fixes b {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .fx-ok {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #062a12;
+    background: var(--c-green);
+  }
+  .fx-ok :global(svg) {
+    width: 13px;
+    height: 13px;
+  }
+  .news-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+  }
+
+  @media (max-width: 980px) {
+    .news {
+      grid-template-columns: 1fr 1fr;
+    }
+    .nw-wide {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 700px) {
+    .news {
+      grid-template-columns: 1fr;
+    }
+    .nw-wide,
+    .nw-fixes {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+    }
+    .fixes {
+      grid-template-columns: 1fr;
+    }
+    .nw {
+      padding: 16px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kd-num,
+    .kd-app {
+      animation: none !important;
+    }
+    .kd-num {
+      opacity: 1;
+    }
+  }
+</style>
