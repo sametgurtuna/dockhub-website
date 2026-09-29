@@ -380,7 +380,7 @@ function meetingsFrom(d: Date): Meeting[] {
 
 type Clip = { kind: 'text' | 'link' | 'image'; text: string; when: string; pinned?: boolean; art?: number };
 const clips: Clip[] = [
-  { kind: 'text', text: 'git push origin v0.9.1', when: 'Just now' },
+  { kind: 'text', text: 'git push origin v0.9.2', when: 'Just now' },
   { kind: 'link', text: 'github.com/sametgurtuna/DockHub', when: '2 min ago' },
   { kind: 'image', text: 'Screenshot 1280 × 720', when: '9 min ago', art: 1 },
   { kind: 'text', text: 'Ship the new widgets on Friday', when: '24 min ago', pinned: true },
@@ -392,7 +392,7 @@ const files: DlFile[] = [
   { name: 'Quarterly report.pdf', ext: 'pdf', size: '2.4 MB', when: '3 min ago' },
   { name: 'Holiday photo.jpg', ext: 'jpg', size: '4.1 MB', when: '18 min ago' },
   { name: 'Budget 2027.xlsx', ext: 'xlsx', size: '86 KB', when: '1 hour ago' },
-  { name: 'DockHub-Setup-0.9.1-x64.exe', ext: 'exe', size: '59.5 MB', when: '2 hours ago' },
+  { name: 'DockHub-Setup-0.9.2-x64.exe', ext: 'exe', size: '59.5 MB', when: '2 hours ago' },
   { name: 'Slides.pptx', ext: 'pptx', size: '12 MB', when: 'Yesterday' },
   { name: 'Assets.zip', ext: 'zip', size: '31 MB', when: 'Yesterday' },
 ];

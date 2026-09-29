@@ -779,6 +779,7 @@ export function initDemo() {
         pick('Backdrop', 'sparkle', 'backdrop', [
           ['blur', 'Blurred glass'],
           ['acrylic', 'Acrylic'],
+          ['transparent', 'Transparent'],
           ['solid', 'Solid'],
         ]),
         'sep',
@@ -2008,7 +2009,7 @@ export function initDemo() {
           row('Size', 'Small matches default Windows taskbar height', select('size', [['small', 'Small (48)'], ['medium', 'Medium (56)'], ['large', 'Large (66)']])),
           h('div', { class: 'set-group', text: 'Appearance' }),
           row('Theme', 'Dark, light, or follow system', select('theme', [['dark', 'Dark'], ['light', 'Light']])),
-          row('Backdrop', 'Blurred glass, Acrylic, or solid', select('backdrop', [['blur', 'Blurred glass'], ['acrylic', 'Acrylic'], ['solid', 'Solid']])),
+          row('Backdrop', 'Blurred glass, Acrylic, transparent, or solid', select('backdrop', [['blur', 'Blurred glass'], ['acrylic', 'Acrylic'], ['transparent', 'Transparent'], ['solid', 'Solid']])),
         );
       } else if (page === 'Taskbar') {
         rows.push(
