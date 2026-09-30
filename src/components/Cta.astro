@@ -15,19 +15,24 @@ import { site } from '../lib/site';
           Free, never asks for administrator rights, and your original taskbar is always one click away.
         </p>
         <div class="cta-actions">
-          <a class="btn btn-primary" href={site.downloadUrl}>
-            <span class="btn-ic" set:html={icons.download} />
+          <a class="btn btn-primary" href={site.downloadWinUrl}>
+            <span class="btn-ic" set:html={icons.windows} />
             <span>Download for Windows</span>
           </a>
-          <a class="btn btn-glass" href={site.githubUrl} target="_blank" rel="noopener">
+          <a class="btn btn-glass" href={site.downloadMacUrl}>
+            <span class="btn-ic" set:html={icons.apple} />
+            <span>Download for macOS</span>
+          </a>
+          <a class="btn btn-quiet" href={site.githubUrl} target="_blank" rel="noopener">
             <span class="btn-ic" set:html={icons.github} />
-            <span>View on GitHub</span>
+            <span>GitHub</span>
           </a>
         </div>
         <p class="cta-fine">
           <span>Version {site.version}</span>
-          <span>Windows 10 1809 or newer</span>
-          <span>60 MB installer, .NET included</span>
+          <span>Windows 10/11 (.NET 10)</span>
+          <span>macOS 15+ Sequoia (Swift 6)</span>
+          <span>Zero admin rights</span>
         </p>
       </div>
     </div>

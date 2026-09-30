@@ -9,21 +9,31 @@ import { widgets } from '../scripts/widgets';
   <div class="hero-glow" aria-hidden="true"></div>
 
   <div class="wrap hero-head">
-    <h1 class="hero-title">
-      <span class="line"><span>Your taskbar,</span></span>
-      <span class="line"><span>rebuilt as a dock.</span></span>
-    </h1>
+    <div class="hero-main">
+      <a class="hero-milestone" href="#new">
+        <span class="hm-badge">v1.0 Milestone</span>
+        <span>Native macOS 15 Sequoia support is here</span>
+        <span class="hm-arrow" set:html={icons.arrowRight} />
+      </a>
+      <h1 class="hero-title">
+        <span class="line"><span>Your desktop,</span></span>
+        <span class="line"><span>rebuilt as a dock.</span></span>
+      </h1>
+    </div>
 
     <div class="hero-side">
       <p class="hero-lead">
-        DockHub swaps the Windows taskbar for a glass dock with your apps, tray, clock and {widgets.length} live widgets. Close it and the
-        taskbar comes straight back.
+        DockHub brings a modern, floating glass dock with your apps, tray, clock, and {widgets.length} live widgets. Now with full native macOS 15 Sequoia support and .NET 10 on Windows.
       </p>
 
       <div class="hero-cta">
-        <a class="btn btn-primary btn-hero" href={site.downloadUrl}>
-          <span class="btn-ic" set:html={icons.download} />
-          <span>Download for Windows</span>
+        <a class="btn btn-primary btn-hero" href={site.downloadWinUrl}>
+          <span class="btn-ic" set:html={icons.windows} />
+          <span>Windows</span>
+        </a>
+        <a class="btn btn-glass btn-hero" href={site.downloadMacUrl}>
+          <span class="btn-ic" set:html={icons.apple} />
+          <span>macOS (.dmg)</span>
         </a>
         <a class="btn btn-quiet btn-hero" href={site.githubUrl} target="_blank" rel="noopener">
           <span class="btn-ic" set:html={icons.github} />
@@ -34,7 +44,7 @@ import { widgets } from '../scripts/widgets';
       <ul class="hero-meta" aria-label="At a glance">
         <li><span class="meta-ic" set:html={icons.check} />Free and open source</li>
         <li><span class="meta-ic" set:html={icons.check} />No admin rights needed</li>
-        <li><span class="meta-ic" set:html={icons.check} />Windows 10 and 11</li>
+        <li><span class="meta-ic" set:html={icons.check} />Windows 10/11 &amp; macOS 15+</li>
         <li>
           <a href={site.releaseUrl} target="_blank" rel="noopener">
             <span class="meta-ic" set:html={icons.arrowRight} />What's new in v{site.version}
@@ -76,6 +86,51 @@ import { widgets } from '../scripts/widgets';
     align-items: end;
     gap: 28px clamp(32px, 5vw, 72px);
     margin-bottom: clamp(24px, 3.2vh, 36px);
+  }
+
+  .hero-main {
+    display: grid;
+    gap: 16px;
+    align-content: end;
+  }
+  .hero-milestone {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 14px 4px 6px;
+    border-radius: 99px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 520;
+    text-decoration: none;
+    width: fit-content;
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  }
+  .hero-milestone:hover {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--text);
+  }
+  .hm-badge {
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #0078d4, #00c7be);
+    box-shadow: 0 2px 8px rgb(0 120 212 / 0.35);
+  }
+  .hm-arrow {
+    display: grid;
+    width: 13px;
+    height: 13px;
+    color: var(--text-3);
+    transition: transform var(--t-fast);
+  }
+  .hero-milestone:hover .hm-arrow {
+    transform: translateX(2px);
+    color: var(--text);
   }
 
   .hero-title {

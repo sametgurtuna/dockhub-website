@@ -16,8 +16,12 @@ const faqs = [
     a: 'The built-in crash handler restores the taskbar before the process exits. In the event of a sudden power loss or force-kill via Task Manager, the taskbar remains in auto-hide mode and will slide open when your mouse hovers the screen edge. On your next session or by running "DockHub.exe --restore-taskbar", the original state is cleanly restored.',
   },
   {
-    q: 'Which Windows versions are supported?',
-    a: 'Windows 10 1809 (build 17763) and higher. For rounded corners and Mica blur materials, Windows 11 22H2 or newer is recommended. The 60 MB installer bundles the .NET runtime, so there is nothing else to install.',
+    q: 'Which platforms and operating systems are supported?',
+    a: 'Windows 10 (1809+) & Windows 11 (x64 and Snapdragon ARM64), plus macOS 15+ Sequoia (Apple Silicon and Intel). Windows builds bundle .NET 10 LTS, while macOS is 100% native Swift 6 and AppKit.',
+  },
+  {
+    q: 'How does DockHub work on macOS?',
+    a: 'On macOS, DockHub runs as a high-performance floating AppKit panel with SwiftUI views. It can run as an auxiliary companion dock or automatically conceal the native macOS Dock while active (configurable in Settings › General).',
   },
   {
     q: 'Does it launch automatically on startup?',

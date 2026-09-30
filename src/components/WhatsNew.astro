@@ -8,34 +8,63 @@ import { site } from '../lib/site';
 <section class="section" id="new">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="pill-new">New in v0.8 and v0.9</span>
-      <h2 class="section-title">More taskbar than ever.</h2>
+      <span class="pill-new">DockHub 1.0 Milestone</span>
+      <h2 class="section-title">Native macOS support &amp; desktop parity.</h2>
       <p class="section-lead">
-        Maximized windows stop at the dock, the tray shows your keyboard language, microphone and notifications, and a quick launcher is one
-        shortcut away. Plus new widgets, profiles that switch by themselves, web widgets from a link, far more devices in Device batteries and
-        widgets on every display.
+        DockHub 1.0 marks a major milestone: full cross-platform parity between Windows 10/11 (.NET 10) and macOS 15 Sequoia (Swift 6).
+        Experience native floating panels, Web Widgets SDK 1.0, 30+ built-in interactive widgets, automated crash safety, and shared configuration.
       </p>
     </div>
 
     <div class="news">
       <article class="nw nw-wide reveal">
         <div class="nw-art" aria-hidden="true">
-          <div class="mock-ql">
-            <div class="ql-box"><span class="ql-s" set:html={icons.search} /><span>term</span><i class="ql-caret"></i></div>
-            <div class="ql-r on"><span class="ql-i" set:html={appIcons.terminal} /><span><b>Terminal</b><small>App</small></span></div>
-            <div class="ql-r"><span class="ql-i ql-d" set:html={icons.settings} /><span><b>Turn on auto-hide</b><small>DockHub command</small></span></div>
-            <div class="ql-r"><span class="ql-i ql-d" set:html={icons.copy} /><span><b>= 30</b><small>200*15% · Enter copies</small></span></div>
-          </div>
-          <div class="keys-row">
-            <kbd class="k k-win" set:html={icons.windows} /><span class="k-plus">+</span><kbd class="k">Alt</kbd><span class="k-plus">+</span><kbd class="k">Space</kbd>
+          <div class="mock-mac">
+            <div class="mac-header">
+              <span class="mac-dots"><i class="md-r"></i><i class="md-y"></i><i class="md-g"></i></span>
+              <span class="mac-title">macOS 15 Sequoia · Swift 6</span>
+            </div>
+            <div class="mac-dock-preview">
+              <span class="mdp-item" set:html={appIcons.browser} />
+              <span class="mdp-item" set:html={appIcons.terminal} />
+              <span class="mdp-item" set:html={appIcons.music} />
+              <span class="mdp-sep"></span>
+              <span class="mdp-w"><i style="--c:var(--c-blue)"></i>Calendar</span>
+              <span class="mdp-w"><i style="--c:var(--c-green)"></i>AirDrop</span>
+              <span class="mdp-w"><i style="--c:var(--c-orange)"></i>Shortcuts</span>
+            </div>
+            <div class="mac-badges">
+              <span>AppKit &amp; SwiftUI</span>
+              <span>Dock Concealment</span>
+              <span>Zero Admin</span>
+            </div>
           </div>
         </div>
         <div class="nw-copy">
-          <h3>A quick launcher, Spotlight style.</h3>
+          <h3>Built from the ground up for macOS.</h3>
           <p>
-            Type to find apps, open windows, DockHub and Windows settings, recent files and dock commands. It does quick math too, and anything
-            else is one Enter away from a web search. Open it with Win + Alt + Space, or make the search button open it. Try the search button in
-            the demo above.
+            Native Swift 6 architecture with strict concurrency, AppKit floating panels, and smooth spring animations.
+            DockHub can accompany the macOS dock or automatically conceal it while active. Includes Mac-tailored widgets like
+            Calendar with 1-click meeting join, AirDrop, Apple Shortcuts, and Bluetooth battery monitoring.
+            Special thanks to <a href="https://github.com/farukolmez22" target="_blank" rel="noopener">@farukolmez22</a> for contributions and testing.
+          </p>
+        </div>
+      </article>
+
+      <article class="nw nw-wide reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-link">
+            <span class="ml-url">github.com/you/widgets/tree/main/pomodoro</span>
+            <span class="mt-btn">Install</span>
+          </div>
+          <div class="mock-auto">SDK 1.0 · API v2 · <b>Featured Community Widgets</b></div>
+        </div>
+        <div class="nw-copy">
+          <h3>Web widgets &amp; SDK 1.0.</h3>
+          <p>
+            Build custom desktop widgets with standard HTML, CSS, and modern JavaScript without writing C# or Swift.
+            Runs on WebView2 (Windows) and WKWebView (macOS) with safe network sandboxing, theme synchronization, and 1-click installation from GitHub or .dockwidget packages.{' '}
+            <a href={site.sdkUrl} target="_blank" rel="noopener">SDK guide ›</a>
           </p>
         </div>
       </article>
@@ -49,25 +78,45 @@ import { site } from '../lib/site';
           </div>
         </div>
         <div class="nw-copy">
-          <h3>Maximized windows stop at the dock.</h3>
-          <p>Just like the Windows taskbar, at every display scaling and on every screen with a dock. DockHub checks it after display and Explorer changes and repairs it by itself.</p>
+          <h3>Upgraded to .NET 10 LTS.</h3>
+          <p>Windows core upgraded to Microsoft .NET 10 LTS (supported through 2028). Built-in crash protection restarts the dock seamlessly; in any failure, the original Windows taskbar instantly returns with zero system alteration.</p>
         </div>
       </article>
 
       <article class="nw reveal">
         <div class="nw-art" aria-hidden="true">
-          <div class="mock-tray">
-            <span class="tr-ic tr-lang">TUR</span>
-            <span class="tr-ic tr-mic" set:html={icons.mic} />
-            <span class="tr-ic" set:html={icons.wifi} />
-            <span class="tr-ic" set:html={icons.volume} />
-            <span class="tr-clock">10:24<b>2</b></span>
-            <span class="tr-tip">Microphone: on<small>In use by Teams · click to mute</small></span>
+          <div class="mock-widgets">
+            <span style="--c:var(--c-orange)">Claude Code</span>
+            <span style="--c:var(--c-green)">OpenAI Codex</span>
+            <span style="--c:var(--c-blue)">Gemini CLI</span>
+            <span style="--c:var(--c-yellow)">Todoist</span>
+            <span style="--c:var(--c-pink)">Battery Gear</span>
+            <span style="--c:var(--c-green)">GPU &amp; Ping</span>
           </div>
         </div>
         <div class="nw-copy">
-          <h3>A smarter tray.</h3>
-          <p>Keyboard language (click or scroll to switch), a microphone icon you can click to mute, the number of waiting notifications and a moon while Do Not Disturb is on.</p>
+          <h3>30+ widgets &amp; AI quotas.</h3>
+          <p>Live tracking for Claude Code (5-hour and weekly), OpenAI Codex, and Gemini CLI right on your dock. Plus battery monitoring for Bluetooth headsets, mice, Xbox/PlayStation controllers, and Logitech/Razer gear.</p>
+        </div>
+      </article>
+
+      <article class="nw reveal">
+        <div class="nw-art" aria-hidden="true">
+          <div class="mock-ql">
+            <div class="ql-box"><span class="ql-s" set:html={icons.search} /><span>term</span><i class="ql-caret"></i></div>
+            <div class="ql-r on"><span class="ql-i" set:html={appIcons.terminal} /><span><b>Terminal</b><small>App</small></span></div>
+            <div class="ql-r"><span class="ql-i ql-d" set:html={icons.settings} /><span><b>Turn on auto-hide</b><small>DockHub command</small></span></div>
+            <div class="ql-r"><span class="ql-i ql-d" set:html={icons.copy} /><span><b>= 30</b><small>200*15% · Enter copies</small></span></div>
+          </div>
+          <div class="keys-row">
+            <kbd class="k k-win" set:html={icons.windows} /><span class="k-plus">+</span><kbd class="k">Alt</kbd><span class="k-plus">+</span><kbd class="k">Space</kbd>
+          </div>
+        </div>
+        <div class="nw-copy">
+          <h3>Quick launcher, Spotlight style.</h3>
+          <p>
+            Type to find apps, open windows, DockHub and system settings, recent files, and dock commands. It does quick math, unit and currency conversions, or searches the web on Enter. Open it with Win + Alt + Space (or ⌘⌥Space).
+          </p>
         </div>
       </article>
 
@@ -84,76 +133,28 @@ import { site } from '../lib/site';
           </div>
         </div>
         <div class="nw-copy">
-          <h3>Profiles that switch by themselves.</h3>
+          <h3>Profiles that switch automatically.</h3>
           <p>Bring in your gaming dock while a game runs, or your work dock during office hours. When the app closes or the hours end, DockHub goes back.</p>
-        </div>
-      </article>
-
-      <article class="nw reveal">
-        <div class="nw-art" aria-hidden="true">
-          <div class="mock-widgets">
-            <span style="--c:var(--c-green)">GPU</span>
-            <span style="--c:var(--c-yellow)">Brightness</span>
-            <span style="--c:var(--c-blue)">Wi-Fi &amp; Bluetooth</span>
-            <span style="--c:var(--c-pink)">Screenshot</span>
-            <span style="--c:var(--c-green)">To do · Todoist</span>
-            <span style="--c:var(--c-orange)">Codex &amp; Gemini usage</span>
-          </div>
-        </div>
-        <div class="nw-copy">
-          <h3>Five new widgets.</h3>
-          <p>GPU load, screen brightness and night light, Wi-Fi and Bluetooth switches, one-click screenshots and today's tasks. AI usage now also tracks OpenAI Codex and Gemini CLI.</p>
-        </div>
-      </article>
-
-      <article class="nw reveal">
-        <div class="nw-art" aria-hidden="true">
-          <div class="mock-peek">
-            <div class="pk-thumb"><i></i><span>Report.docx</span></div>
-            <div class="pk-thumb on"><i></i><span>Music</span><b set:html={icons.pause} /></div>
-          </div>
-          <div class="mock-auto">Rest to peek · scroll to cycle · play/pause</div>
-        </div>
-        <div class="nw-copy">
-          <h3>Livelier previews.</h3>
-          <p>Icons bounce while an app starts. In previews, rest on a thumbnail to peek at that window, scroll to cycle through windows, and pause music right there.</p>
-        </div>
-      </article>
-
-      <article class="nw nw-wide reveal">
-        <div class="nw-art" aria-hidden="true">
-          <div class="mock-link">
-            <span class="ml-url">github.com/you/widgets/tree/main/pomodoro</span>
-            <span class="mt-btn">Install</span>
-          </div>
-          <div class="mock-auto">Featured: <b>GitHub pull requests</b></div>
-        </div>
-        <div class="nw-copy">
-          <h3>Web widgets from a link.</h3>
-          <p>
-            Paste a manifest.json, a .dockwidget file or a GitHub folder link. You see the permissions first. Featured widgets install in one click.{' '}
-            <a href={site.sdkUrl} target="_blank" rel="noopener">SDK guide</a>.
-          </p>
         </div>
       </article>
 
       <article class="nw nw-full nw-fixes reveal">
         <div class="nw-copy">
-          <h3>And in v0.9.</h3>
-          <p>More devices, more displays, more languages, and v{site.version} fixes what you reported.</p>
+          <h3>Complete cross-platform parity in v1.0.</h3>
+          <p>Every feature refined, tested, and aligned across Windows and macOS.</p>
         </div>
         <ul class="fixes">
-          <li><span class="fx-ok" set:html={icons.check} /><span><b>Device batteries for far more gear.</b> Xbox and PlayStation controllers, Logitech, Razer, SteelSeries Arctis 7 and LAMZU mice, with a low battery warning.</span></li>
-          <li><span class="fx-ok" set:html={icons.check} /><span><b>Widgets on every display.</b> Put any widget on the dock of any screen.</span></li>
-          <li><span class="fx-ok" set:html={icons.check} /><span><b>German and Spanish</b> next to English and Turkish.</span></li>
-          <li><span class="fx-ok" set:html={icons.check} /><span><b>Steadier, sharper, clearer.</b> Changing the design no longer moves your dock. v0.9.2 stops it closing by itself, sharpens icons on high-DPI screens and adds a Transparent backdrop for PCs where blur shows black.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Unified config.json.</b> Shared settings schema between Windows and macOS with automatic daily backups and instant Undo (Ctrl+Z / ⌘Z).</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Four languages.</b> Complete interface localization in English, Turkish, German, and Spanish.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Multi-monitor docks.</b> Put independent floating docks on every connected screen with per-monitor DPI scaling.</span></li>
+          <li><span class="fx-ok" set:html={icons.check} /><span><b>Zero administrator privileges.</b> 100% safe user space execution. Explorer and Finder are never modified or injected.</span></li>
         </ul>
       </article>
     </div>
 
     <p class="news-more reveal">
       <a class="btn btn-quiet" href={site.releaseUrl} target="_blank" rel="noopener">
-        Full release notes<span class="btn-ic" set:html={icons.arrowRight} />
+        Full v1.0.0 release notes<span class="btn-ic" set:html={icons.arrowRight} />
       </a>
     </p>
   </div>
@@ -262,6 +263,93 @@ import { site } from '../lib/site';
     font-weight: 600;
     color: var(--accent-ink);
     background: var(--accent);
+  }
+
+  /* macos mock */
+  .mock-mac {
+    display: grid;
+    gap: 12px;
+    width: min(100%, 360px);
+    padding: 12px;
+    border-radius: 14px;
+    background: rgb(28 30 38 / 0.94);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 16px 32px -12px rgb(0 0 0 / 0.7);
+  }
+  .mac-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 4px;
+  }
+  .mac-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .mac-dots i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .md-r { background: #ff5f56; }
+  .md-y { background: #ffbd2e; }
+  .md-g { background: #27c93f; }
+  .mac-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.02em;
+  }
+  .mac-dock-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+  .mdp-item {
+    width: 22px;
+    height: 22px;
+    display: grid;
+  }
+  .mdp-item :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  .mdp-sep {
+    width: 1px;
+    height: 18px;
+    background: rgb(255 255 255 / 0.2);
+  }
+  .mdp-w {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 550;
+    color: var(--text-2);
+  }
+  .mdp-w i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  .mac-badges {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .mac-badges span {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-3);
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.04);
   }
 
   /* profiles */
